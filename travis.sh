@@ -35,8 +35,10 @@
 ## This is a "common" script that can be run on travis CI at a downstream github repository.
 ## 
 ## Input
-##  .travis.rosintall: A .rosintall file that's used to download the resource of the dependended packages that need to be built from source.
-## 
+##   - .travis.rosintall: A .rosintall file that's used to download the resource of the dependended packages that need to be built from source.
+##   - $ROS_DISTRO: Name of ROS distro in lower characters (e.g. indigo).
+##   - (optional) $ROS_REPOSITORY_PATH: URL of ROS deb file repository where ROS binary packages are to be downloaded from.
+##   - (optional) $USE_DEB: boolean to designate whether use binary or source of specific depended package(s)
 
 set -x
 
