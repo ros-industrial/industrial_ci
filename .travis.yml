@@ -1,0 +1,38 @@
+#   This .travis.yml works to check "this" repository, namely `industrial_ci`. Do not get confused with the check of "client" repositories (repos that use travis configs in this repo).
+
+#  Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
+
+sudo: required
+dist: trusty
+# Force travis to use its minimal image with default Python settings
+language: generic
+compiler:
+  - gcc
+#notifications:
+#  Whoever receives success and/or failure via email
+env:
+  matrix:
+#    - ROS_DISTRO=hydro AFTER_INSTALL=""
+#    - ROS_DISTRO=hydro USE_CATKIN_MAKE=true BEFORE_SCRIPT="pwd; git clone http://github.com/jsk-ros-pkg/jsk_common_msgs" NOT_TEST_INSTALL=true
+#    - ROS_DISTRO=hydro AFTER_INSTALL="" TEST_PKGS=" "
+#    - ROS_DISTRO=hydro AFTER_INSTALL="" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
+#    - ROS_DISTRO=hydro AFTER_INSTALL="mongodb-clients"
+#    - ROS_DISTRO=hydro BEFORE_SCRIPT="pwd; git clone https://github.com/ros-industrial/industrial_core"
+    - ROS_DISTRO=indigo BUILDER='not-compile'
+    - ROS_DISTRO=indigo BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci
+    - ROS_DISTRO=indigo BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci TRAVIS_BRANCH=master TRAVIS_COMMIT=''  TRAVIS_PULL_REQUEST=''
+matrix:
+  allow_failures:
+    - env: ROS_DISTRO=jade BUILDER='not-compile'
+    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci
+    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci TRAVIS_BRANCH=master TRAVIS_COMMIT=''  TRAVIS_PULL_REQUEST=''
+before_script:
+  - CI_DIR=.ci_config
+  - mkdir $CI_DIR; cp * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories
+  - export BEFORE_SCRIPT="rm -fr common_travis/CATKIN_IGNORE; ${BEFORE_SCRIPT}"
+  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin build -i -v --limit-status-rate 0.001@catkin_make@' $CI_DIR/travis.sh; fi
+  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
+  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
+script:
+  - source $CI_DIR/travis.sh
+  - if [ "${AFTER_INSTALL}" != "" ] ; then sudo apt-get install -f ${AFTER_INSTALL}; fi
