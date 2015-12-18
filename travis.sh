@@ -105,7 +105,7 @@ if [ $HAVE_MONGO_DB == 0 ]; then
     sudo apt-get install -q -qq -y mongodb-clients mongodb-server -o Dpkg::Options::="--force-confdef" || echo "ok"
 fi
 
-travis_time_end
+travis_time_end  # setup_ros
 travis_time_start setup_rosdep
 
 # Setup rosdep
@@ -115,7 +115,7 @@ sudo rosdep init
 ret_rosdep=1
 rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
-travis_time_end
+travis_time_end  # setup_rosdep
 travis_time_start setup_catkin
 
 ## BEGIN: travis' before_install: # Use this to prepare the system to install prerequisites or dependencies ##
@@ -123,7 +123,9 @@ travis_time_start setup_catkin
 sudo apt-get install -y -q -qq ros-$ROS_DISTRO-roslaunch
 (cd /opt/ros/$ROS_DISTRO/lib/python2.7/dist-packages; wget --no-check-certificate https://patch-diff.githubusercontent.com/raw/ros/ros_comm/pull/641.diff -O /tmp/641.diff; [ "$ROS_DISTRO" == "hydro" ] && sed -i s@items@iteritems@ /tmp/641.diff ; sudo patch -p4 < /tmp/641.diff)
 
-travis_time_end
+travis_time_end  # setup_catkin
+
+travis_time_start check_version_ros
 
 # Check ROS tool's version
 echo -e "\e[0KROS tool's version"
@@ -131,6 +133,8 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 rosversion roslaunch
 rosversion rospack
 apt-cache show python-rospkg | grep '^Version:' | awk '{print $2}'
+
+travis_time_end  # check_version_ros
 
 travis_time_start setup_rosws
 
@@ -165,7 +169,7 @@ if [ ! -e .rosinstall ]; then
     echo "- git: {local-name: $DOWNSTREAM_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
 fi
 
-travis_time_end
+travis_time_end  # setup_rosws
 
 travis_time_start before_script
 
@@ -173,7 +177,7 @@ travis_time_start before_script
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
 if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -c "${BEFORE_SCRIPT}"; fi
 
-travis_time_end
+travis_time_end  # before_script
 
 travis_time_start rosdep_install
 
@@ -182,7 +186,7 @@ if [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh ]; then
     ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh
 fi
 
-travis_time_end
+travis_time_end  # rosdep_install
 
 $ROSWS --version
 $ROSWS info -t .
@@ -197,7 +201,7 @@ if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_or
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS"); fi
 if [ "$BUILDER" == catkin ]; then catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
-travis_time_end
+travis_time_end  # catkin_build
 travis_time_start catkin_run_tests
 
 # Patches for rostest that are only available in newer codes.
@@ -214,7 +218,7 @@ if [ "$BUILDER" == catkin ]; then
     catkin_test_results build || error
 fi
 
-travis_time_end
+travis_time_end  # catkin_run_tests
 
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
@@ -230,7 +234,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack plugins --attrib=plugin nodelet
     fi
 
-    travis_time_end
+    travis_time_end  # catkin_install_build
     travis_time_start catkin_install_run_tests
 
     export EXIT_STATUS=0
@@ -253,7 +257,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
       [ $EXIT_STATUS -eq 0 ] || error  # unless all tests pass, raise error
     fi
 
-    travis_time_end
+    travis_time_end  # catkin_install_run_tests
 
 fi
 
@@ -267,7 +271,7 @@ if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --verbo
 if [ "$BUILDER" == catkin -a -e ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --verbose --all ~/.ros/test_results/ || error; fi
 
-travis_time_end
+travis_time_end  # after_script
 
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
 pwd
