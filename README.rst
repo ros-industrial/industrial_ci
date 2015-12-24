@@ -14,18 +14,35 @@ This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/
 What checks are enforced for the client repositories?
 -------------------------------------------------------------
 
-Some checked items:
+Things to be checked:
 
 * If your package builds.
 * If your built package goes into the `install` space.
-* If tests (if any) available pass the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
+* If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
+* If tests in designated downstream packages pass.
 
 Variables you can configure
-++++++++++++++++++++++++++++++++++++
+------------------------------------
 
-* OS to use. Defined at `dist` tag in `.travis.yml` in the client repo.
-* Location of ROS' binary repositories where depended packages get installed from (typically both standard repo and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_): defined as `ROS_REPOSITORY_PATH` variable in client repo.
-* Version of ROS (Indigo, Jade etc.). Defined as `ROS_DISTRO` variable in client repo.
+You can configure the behavior in `.travis.yml` in your client repository.
+
+* OS to use. Defined at `dist` tag.
+
+Required environment variables:
+
+* `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_)
+* `ROS_DISTRO`: Version of ROS (Indigo, Jade etc.).
+
+Optional environment variables:
+
+Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
+
+* `BUILDER`: Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
+* `NOT_TEST_INSTALL`: If you do NOT want to test `install` space, set this as true.
+* `PKGS_DOWNSTREAM`: Packages in downstream to be tested.
+* `ROS_PARALLEL_JOBS`: Maximum number of packages which could be built in parallel. See for more detail `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally.
+* `ROSWS`: Currently only `wstool` is available.
+* `USE_DEB`: (NOT Implemented yet) When this is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
 
 Usage
 ======
@@ -92,6 +109,53 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
     - source ./travis.sh
 
 2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
+
+(Optional) To use specific version of industrial_ci in your client repo
+-------------------------------------------------------------------------------------
+
+(A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version. The following is an example using `git submodule`.
+
+First time you define the dependency to this repo
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+1. Run git submodule command.
+
+::
+
+  CLIENTREPO_LOCAL$ git submodule add https://github.com/ros-industrial/industrial_ci .ci_config
+
+This standard `git submodule` command:
+
+* hooks up your client repository to this repo by the name "`.ci_config`" (this name is hardcoded and mandatory).
+* stores the configuration in a file called `.gitmodules`.
+
+2. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_USER).
+
+3. In `.travis.yml` file in your client repo, add the portion below:
+
+::
+
+  script: 
+    - source .ci_config/travis.sh
+    #- source ./travis.sh  # Optional. Explained later
+
+Also, the example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
+
+That's it.
+
+Apply the changes in this repo (industrial_ci) to the checking in client repos
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Maintainers of client repos are responsible for applying the changes that happen in this repos, if they want to use up-to-date checks; since `git submodule` does NOT provide features to automatically detect the changes made in the sub modules, maintainers need to keep an eye on the changes.
+
+1. Update the SHA key of the commit in this repo. The command below assumes that there's `.gitmodules` file that's generated by `git submodule add` command explained above.
+
+::
+
+  CLIENTREPO_LOCAL$ git submodule foreach git pull origin master
+
+2. Don't forget to commit the changes the command above makes.
+
 
 For maintainers of industrial_ci repository
 ================================================
