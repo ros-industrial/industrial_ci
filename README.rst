@@ -76,6 +76,12 @@ Apply the changes in this repo (industrial_ci) to the checking in client repos
 Nothing.
 Once you add `git clone` statement in your client repo, basically you don't need to do anything to apply the change in `industrial_ci` repository.
 
+Example client packages
+-------------------------------
+
+* `ros-industrial/industrial_core <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_
+* `ros-industrial-consortium/descartes <https://github.com/ros-industrial-consortium/descartes/blob/indigo-devel/.travis.yml>`_
+
 (Optional but recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
