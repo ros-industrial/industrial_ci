@@ -16,6 +16,7 @@ What are checked?
 
 List of the checked items, in the actual order to be run.
 
+0. Assume the following platform: Linux (Ubuntu 14.04/Trusty), `ROS <http://ros.org>`_.
 1. If your package builds.
 2. If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
 3. If your package gets installed (i.e. built artifact goes into the `install` space).
@@ -65,6 +66,25 @@ Note that some of these currently tied only to a single option, but we still lea
 * `USE_DEB`: (NOT Implemented yet) When this is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
+
+FAQ
+======
+
+- Q- This config can be used ONLY by the repositories under `github/ros-industrial <https://github.com/ros-industrial>`_ organization?
+
+  A- No. `industrial_ci` repo is open to public. Anyone can use this from any platform. Note that because as of Dec. 2015 it has only config for `Travis CI <https://travis-ci.org/>`_, you may want to use it where Travis CI is available (`github.com` works the best.
+
+- Q- What kind of checks are implemented that are specific to industrial robotics?
+
+  A- As of Dec. 2015, no particular configuration for industrial robot is defined.
+
+- Q- So, can the config be used against any robotics repository?
+
+  A- I'd say no. It's still limited for the projects based on `ROS <http://ros.org/>`_. And checks are run on Ubuntu linux.
+
+- Q- In my project there aren't yet test cases. Can I still have it checked using `industrial_ci` and what can I get out of the check?
+
+  A- The `industrial_ci` still provides valuable checks; it ensures if your package builds without issues. Also installation rules if you define. Just as a headsup that making test cases are highly recommended as your ear may hurt.
 
 Usage
 ======
