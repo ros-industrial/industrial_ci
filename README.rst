@@ -11,15 +11,28 @@ This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/
 
 (As of November 2015) The CI config in this repository is intended to be used by the client repos by `git submodule` feature. This repo provides configuration for `travis CI`. In client repos you can define custom, repository-specific checks, in addition to the generic config stored in this repo.
 
-What checks are enforced for the client repositories?
--------------------------------------------------------------
+What are checked?
+------------------------------------
 
-Things to be checked:
+List of the checked items, in the actual order to be run.
 
-* If your package builds.
-* If your built package goes into the `install` space.
-* If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
-* If tests in designated downstream packages pass.
+1. If your package builds.
+2. If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
+3. If your package gets installed (i.e. built artifact goes into the `install` space).
+4. If tests in designated downstream packages pass.
+
+Your client repository does NOT need to pass all of above steps; in fact you can have only some of them tested. To pass the steps without having tested, simply "empty" them. For instance, in your client repository:
+
+* Step 2 will be skipped when no test files are present.
+* Step 3 will be skipped when no installation rule is defined.
+* Step 4 will be skipped when no downstream packages to be tested are defined.
+
+Example client packages
+-------------------------------
+
+* `ros-industrial/industrial_core <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_
+* `ros-industrial-consortium/descartes <https://github.com/ros-industrial-consortium/descartes/blob/indigo-devel/.travis.yml>`_
+
 
 Variables you can configure
 ------------------------------------
@@ -33,16 +46,25 @@ Required environment variables:
 * `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_)
 * `ROS_DISTRO`: Version of ROS (Indigo, Jade etc.).
 
-Optional environment variables:
+Optional environment variables
+++++++++++++++++++++++++++++++++
 
 Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
 
-* `BUILDER`: Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
-* `NOT_TEST_INSTALL`: If you do NOT want to test `install` space, set this as true.
-* `PKGS_DOWNSTREAM`: Packages in downstream to be tested.
-* `ROS_PARALLEL_JOBS`: Maximum number of packages which could be built in parallel. See for more detail `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally.
-* `ROSWS`: Currently only `wstool` is available.
+* `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
+* `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
+* `BUILD_PKGS` (default: not set): `PKGS_DOWNSTREAM` will be filled with packages specified with this. Also these packages are to be built when `NOT_TEST_INSTALL` is set.
+* `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
+* `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
+* `NOT_TEST_INSTALL` (default: not set): If you do NOT want to test `install` space, set this as true.
+* `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
+* `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages which could be built in parallel. See for more detail `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally.
+* `ROS_PARALLEL_TEST_JOBS` (default: not set): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
+* `ROSWS` (default: wstool): Currently only `wstool` is available.
+* `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
 * `USE_DEB`: (NOT Implemented yet) When this is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
+
+Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
 Usage
 ======
@@ -75,12 +97,6 @@ Apply the changes in this repo (industrial_ci) to the checking in client repos
 
 Nothing.
 Once you add `git clone` statement in your client repo, basically you don't need to do anything to apply the change in `industrial_ci` repository.
-
-Example client packages
--------------------------------
-
-* `ros-industrial/industrial_core <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_
-* `ros-industrial-consortium/descartes <https://github.com/ros-industrial-consortium/descartes/blob/indigo-devel/.travis.yml>`_
 
 (Optional but recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
