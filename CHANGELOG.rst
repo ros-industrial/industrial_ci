@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2016-01-05)
+------------------
 * [feat] Better variable name for downstream pkgs
 * [doc] Many improvements including replacing "git submodule" with "git clone"
 * [enhance] Output enhancement and cleanup
