@@ -114,7 +114,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * `BUILD_PKGS` (default: not set): `PKGS_DOWNSTREAM` will be filled with packages specified with this. Also these packages are to be built when `NOT_TEST_INSTALL` is set.
 * `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
-* `NOT_TEST_INSTALL` (default: not set): If you do NOT want to test `install` space, set this as true.
+* `NOT_TEST_BUILD` (default: not set): If true, tests in build space won't be run.
+* `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages which could be built in parallel. See for more detail `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally.
 * `ROS_PARALLEL_TEST_JOBS` (default: not set): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
