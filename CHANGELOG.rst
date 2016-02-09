@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2016-02-08)
+------------------
 * [fix] Move a patch that becomes available via DEB to older ROS distro only section (`#20 <https://github.com/ros-industrial/industrial_ci/issues/20>`_)
 * [feat] Add option to not test (`#16 <https://github.com/ros-industrial/industrial_ci/issues/16>`_)
 * Contributors: Isaac I.Y. Saito, Gijs van der Hoorn
