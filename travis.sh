@@ -65,6 +65,7 @@ function error {
 }
 
 BUILDER=catkin
+BUILDER_CMI=catkin_make_isolated
 ROSWS=wstool
 CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
 
@@ -195,7 +196,11 @@ source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting enviro
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${CI_SOURCE_PATH} --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS"); fi
-if [ "$BUILDER" == catkin ]; then catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
+if [ "$BUILDER" == catkin ]; then
+    catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ;
+elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
+    catkin_make_isolated $BUILD_PKGS $CATKIN_PARALLEL_JOBS;
+fi
 
 travis_time_end  # catkin_build
 
@@ -214,6 +219,10 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
         catkin run_tests -iv --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results build || error
+    elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
+        source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
+        catkin_make_isolated --catkin-make-args run_tests $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS
+        catkin_test_results build || error
     fi
     
     travis_time_end  # catkin_run_tests
@@ -231,6 +240,12 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         source install/setup.bash
         rospack profile
         rospack plugins --attrib=plugin nodelet
+    elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
+        rm -fr build devel
+        catkin_make_isolated $BUILD_PKGS $CATKIN_PARALLEL_JOBS
+        source install_isolated/setup.bash
+        rospack profile
+        rospack plugins --attrib=plugin nodelet
     fi
 
     travis_time_end  # catkin_install_build
@@ -238,10 +253,14 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
     export EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
-    if [ "$BUILDER" == catkin ]; then
+    if [ "$BUILDER" == catkin ] || [ "$BUILDER" == "$BUILDER_CMI" ]; then
+      if [ "$BUILDER" == catkin ]; then DIR_INSTALLSPACE=install;
+      elif [ "$BUILDER" == "$BUILDER_CMI" ]; then DIR_INSTALLSPACE=install_isolated;
+      fi
+
       for pkg in $PKGS_DOWNSTREAM; do
         echo "[$pkg] Started testing..."
-        rostest_files=$(find install/share/$pkg -iname '*.test')
+        rostest_files=$(find $DIR_INSTALLSPACE/share/$pkg -iname '*.test')
         echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
@@ -266,9 +285,11 @@ travis_time_start after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
 PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
-if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --verbose --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ || error; fi
-if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --verbose --all ~/.ros/test_results/ || error; fi
+if [ "$BUILDER" == catkin ] || [ "$BUILDER" == "$BUILDER_CMI" ]; then
+    if [ -e $ROS_LOG_DIR ]; then catkin_test_results --verbose --all $ROS_LOG_DIR || error; fi
+    if [ -e ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ || error; fi
+    if [ -e ~/.ros/test_results/ ]; then catkin_test_results --verbose --all ~/.ros/test_results/ || error; fi
+fi
 
 travis_time_end  # after_script
 

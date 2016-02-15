@@ -11,6 +11,8 @@ This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/
 
 (As of December 2015) The CI config in this repository is intended to be used by the client repos by `git clone` feature. This repo provides configuration for `Travis CI`. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
+(As of Feb 2016) Checks run using `catkin_tools <https://catkin-tools.readthedocs.org>`_ by default. You can alternatively switch to `catkin_make_isolated <http://www.ros.org/reps/rep-0134.html>`_ (but not recommended unless you're trying to workaround issues that only happen with catkin_tools (`an example <https://github.com/ros-industrial/industrial_ci/issues/21#issuecomment-182304882>`_).
+
 FAQ
 ======
 
@@ -107,12 +109,12 @@ Required environment variables:
 Optional environment variables
 ++++++++++++++++++++++++++++++++
 
-Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
+Note that with `BUILDER` option, you can switch the building tool, and a lot of the variables below are primarilly made available for the default builder `catkin_tools`.
 
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
 * `BUILD_PKGS` (default: not set): `PKGS_DOWNSTREAM` will be filled with packages specified with this. Also these packages are to be built when `NOT_TEST_INSTALL` is set.
-* `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
+* `BUILDER` (default: catkin): available options [ `catkin`, `catkin_make_isolated` ]. With `catkin` set, `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_.
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
