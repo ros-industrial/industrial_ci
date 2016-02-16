@@ -86,6 +86,9 @@ if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PAR
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"; fi
 echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
+if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".rosinstall.travis"; fi
+if [ ! "$USE_DEB" ]; then export USE_DEB="true"; fi
+
 # Set apt repo
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 # Common ROS install preparation
@@ -141,19 +144,19 @@ mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 # When USE_DEB is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
 ### Currently disabled
-###if [ "$USE_DEB" == false ]; then
-###    $ROSWS init .
-###    if [ -e $CI_SOURCE_PATH/.travis.rosinstall ]; then
-###        # install (maybe unreleased version) dependencies from source
-###        $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall
-###    fi
-###    if [ -e $CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO ]; then
-###        # install (maybe unreleased version) dependencies from source for specific ros version
-###        $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO
-###    fi
-###    $ROSWS update
-###    $ROSWS set $DOWNSTREAM_REPO_NAME http://github.com/$TRAVIS_REPO_SLUG --git -y
-###fi
+if [ "$USE_DEB" == false ]; then
+    $ROSWS init .
+    if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME ]; then
+        # install (maybe unreleased version) dependencies from source
+        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME
+    fi
+    if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
+        # install (maybe unreleased version) dependencies from source for specific ros version
+        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
+    fi
+    $ROSWS update
+    $ROSWS set $DOWNSTREAM_REPO_NAME http://github.com/$TRAVIS_REPO_SLUG --git -y
+fi
 # CI_SOURCE_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
 ln -s $CI_SOURCE_PATH .
 ####if [ "$USE_DEB" == source -a -e $DOWNSTREAM_REPO_NAME/setup_upstream.sh ]; then $ROSWS init .; $DOWNSTREAM_REPO_NAME/setup_upstream.sh -w ~/ros/ws_$DOWNSTREAM_REPO_NAME ; $ROSWS update; fi
@@ -242,7 +245,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack plugins --attrib=plugin nodelet
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
         rm -fr build devel
-        catkin_make_isolated $BUILD_PKGS $CATKIN_PARALLEL_JOBS
+        catkin_make_isolated --install $BUILD_PKGS $CATKIN_PARALLEL_JOBS
         source install_isolated/setup.bash
         rospack profile
         rospack plugins --attrib=plugin nodelet

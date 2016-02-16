@@ -1,0 +1,6 @@
+- git:
+    uri: https://github.com/ros-industrial/industrial_core.git
+    local-name: ros-industrial/industrial_core
+- git:  # Better entry needed than ros_tutorials.
+    uri: https://github.com/ros/ros_tutorials.git
+    local-name: ros/ros_tutorials
