@@ -64,10 +64,10 @@ function error {
     exit 1
 }
 
-${BUILDER:=catkin}
+BUILDER=${BUILDER:=catkin}
 BUILDER_CMI=catkin_make_isolated
-ROSWS=wstool
-CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+ROSWS=${ROSWS:=wstool}
+CI_PARENT_DIR=${CI_PARENT_DIR:=.ci_config}  # This is the folder name that is used in downstream repositories in order to point to this repo.
 
 trap error ERR
 
