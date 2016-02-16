@@ -189,7 +189,7 @@ $ROSWS --version
 $ROSWS info -t .
 cd ../
 
-travis_time_start catkin_build
+travis_time_start build
 
 ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
@@ -199,13 +199,13 @@ if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_
 if [ "$BUILDER" == catkin ]; then
     catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ;
 elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
-    catkin_make_isolated $BUILD_PKGS $CATKIN_PARALLEL_JOBS;
+    catkin_make_isolated --merge $BUILD_PKGS $CATKIN_PARALLEL_JOBS;
 fi
 
-travis_time_end  # catkin_build
+travis_time_end  # build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
-    travis_time_start catkin_run_tests
+    travis_time_start run_tests
     
     # Patches for rostest that are only available in newer codes.
     # Some are already available via DEBs so that patches for them are not needed, but because EOLed distros (e.g. Hydro) where those patches are not released into may be still tested, all known patches are applied here.
@@ -221,16 +221,16 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         catkin_test_results build || error
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
-        catkin_make_isolated --catkin-make-args run_tests $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS
+        catkin_make_isolated --merge --catkin-make-args run_tests $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS
         catkin_test_results build || error
     fi
     
-    travis_time_end  # catkin_run_tests
+    travis_time_end  # run_tests
 fi
 
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
-    travis_time_start catkin_install_build
+    travis_time_start install_build
 
     # Test if the packages in the downstream repo build.
     if [ "$BUILDER" == catkin ]; then
@@ -248,8 +248,8 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack plugins --attrib=plugin nodelet
     fi
 
-    travis_time_end  # catkin_install_build
-    travis_time_start catkin_install_run_tests
+    travis_time_end  # install_build
+    travis_time_start install_run_tests
 
     export EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
@@ -275,7 +275,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
       [ $EXIT_STATUS -eq 0 ] || error  # unless all tests pass, raise error
     fi
 
-    travis_time_end  # catkin_install_run_tests
+    travis_time_end  # install_run_tests
 
 fi
 
