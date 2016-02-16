@@ -88,6 +88,7 @@ if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://package
 echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
 if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".rosinstall.travis"; fi
 if [ ! "$USE_DEB" ]; then export USE_DEB="true"; fi
+DIR_INSTALLSPACE=install;
 
 # Set apt repo
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -202,7 +203,7 @@ if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_
 if [ "$BUILDER" == catkin ]; then
     catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ;
 elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
-    catkin_make_isolated --merge $BUILD_PKGS $CATKIN_PARALLEL_JOBS;
+    catkin_make_isolated --merge $BUILD_PKGS $ROS_PARALLEL_JOBS;
 fi
 
 travis_time_end  # build
@@ -223,9 +224,9 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         catkin run_tests -iv --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results build || error
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
-        source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
-        catkin_make_isolated --merge --catkin-make-args run_tests $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS
-        catkin_test_results build || error
+        source devel_isolated/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
+        catkin_make_isolated --force-cmake --catkin-make-args run_tests $ROS_PARALLEL_TEST_JOBS
+        catkin_test_results build_isolated || error
     fi
     
     travis_time_end  # run_tests
@@ -244,9 +245,10 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack profile
         rospack plugins --attrib=plugin nodelet
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
+        $DIR_INSTALLSPACE=install_isolated
         rm -fr build devel
         catkin_make_isolated --install $BUILD_PKGS $CATKIN_PARALLEL_JOBS
-        source install_isolated/setup.bash
+        source $DIR_INSTALLSPACE/setup.bash
         rospack profile
         rospack plugins --attrib=plugin nodelet
     fi
@@ -257,10 +259,6 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     export EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
     if [ "$BUILDER" == catkin ] || [ "$BUILDER" == "$BUILDER_CMI" ]; then
-      if [ "$BUILDER" == catkin ]; then DIR_INSTALLSPACE=install;
-      elif [ "$BUILDER" == "$BUILDER_CMI" ]; then DIR_INSTALLSPACE=install_isolated;
-      fi
-
       for pkg in $PKGS_DOWNSTREAM; do
         echo "[$pkg] Started testing..."
         rostest_files=$(find $DIR_INSTALLSPACE/share/$pkg -iname '*.test')
