@@ -225,7 +225,7 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         catkin_test_results build || error
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
         source devel_isolated/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
-        catkin_make_isolated --force-cmake --catkin-make-args run_tests $ROS_PARALLEL_TEST_JOBS
+        catkin_make_isolated --merge --force-cmake --catkin-make-args run_tests $ROS_PARALLEL_TEST_JOBS
         catkin_test_results build_isolated || error
     fi
     
@@ -245,9 +245,8 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack profile
         rospack plugins --attrib=plugin nodelet
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
-        $DIR_INSTALLSPACE=install_isolated
         rm -fr build devel
-        catkin_make_isolated --install $BUILD_PKGS $CATKIN_PARALLEL_JOBS
+        catkin_make_isolated --install --install-space $DIR_INSTALLSPACE $BUILD_PKGS $CATKIN_PARALLEL_JOBS
         source $DIR_INSTALLSPACE/setup.bash
         rospack profile
         rospack plugins --attrib=plugin nodelet
