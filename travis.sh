@@ -246,7 +246,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack plugins --attrib=plugin nodelet
     elif [ "$BUILDER" == "$BUILDER_CMI" ]; then
         rm -fr build devel
-        catkin_make_isolated --install --install-space $DIR_INSTALLSPACE $BUILD_PKGS $CATKIN_PARALLEL_JOBS
+        catkin_make_isolated --install --install-space $DIR_INSTALLSPACE $BUILD_PKGS $ROS_PARALLEL_JOBS
         source $DIR_INSTALLSPACE/setup.bash
         rospack profile
         rospack plugins --attrib=plugin nodelet
