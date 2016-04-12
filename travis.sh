@@ -64,6 +64,9 @@ function error {
     exit 1
 }
 
+CHARCOLOR_YELLOW='\033[1;33m'
+CHARCOLOR_NOCOLOR='\033[0m'
+
 BUILDER=catkin
 ROSWS=wstool
 CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
@@ -230,7 +233,8 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         catkin build -i -v --summarize --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash
         rospack profile
-        rospack plugins --attrib=plugin nodelet
+        # 
+        rospack plugins --attrib=plugin nodelet || echo -e "${CHARCOLOR_YELLOW}No nodelet plugin found.${CHARCOLOR_NOCOLOR} If any of the software in your repository does not utilize nodelet, ignore this. ${CHARCOLOR_YELLOW}But if your software depends on nodelet but you're seeing this warning, something is wrong.${CHARCOLOR_NOCOLOR}"
     fi
 
     travis_time_end  # catkin_install_build
