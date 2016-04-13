@@ -230,7 +230,6 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         catkin build -i -v --summarize --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash
         rospack profile
-        rospack plugins --attrib=plugin nodelet
     fi
 
     travis_time_end  # catkin_install_build
