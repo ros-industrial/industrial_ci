@@ -2,6 +2,14 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] Temporarilly disable `rospack plugin` line (fixes `#26 <https://github.com/ros-industrial/industrial_ci/issues/26>`_). `#28 <https://github.com/ros-industrial/industrial_ci/issues/28>`_
+* [fix] missing an arg for specifying the number parallel job.
+* Fix undeclared args for the number parallel job `#22 <https://github.com/ros-industrial/industrial_ci/issues/22>`_
+* [doc] Clarify parallel job args.
+* Contributors: Isaac I.Y. Saito
+
 0.1.2 (2016-02-08)
 ------------------
 * [fix] Move a patch that becomes available via DEB to older ROS distro only section (`#20 <https://github.com/ros-industrial/industrial_ci/issues/20>`_)
