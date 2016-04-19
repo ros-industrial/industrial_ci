@@ -2,6 +2,11 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adjust to catkin_tools 0.4.0 `#31 <https://github.com/ros-industrial/industrial_ci/issues/31>`_
+* Contributors: Isaac I.Y. Saito
+
 0.1.3 (2016-04-14)
 ------------------
 * [fix] Temporarilly disable `rospack plugin` line (fixes `#26 <https://github.com/ros-industrial/industrial_ci/issues/26>`_). `#28 <https://github.com/ros-industrial/industrial_ci/issues/28>`_
