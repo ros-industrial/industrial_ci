@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2016-04-19)
+------------------
 * Adjust to catkin_tools 0.4.0 `#31 <https://github.com/ros-industrial/industrial_ci/issues/31>`_
 * Contributors: Isaac I.Y. Saito
 
