@@ -7,9 +7,15 @@ Continuous integration repository for ROS-Industrial
 Introduction
 ============
 
-This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization (calling them as "**client**" repos). ROS-powered repositories in other organizations can potentially utilize the CI config here too.
+This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-(As of December 2015) The CI config in this repository is intended to be used by the client repos by `git clone` feature. This repo provides configuration for `Travis CI`. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+
+Terminology
+----------------
+
+* **client repository**: The repositories that use the configuration stored in this repo to run CI jobs.
+* **downstream packages**: The software packages that depend on the package that's targetted to be tested using industrial_ci.
 
 FAQ
 ======
@@ -40,9 +46,9 @@ What are checked?
 List of the checked items, in the actual order to be run.
 
 1. If your package builds.
-2. If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
+2. If available tests in the given package pass. Because tests use software from `install` space, it is important that the building step ends without issues (otherwise the tests may not be reached).
 3. If your package gets installed (i.e. built artifact goes into the `install` space).
-4. If tests in designated downstream packages pass.
+4. If downstream packages are designated, the tests in those packages pass.
 
 Your client repository does NOT need to pass all of above steps; in fact you can have only some of them tested. To pass the steps without having tested, simply "empty" them. For instance, in your client repository:
 
@@ -115,12 +121,12 @@ Note that some of these currently tied only to a single option, but we still lea
 
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
-* `BUILD_PKGS` (default: not set): `PKGS_DOWNSTREAM` will be filled with packages specified with this. Also these packages are to be built when `NOT_TEST_INSTALL` is set.
+* `BUILD_PKGS_WHITELIST` (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
 * `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
-* `NOT_TEST_BUILD` (default: not set): If true, tests in build space won't be run.
+* `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
 * `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
 * `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
 * `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
