@@ -64,6 +64,12 @@ function error {
     exit 1
 }
 
+# Start prerelease, and once it finishs then finish this script too.
+if [ "$PRERELEASE" == true ]; then
+  ./ros_pre-release.sh;
+  exit;
+fi
+
 BUILDER=catkin
 ROSWS=wstool
 CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
