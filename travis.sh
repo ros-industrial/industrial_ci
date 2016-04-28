@@ -65,8 +65,8 @@ function error {
 }
 
 # Start prerelease, and once it finishs then finish this script too.
-if [ "$PRERELEASE" == true ]; then
-  ./ros_pre-release.sh;
+if [ "$PRERELEASE" == true && -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
+  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh
   exit;
 fi
 
