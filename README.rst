@@ -196,6 +196,52 @@ Maintainers of client repos are responsible for applying the changes that happen
 
 2. Don't forget to commit the changes the command above makes.
 
+(Optional) Run ROS Prerelease Test
+-------------------------------------------------------------------------------------
+
+Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. To do so, add a single line to your Travis config (eg. `.travis.yml`):
+
+::
+
+  ROS_DISTRO=indigo PRERELEASE=true
+
+Or with more configuration:
+
+::
+
+  ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+
+The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
+
+(Workaround) Prerelease Test check on Travis always passes
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+As of April 2016, because this check on Travis CI always passes regardless the result of Prerelease Test (due to the limitaiton discussed in `a pull request <https://github.com/ros-industrial/industrial_ci/pull/35#issuecomment-214678922>`_), you should not use this Prerelease Test-based check as a criteria for Travis CI check. 
+
+Recommended way is to put the line in `allow_failures` matrix. E.g.:
+
+::
+
+  :
+  matrix:
+    allow_failures:
+      - env: ROS_DISTRO=indigo PRERELEASE=true
+  :
+
+(Workaround) Don't want to always run Prerelease Test
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Running Prerelease Test may usually take longer than the tests commonly defined, which can result in longer time for the Travis check to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
+
+::
+
+  :
+  env:
+    matrix:
+      - ROS_DISTRO=indigo PRERELEASE=true
+  :
+
+Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
 
 For maintainers of industrial_ci repository
 ================================================
