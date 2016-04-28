@@ -37,32 +37,7 @@
 
 set -x
 
-function travis_time_start {
-    set +x
-    TRAVIS_START_TIME=$(date +%s%N)
-    TRAVIS_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-    TRAVIS_FOLD_NAME=$1
-    echo -e "\e[0Ktravis_fold:start:$TRAVIS_FOLD_NAME"
-    echo -e "\e[0Ktravis_time:start:$TRAVIS_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
-    set -x
-}
-
-function travis_time_end {
-    set +x
-    _COLOR=${1:-32}
-    TRAVIS_END_TIME=$(date +%s%N)
-    TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
-    echo -e "travis_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
-    echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${_COLOR}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${_COLOR}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
-    set -x
-}
-
-function error {
-    travis_time_end 31
-    trap - ERR
-    exit 1
-}
+source ./util.sh
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true && -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
