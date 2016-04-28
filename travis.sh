@@ -42,11 +42,13 @@ source ./util.sh
 export CI_SOURCE_PATH=$(pwd)
 CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
 
+travis_time_start prerelease_from_travis_sh
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
   ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh
   catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
 fi
+travis_time_end  # prerelease_from_travis_sh
 
 BUILDER=catkin
 ROSWS=wstool

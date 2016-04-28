@@ -44,6 +44,7 @@ function travis_time_start {
 
 function travis_time_end {
     set +x
+    if [ -z $TRAVIS_START_TIME ]; then echo '[travis_time_end] var TRAVIS_START_TIME is not set. You need to call `travis_time_start` in advance. Rerutning.'; return; fi
     _COLOR=${1:-32}
     TRAVIS_END_TIME=$(date +%s%N)
     TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
