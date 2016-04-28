@@ -36,7 +36,7 @@ set -x
 source ./util.sh
 
 if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="1"; fi
-if [ ! "$PRERELEASE_REPONAME" ]; then NAME_REPO=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 1); fi
+if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 1); fi
 echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"
 
 travis_time_start setup_docker
