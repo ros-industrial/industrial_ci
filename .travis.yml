@@ -20,14 +20,12 @@ env:
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
     - ROS_DISTRO=indigo PRERELEASE=true
     - ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+    - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1
 matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo PRERELEASE=true
     - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
-    - env: ROS_DISTRO=jade PRERELEASE=true PRERELEASE_REPONAME=moveit_msgs PRERELEASE_DOWNSTREAM_DEPTH=1
-    - env: ROS_DISTRO=jade BUILDER='not-compile'
-    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci
-    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci TRAVIS_BRANCH=master TRAVIS_COMMIT=''  TRAVIS_PULL_REQUEST=''
+    - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1
 before_script:
   - CI_DIR=.ci_config
   - mkdir $CI_DIR; cp * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories

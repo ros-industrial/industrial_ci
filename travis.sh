@@ -39,15 +39,17 @@ set -x
 
 source ./util.sh
 
+export CI_SOURCE_PATH=$(pwd)
+CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+
 # Start prerelease, and once it finishs then finish this script too.
-if [ "$PRERELEASE" == true && -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
+if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
   ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh
-  catkin_test_results build || error
+  catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
 fi
 
 BUILDER=catkin
 ROSWS=wstool
-CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
 
 trap error ERR
 
@@ -57,7 +59,6 @@ if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`g
 travis_time_start setup_ros
 
 # Define some config vars
-export CI_SOURCE_PATH=$(pwd)
 export DOWNSTREAM_REPO_NAME=${PWD##*/}
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
