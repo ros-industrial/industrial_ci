@@ -61,6 +61,8 @@ travis_time_start run_prerelease
 
 ./prerelease.sh;
 
+catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+
 travis_time_end  # run_prerelease
 
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
