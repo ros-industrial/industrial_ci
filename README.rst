@@ -76,7 +76,7 @@ With the following few short steps, you can start in your client repository usin
     - source .ci_config/travis.sh
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
-* Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
+* Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
 
 That's it.
 
