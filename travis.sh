@@ -184,9 +184,13 @@ fi
 
 travis_time_end  # rosdep_install
 
+travis_time_start wstool_info
+
 $ROSWS --version
 $ROSWS info -t .
 cd ../
+
+travis_time_end  # wstool_info
 
 travis_time_start catkin_build
 
