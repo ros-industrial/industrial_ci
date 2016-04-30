@@ -39,6 +39,14 @@ if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH
 if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2); fi
 echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"
 
+travis_time_start install_for_display_testresult
+# Set apt repo
+sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+# Common ROS install preparation
+wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+sudo apt-get -qq install -y ros-$ROS_DISTRO-catkin && source /opt/ros/$ROS_DISTRO/setup.bash || (echo 'ros-latest.list content: \n'; cat /etc/apt/sources.list.d/ros-latest.list; error;)
+travis_time_end  # install_for_display_testresult
+
 travis_time_start setup_docker
 
 sudo usermod -aG docker ubuntu
@@ -58,12 +66,13 @@ mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; generate_prerelease_script
 travis_time_end  # setup_prerelease_scripts
 
 travis_time_start run_prerelease
-
 ./prerelease.sh;
-
-catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
-
 travis_time_end  # run_prerelease
+
+travis_time_start show_testresult
+catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+travis_time_end  # show_testresult
+
 
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
 pwd
