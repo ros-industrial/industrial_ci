@@ -33,7 +33,7 @@
 
 set -x
 
-source ./util.sh
+source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
 
 if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="0"; fi
 if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2); fi
