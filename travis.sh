@@ -35,6 +35,7 @@
 ## This is a "common" script that can be run on travis CI at a downstream github repository.
 ## See ./README.rst for the detailed usage.
 
+set -e
 set -x
 
 export CI_SOURCE_PATH=$(pwd)

@@ -31,6 +31,7 @@
 #
 ## Author: Isaac I. Y. Saito
 
+set -e
 set -x
 
 source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
