@@ -39,7 +39,7 @@ set -e
 set -x
 
 export CI_SOURCE_PATH=$(pwd)
-CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+export CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
 BUILDER=catkin
 ROSWS=wstool
 
