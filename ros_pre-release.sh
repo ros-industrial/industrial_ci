@@ -71,7 +71,7 @@ travis_time_start run_prerelease
 travis_time_end  # run_prerelease
 
 travis_time_start show_testresult
-catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+catkin_test_results build_isolated && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
 travis_time_end  # show_testresult
 
 
