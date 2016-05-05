@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-## Author: Isaac I. Y. Saito
+## Author: Isaac I. Y. Saito, Mathias Lè´‰dtke
 
 set -e
 set -x
