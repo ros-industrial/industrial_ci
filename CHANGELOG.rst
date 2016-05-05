@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.1 (2016-05-06)
+------------------
 * [feat] Add docker-based ROS prerelease test. `#35 <https://github.com/ros-industrial/industrial_ci/issues/35>`_
 * [fix] Correct environment variable exportation to subprocesses.
 * [fix] Better script termination with 'set -e'.
