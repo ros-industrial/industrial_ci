@@ -12,23 +12,16 @@ compiler:
 #  Whoever receives success and/or failure via email
 env:
   matrix:
-#    - ROS_DISTRO=hydro AFTER_INSTALL=""
-#    - ROS_DISTRO=hydro USE_CATKIN_MAKE=true BEFORE_SCRIPT="pwd; git clone http://github.com/jsk-ros-pkg/jsk_common_msgs" NOT_TEST_INSTALL=true
-#    - ROS_DISTRO=hydro AFTER_INSTALL="" TEST_PKGS=" "
-#    - ROS_DISTRO=hydro AFTER_INSTALL="" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
-#    - ROS_DISTRO=hydro AFTER_INSTALL="mongodb-clients"
-#    - ROS_DISTRO=hydro BEFORE_SCRIPT="pwd; git clone https://github.com/ros-industrial/industrial_core"
-    - ROS_DISTRO=indigo BUILDER='not-compile'
-    - ROS_DISTRO=indigo BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci
-    - ROS_DISTRO=indigo BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci TRAVIS_BRANCH=master TRAVIS_COMMIT=''  TRAVIS_PULL_REQUEST=''
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
+    # - env: ROS_DISTRO=indigo PRERELEASE=true  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
+    - ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+    - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1
 matrix:
   allow_failures:
-    - env: ROS_DISTRO=jade BUILDER='not-compile'
-    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci
-    - env: ROS_DISTRO=jade BUILDER='not-compile' TRAVIS_REPO_SLUG=ros-industrial/industrial_ci TRAVIS_BRANCH=master TRAVIS_COMMIT=''  TRAVIS_PULL_REQUEST=''
+    - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+    - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
 before_script:
   - CI_DIR=.ci_config
   - mkdir $CI_DIR; cp * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories

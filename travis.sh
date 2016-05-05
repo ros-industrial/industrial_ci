@@ -29,44 +29,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-## Greatly inspired by JSK travis with additional comments for maintainability: https://github.com/jsk-ros-pkg/jsk_travis 
+## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis 
 ## Author: Isaac I. Y. Saito
 
 ## This is a "common" script that can be run on travis CI at a downstream github repository.
 ## See ./README.rst for the detailed usage.
 
+set -e
 set -x
 
-function travis_time_start {
-    set +x
-    TRAVIS_START_TIME=$(date +%s%N)
-    TRAVIS_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-    TRAVIS_FOLD_NAME=$1
-    echo -e "\e[0Ktravis_fold:start:$TRAVIS_FOLD_NAME"
-    echo -e "\e[0Ktravis_time:start:$TRAVIS_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
-    set -x
-}
-
-function travis_time_end {
-    set +x
-    _COLOR=${1:-32}
-    TRAVIS_END_TIME=$(date +%s%N)
-    TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
-    echo -e "travis_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
-    echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${_COLOR}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${_COLOR}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
-    set -x
-}
-
-function error {
-    travis_time_end 31
-    trap - ERR
-    exit 1
-}
-
+export CI_SOURCE_PATH=$(pwd)
+export CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
 BUILDER=catkin
 ROSWS=wstool
-CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+
+source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
 
 trap error ERR
 
@@ -76,7 +53,6 @@ if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`g
 travis_time_start setup_ros
 
 # Define some config vars
-export CI_SOURCE_PATH=$(pwd)
 export DOWNSTREAM_REPO_NAME=${PWD##*/}
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -102,6 +78,15 @@ if [ $HAVE_MONGO_DB == 0 ]; then
 fi
 
 travis_time_end  # setup_ros
+
+# Start prerelease, and once it finishs then finish this script too.
+# This block needs to be here because catkin_test_results isn't available until up to this point.
+travis_time_start prerelease_from_travis_sh
+if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
+  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh && exit 0 || exit 1;
+fi
+travis_time_end  # prerelease_from_travis_sh
+
 travis_time_start setup_rosdep
 
 # Setup rosdep
@@ -184,8 +169,16 @@ fi
 
 travis_time_end  # rosdep_install
 
-travis_time_start wstool_info
+# Start prerelease, and once it finishs then finish this script too.
+# This block needs to be here because catkin_test_results isn't available until up to this point.
+travis_time_start prerelease_from_travis_sh
+if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
+  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh
+  catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+fi
+travis_time_end  # prerelease_from_travis_sh
 
+travis_time_start wstool_info
 $ROSWS --version
 $ROSWS info -t .
 cd ../
