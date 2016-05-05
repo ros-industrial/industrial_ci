@@ -2,6 +2,19 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [feat] Add docker-based ROS prerelease test. `#35 <https://github.com/ros-industrial/industrial_ci/issues/35>`_
+* [fix] Correct environment variable exportation to subprocesses.
+* [fix] Better script termination with 'set -e'.
+* [fix] broken link in README `#37 <https://github.com/ros-industrial/industrial_ci/issues/37>`_
+* [fix] apt-get quiet option `#33 <https://github.com/ros-industrial/industrial_ci/issues/33>`_
+* [sys] Extract util functions
+* [sys] Remove meaningless Travis jobs
+* [doc] Some clarifications.
+* [improve] More fold Travis result (wstool version and localname info) `#38 <https://github.com/ros-industrial/industrial_ci/issues/38>`_
+* Contributors: Mathias Luedtke, Dave Coleman, Victor Lamoine, Isaac I.Y. Saito
+
 0.2.0 (2016-04-19)
 ------------------
 * Adjust to catkin_tools 0.4.0 `#31 <https://github.com/ros-industrial/industrial_ci/issues/31>`_
