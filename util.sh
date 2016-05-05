@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Originally developed in JSK travis package https://github.com/jsk-ros-pkg/jsk_travis 
+
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2016, Isaac I. Y. Saito

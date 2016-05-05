@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-## Greatly inspired by JSK travis with additional comments for maintainability: https://github.com/jsk-ros-pkg/jsk_travis 
+## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis 
 ## Author: Isaac I. Y. Saito
 
 ## This is a "common" script that can be run on travis CI at a downstream github repository.
