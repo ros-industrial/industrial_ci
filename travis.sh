@@ -64,7 +64,9 @@ echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
 # Set apt repo
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 # Common ROS install preparation
-wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+# apt key acquisition. Since keyserver may often become accessible, backup method is added.
+if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
+sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key 0xB01FA116 || ((echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -) || (echo 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'; error))
 lsb_release -a
 sudo apt-get update
 sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-rosbash ros-$ROS_DISTRO-rospack
