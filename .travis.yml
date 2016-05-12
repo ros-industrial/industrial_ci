@@ -15,6 +15,8 @@ notifications:
       - gm130s@gmail.com  # Change this to yours should you copy this file.
 env:
   matrix:
+    - ROS_DISTRO=indigo QUIET_CATKIN_COMMANDS='true'  # As long as the variable QUIET_CATKIN_COMMANDS exists no matter what value is passed, 
+    - ROS_DISTRO=indigo QUIET_CATKIN_COMMANDS='true' QUIET_SLEEP_LENGTH='10'
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform

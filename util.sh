@@ -137,3 +137,37 @@ function success {
     if [ $_exit_code -ne "-1" ] && [ $_exit_code -ne "0" ]; then echo "${_FUNC_MSG_PREFIX} error: arg _exit_code must be either empty, -1 or 0. Returning."; return; fi
     _end_fold_script $_exit_code
 }
+
+#######################################
+# Execute a command quietly by redirecting its output to /dev/null. It still prints "heartbeat" message during its run, which is useful on Travis CI to keep the command running where commands are terminated when no there's output for certain period.
+# Ref. http://stackoverflow.com/a/20165094/577001
+#
+# Globals:
+#   (None)
+# Arguments:
+#   _COMMAND: Full command line(s) including arguments, options.
+#   _SLEEP_LENGTH: (default: 60) Seconds to sleep interval to print heartbeat msg. 
+# Returns:
+#   None
+#######################################
+function quiet {
+    _COMMAND="$1"  # Needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
+    _SLEEP_LENGTH=$2; _SLEEP_LENGTH=${_SLEEP_LENGTH:=60}
+    $_COMMAND > /dev/null &
+    pid=$!
+
+    # If this script is killed, kill the `catkin`.
+    trap "kill $pid 2> /dev/null" EXIT
+    # While catkin is running...
+    _COUNT_LOOP=0
+    set +x  # Need to disable command print to silence the output during "while".
+    while kill -0 $pid 2> /dev/null; do
+        # Do stuff
+        echo "A command '$_COMMAND' is running quiet mode. Elapsed: ${_COUNT_LOOP}"
+        sleep $_SLEEP_LENGTH
+        _COUNT_LOOP=$(($_COUNT_LOOP+$_SLEEP_LENGTH))
+    done
+    set -x  # Re-enable command print now that long part is over.
+    # Disable the trap on a normal exit.
+    trap - EXIT
+}
