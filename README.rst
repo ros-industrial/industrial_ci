@@ -118,9 +118,9 @@ Note that some of these currently tied only to a single option, but we still lea
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
 * `NOT_TEST_BUILD` (default: not set): If true, tests in build space won't be run.
 * `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
-* `PRERELEASE` (default: false): If `true`, run `prerelease test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/130s/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
-* `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the packages dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). Note that you might as well use `0` for the packages that are depended on many packages, because the job simply won't finish within Travis CI's time limit (50 minutes).
-* `PRERELEASE_REPONAME` (default: not set): The target of prerelease test (that you select at `<http://prerelease.ros.org/indigo>`_, `<http://prerelease.ros.org/kinetic>`_ etc.) If not set then it tests the package of the repository's name. You can specify this by your ROS package name format (with underscore e.g. `industrial_core`), not Debian package name format.
+* `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
+* `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
+* `PRERELEASE_REPONAME` (default: not set): The target of Prerelease Test (that you select at `<http://prerelease.ros.org/indigo>`_, `<http://prerelease.ros.org/kinetic>`_ etc.) If not set then it tests the package of the repository's name. You can specify this by your ROS package name format (with underscore e.g. `industrial_core`), not Debian package name format. NOTE that this package name must be listed in the `rosdistro/distribution.yaml` (e.g. [for ROS Indigo](https://github.com/ros/rosdistro/blob/master/indigo/distribution.yaml)) (this requirement comes from ROS buildfarm's Prerelease Test).
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
@@ -219,25 +219,10 @@ See the usage sample in `.travis in indusrial_ci repository <https://github.com/
 
 The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
 
-(Workaround) Prerelease Test job on Travis always passes
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-As of April 2016, because the Prerelease Test job on Travis CI always passes regardless the test result (due to the limitaiton discussed in `a pull request <https://github.com/ros-industrial/industrial_ci/pull/35#issuecomment-214678922>`_), you should not use this Prerelease Test-based job as a criteria for Travis CI check. 
-
-Recommended way is to put the line in `allow_failures` matrix. E.g.:
-
-::
-
-  :
-  matrix:
-    allow_failures:
-      - env: ROS_DISTRO=indigo PRERELEASE=true
-  :
-
 (Workaround) Don't want to always run Prerelease Test
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Running Prerelease Test may usually take longer than the tests commonly defined, which can result in longer time for the Travis check to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
+The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire Travis jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
 
 ::
 
