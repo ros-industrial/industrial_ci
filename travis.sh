@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis 
+## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis
 ## Author: Isaac I. Y. Saito
 
 ## This is a "common" script that can be run on travis CI at a downstream github repository.
@@ -163,32 +163,43 @@ travis_time_start setup_rosws
 # Create workspace
 mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
-# When USE_DEB is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
-### Currently disabled
-###if [ "$USE_DEB" == false ]; then
-###    $ROSWS init .
-###    if [ -e $CI_SOURCE_PATH/.travis.rosinstall ]; then
-###        # install (maybe unreleased version) dependencies from source
-###        $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall
-###    fi
-###    if [ -e $CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO ]; then
-###        # install (maybe unreleased version) dependencies from source for specific ros version
-###        $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO
-###    fi
-###    $ROSWS update
-###    $ROSWS set $DOWNSTREAM_REPO_NAME http://github.com/$TRAVIS_REPO_SLUG --git -y
-###fi
+case "$USE_DEB" in
+true) # When USE_DEB is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
+   $ROSWS init .
+   if [ -e $CI_SOURCE_PATH/.travis.rosinstall ]; then
+       # install (maybe unreleased version) dependencies from source
+       $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall
+   fi
+   if [ -e $CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO ]; then
+       # install (maybe unreleased version) dependencies from source for specific ros version
+       $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO
+   fi
+   ;;
+
+source)
+   $ROSWS init .
+   $DOWNSTREAM_REPO_NAME/setup_upstream.sh -w ~/ros/ws_$DOWNSTREAM_REPO_NAME
+   $ROSWS update
+   ;;
+http://* | https://*) # When USE_DEB is an http url, use it directly
+   $ROSWS init .
+   $ROSWS merge $USE_DEB
+   ;;
+esac
+
+# download upstream packages into workspace
+if [ -e .rosinstall ]; then
+   # ensure that the downstream is not in .rosinstall
+   $ROSWS rm $DOWNSTREAM_REPO_NAME
+   $ROSWS update
+fi
 # CI_SOURCE_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
 ln -s $CI_SOURCE_PATH .
-####if [ "$USE_DEB" == source -a -e $DOWNSTREAM_REPO_NAME/setup_upstream.sh ]; then $ROSWS init .; $DOWNSTREAM_REPO_NAME/setup_upstream.sh -w ~/ros/ws_$DOWNSTREAM_REPO_NAME ; $ROSWS update; fi
+
 # Disable metapackage
 find -L . -name package.xml -print -exec ${CI_SOURCE_PATH}/$CI_PARENT_DIR/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
 
 source /opt/ros/$ROS_DISTRO/setup.bash # ROS_PACKAGE_PATH is important for rosdep
-# Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
-if [ ! -e .rosinstall ]; then
-    echo "- git: {local-name: $DOWNSTREAM_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
-fi
 
 travis_time_end  # setup_rosws
 
@@ -203,7 +214,7 @@ travis_time_end  # before_script
 travis_time_start rosdep_install
 
 # Run "rosdep install" command. Avoid manifest.xml files if any.
-if [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh ]; then 
+if [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh ]; then
     ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh
 fi
 
@@ -239,7 +250,7 @@ travis_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
     travis_time_start catkin_run_tests
-    
+
     # Patches for rostest that are only available in newer codes.
     # Some are already available via DEBs so that patches for them are not needed, but because EOLed distros (e.g. Hydro) where those patches are not released into may be still tested, all known patches are applied here.
     if [ "$ROS_DISTRO" == "hydro" ]; then
@@ -247,13 +258,13 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         (cd /opt/ros/$ROS_DISTRO/lib/python2.7/dist-packages; wget --no-check-certificate https://patch-diff.githubusercontent.com/raw/ros/ros/pull/82.diff -O - | sudo patch -p4)
         (cd /opt/ros/$ROS_DISTRO/share; wget --no-check-certificate https://patch-diff.githubusercontent.com/raw/ros/ros_comm/pull/611.diff -O - | sed s@.cmake.em@.cmake@ | sed 's@/${PROJECT_NAME}@@' | sed 's@ DEPENDENCIES ${_rostest_DEPENDENCIES})@)@' | sudo patch -f -p2 || echo "ok")
     fi
-    
+
     if [ "$BUILDER" == catkin ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
         catkin run_tests -iv --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results build || error
     fi
-    
+
     travis_time_end  # catkin_run_tests
 fi
 
