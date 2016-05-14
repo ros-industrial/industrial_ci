@@ -83,9 +83,6 @@ fi
 
 trap error ERR
 
-git branch --all
-if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $CI_PARENT_DIR | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_PARENT_DIR/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
-
 travis_time_start setup_ros
 
 # Define some config vars
