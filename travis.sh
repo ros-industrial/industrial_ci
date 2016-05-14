@@ -200,6 +200,10 @@ ln -s $CI_SOURCE_PATH .
 find -L . -name package.xml -print -exec ${CI_SOURCE_PATH}/$CI_PARENT_DIR/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
 
 source /opt/ros/$ROS_DISTRO/setup.bash # ROS_PACKAGE_PATH is important for rosdep
+# Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
+if [ ! -e .rosinstall ]; then
+    echo "- git: {local-name: $DOWNSTREAM_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
+fi
 
 travis_time_end  # setup_rosws
 
