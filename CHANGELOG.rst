@@ -2,6 +2,12 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] Remove wrong duplicate prerelease test code block. `#40 <https://github.com/ros-industrial/industrial_ci/issues/40>`_
+* [sys] Adjust to ROS Indigo's up-to-date ros.key acquision. `#42 <https://github.com/ros-industrial/industrial_ci/issues/42>`_
+* Contributors: Isaac I.Y. Saito, Gijs van der Hoorn, Mathias Luedtke
+
 0.2.1 (2016-05-06)
 ------------------
 * [feat] Add docker-based ROS prerelease test. `#35 <https://github.com/ros-industrial/industrial_ci/issues/35>`_
