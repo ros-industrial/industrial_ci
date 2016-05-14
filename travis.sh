@@ -190,7 +190,7 @@ esac
 # download upstream packages into workspace
 if [ -e .rosinstall ]; then
    # ensure that the downstream is not in .rosinstall
-   $ROSWS rm $DOWNSTREAM_REPO_NAME
+   $ROSWS rm $DOWNSTREAM_REPO_NAME || true
    $ROSWS update
 fi
 # CI_SOURCE_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
