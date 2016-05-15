@@ -260,6 +260,8 @@ fi
 travis_time_start after_script
 
 ## BEGIN: travis' after_script
+
+set +x
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
 PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
@@ -269,6 +271,6 @@ if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results
 
 travis_time_end  # after_script
 
+set +x
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
 pwd
-
