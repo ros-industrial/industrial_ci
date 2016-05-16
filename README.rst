@@ -124,9 +124,10 @@ Note that some of these currently tied only to a single option, but we still lea
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
+* `ROSINSTALL_FILENAME` (default: not set): See `USE_DEB` description.
 * `ROSWS` (default: wstool): Currently only `wstool` is available.
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
-* `USE_DEB` (default: true): When this is set `false`, the dependended packages that need to be built from source are downloaded based on file `.travis.rosinstall` in your repository. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
+* `USE_DEB` (default: true): When this is set `false`, the dependended packages that need to be built from source are downloaded based on file `$ROSINSTALL_FILENAME` in your repository. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
@@ -242,12 +243,12 @@ By default the packages your package depend upon are installed via binaries. How
 Use .rosinstall file to specify the depended packages source repository
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Standard way is 1) set `USE_DEB` as `false`, 2) create a file `.travis.rosinstall` using `the same file format as .rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
+Standard way is 1) set `USE_DEB` as `false`, 2) create a file `$ROSINSTALL_FILENAME` using `the same file format as .rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
 
 Have multiple .rosinstall files per ROS-distro
 ++++++++++++++++++++++++++++++++++++++++++++++
 
-By adding `.$ROS_DISTRO` suffix to your `.travis.rosinstall` file, you can specify which file to use per your `$ROS_DISTRO`. E.g. `.travis.rosinstall.$ROS_DISTRO`.
+By adding `.$ROS_DISTRO` suffix to your `$ROSINSTALL_FILENAME` file, you can specify which file to use per your `$ROS_DISTRO`. E.g. `$ROSINSTALL_FILENAME.$ROS_DISTRO`.
 
 Specify downstream packages by source
 ++++++++++++++++++++++++++++++++++++++++++++++

@@ -93,6 +93,8 @@ if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"; fi
+# .rosintall file name 
+if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi 
 # For apt key stores
 if [ ! "$APTKEY_STORE_HTTPS" ]; then export APTKEY_STORE_HTTPS="https://raw.githubusercontent.com/ros/rosdistro/master/ros.key"; fi
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
@@ -155,15 +157,15 @@ travis_time_start setup_rosws
 mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 case "$USE_DEB" in
-false) # When USE_DEB is false, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
+false) # When USE_DEB is false, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
    $ROSWS init .
-   if [ -e $CI_SOURCE_PATH/.travis.rosinstall ]; then
+   if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME ]; then
        # install (maybe unreleased version) dependencies from source
-       $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall
+       $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME
    fi
-   if [ -e $CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO ]; then
+   if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
        # install (maybe unreleased version) dependencies from source for specific ros version
-       $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO
+       $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
    fi
    ;;
 source)
