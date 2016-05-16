@@ -164,7 +164,7 @@ travis_time_start setup_rosws
 mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 case "$USE_DEB" in
-true) # When USE_DEB is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
+false) # When USE_DEB is false, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
    $ROSWS init .
    if [ -e $CI_SOURCE_PATH/.travis.rosinstall ]; then
        # install (maybe unreleased version) dependencies from source
@@ -175,7 +175,6 @@ true) # When USE_DEB is true, the dependended packages that need to be built fro
        $ROSWS merge file://$CI_SOURCE_PATH/.travis.rosinstall.$ROS_DISTRO
    fi
    ;;
-
 source)
    $ROSWS init .
    $DOWNSTREAM_REPO_NAME/setup_upstream.sh -w ~/ros/ws_$DOWNSTREAM_REPO_NAME
