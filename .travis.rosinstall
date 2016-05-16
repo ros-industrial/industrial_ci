@@ -1,0 +1,6 @@
+- git:
+    uri: https://github.com/ros-industrial/industrial_core.git
+    local-name: ros-industrial/industrial_core
+- git:
+    uri: https://github.com/ros-industrial/ros_canopen.git
+    local-name: ros-industrial/ros_canopen
