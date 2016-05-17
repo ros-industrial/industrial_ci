@@ -207,8 +207,7 @@ travis_time_end  # rosdep_install
 # This block needs to be here (i.e. After rosdep is done) because catkin_test_results isn't available until up to this point.
 travis_time_start prerelease_from_travis_sh
 if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
-  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh
-  catkin_test_results build && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh || error
 fi
 travis_time_end  # prerelease_from_travis_sh
 
