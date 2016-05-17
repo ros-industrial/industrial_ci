@@ -56,8 +56,62 @@ function travis_time_end {
     set -x
 }
 
-function error {
-    travis_time_end 31
+#######################################
+# This is "private" function that should only be used by other functions in this file. It does the following:
+#
+# * wraps the section that is started by travis_time_start function. When exit_code == ERR,  the echo color will be 31 (red). Otherwise green.
+# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
+# * exit the process with the code passed.
+#
+# Globals:
+#   (None)
+# Arguments:
+#   exit_code (default: 0): Unix signal. 
+# Returns:
+#   (None)
+#######################################
+function _end_script {
+    exit_code=${1:0}  # If 1st arg is not passed, set 0.
+
+    color_wrap=  # Null string
+    if [ $exit_code -eq ERR ] then
+        $color_wrap=31  # Red color
+    travis_time_end $color_wrap
     trap - ERR
-    exit 1
+
+    exit $exit_code
+}
+
+#######################################
+# This calls "exit 1", along with the following. When your script on Travis CI already uses other functions from this file (util.sh), using this is recommended over calling directly "exit 1".
+#
+# * wraps the section that is started by travis_time_start function with the echo color red (31).
+# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
+#
+# Globals:
+#   (None)
+# Arguments:
+#   (None)
+# Returns:
+#   (None)
+#######################################
+function error {
+    _end_script ERR
+}
+
+#######################################
+# Similar to `error` function, this lets you "exit 0" and take care of other things as following, when your script on Travis CI already uses other functions from this file (util.sh).
+#
+# * wraps the section that is started by travis_time_start function with the echo color green.
+# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
+#
+# Globals:
+#   (None)
+# Arguments:
+#   (None)
+# Returns:
+#   (None)
+#######################################
+function success {
+    _end_script
 }
