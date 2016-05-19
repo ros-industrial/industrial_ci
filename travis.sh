@@ -207,9 +207,10 @@ travis_time_end  # rosdep_install
 # This block needs to be here (i.e. After rosdep is done) because catkin_test_results isn't available until up to this point.
 travis_time_start prerelease_from_travis_sh
 if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then 
-  ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh || error
+  retval_prerelease=$(source ${CI_SOURCE_PATH}/${CI_PARENT_DIR}/ros_pre-release.sh)
+  if [ $retval_prerelease -eq 0 ]; then success; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
+  # With Prerelease option, we want to stop here without running the rest of the code.
 fi
-travis_time_end  # prerelease_from_travis_sh
 
 travis_time_start wstool_info
 $ROSWS --version

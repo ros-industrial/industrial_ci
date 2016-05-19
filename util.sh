@@ -74,8 +74,7 @@ function _end_script {
     exit_code=${1:0}  # If 1st arg is not passed, set 0.
 
     color_wrap=  # Null string
-    if [ $exit_code -eq ERR ] then
-        $color_wrap=31  # Red color
+    if [ $exit_code -eq ERR ]; then $color_wrap=31; fi  # Red color
     travis_time_end $color_wrap
     trap - ERR
 
