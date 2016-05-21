@@ -31,6 +31,7 @@
 #
 ## Author: Isaac I. Y. Saito, Mathias Lè´‰dtke
 
+RETVAL=-1
 set -e
 set -x
 
@@ -38,7 +39,7 @@ source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
 
 if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="0"; fi
 if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2); fi
-echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"
+#echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"  # This shouldn't be echoed since this would become a return value of this entire script.
 
 travis_time_start install_for_display_testresult
 # Set apt repo
@@ -71,9 +72,10 @@ travis_time_start run_prerelease
 travis_time_end  # run_prerelease
 
 travis_time_start show_testresult
-catkin_test_results --verbose && (echo 'ROS Prerelease Test went successful.'; exit 0) || error
+catkin_test_results --verbose && { echo 'ROS Prerelease Test went successful.'; RETVAL=0; success; } || { RETVAL=1; error; }
 travis_time_end  # show_testresult
-
 
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
 pwd
+
+return $RETVAL

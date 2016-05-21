@@ -44,41 +44,39 @@ function travis_time_start {
     set -x
 }
 
-function travis_time_end {
-    set +x
-    if [ -z $TRAVIS_START_TIME ]; then echo '[travis_time_end] var TRAVIS_START_TIME is not set. You need to call `travis_time_start` in advance. Rerutning.'; return; fi
-    _COLOR=${1:-32}
-    TRAVIS_END_TIME=$(date +%s%N)
-    TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
-    echo -e "travis_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
-    echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${_COLOR}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${_COLOR}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
-    set -x
-}
-
 #######################################
-# This is "private" function that should only be used by other functions in this file. It does the following:
+# This function wraps up the timer section on Travis CI that's started (mostly by travis_time_start function). Internally this does:
 #
-# * wraps the section that is started by travis_time_start function. When exit_code == ERR,  the echo color will be 31 (red). Otherwise green.
-# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
-# * exit the process with the code passed.
+# * wraps the section that is started by travis_time_start function. When `exit_code` == ERR,  the echo color will be red. Otherwise green.
+# * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
+# * exits the process if non -1 value is passed to `exit_code`.
 #
 # Globals:
 #   (None)
 # Arguments:
-#   exit_code (default: 0): Unix signal. 
+#   exit_code (default: -1): Unix signal. If -1 then the process continues.
+#   color_wrap (default: 32): Color code for the section delimitter text.
 # Returns:
 #   (None)
 #######################################
-function _end_script {
-    exit_code=${1:0}  # If 1st arg is not passed, set 0.
+function travis_time_end {
+    set +x
+    exit_code=${1:--1}  # If 1st arg is not passed, set -1.
+    color_wrap=${2:-32}
 
-    color_wrap=  # Null string
-    if [ $exit_code -eq ERR ]; then $color_wrap=31; fi  # Red color
-    travis_time_end $color_wrap
-    trap - ERR
+    if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
+    
+    if [ -z $TRAVIS_START_TIME ]; then echo '[travis_time_end] var TRAVIS_START_TIME is not set. You need to call `travis_time_start` in advance. Rerutning.'; return; fi
+    TRAVIS_END_TIME=$(date +%s%N)
+    TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
+    echo -e "travis_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
+    echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
+    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
 
-    exit $exit_code
+    if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit.
+
+    set -x
+    if [ $exit_code -ne "-1" ]; then exit $exit_code; fi
 }
 
 #######################################
@@ -95,7 +93,7 @@ function _end_script {
 #   (None)
 #######################################
 function error {
-    _end_script ERR
+    travis_time_end 1 31
 }
 
 #######################################
@@ -107,10 +105,12 @@ function error {
 # Globals:
 #   (None)
 # Arguments:
-#   (None)
+#   exit_code (default: 0): Unix signal. If -1 passed then the process continues.
 # Returns:
 #   (None)
 #######################################
 function success {
-    _end_script
+    exit_code=${1:-0}  # If 1st arg is not passed, set 0.
+    if [ $exit_code -ne "-1" ] && [ $exit_code -ne "0" ]; then echo "(fuction success) error: argument must be either empty, -1 or 0. Returning."; return; fi
+    travis_time_end $exit_code
 }
