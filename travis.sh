@@ -51,6 +51,8 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   travis_time_start build_docker_image
   docker build -t industrial-ci/xenial .ci_config
   travis_time_end  # build_docker_image
+
+  travis_time_start run_travissh_docker
   docker run \
       -e ROS_REPOSITORY_PATH \
       -e ROS_DISTRO \
@@ -75,6 +77,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e USE_DEBROS_DISTRO \
       -v $(pwd):/root/ci_src industrial-ci/xenial \
       /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
+  travis_time_end  # run_travissh_docker
   exit 0
 fi
 
