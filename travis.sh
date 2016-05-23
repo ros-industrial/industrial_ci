@@ -45,6 +45,42 @@ ROSWS=wstool
 
 source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
 
+# Building in 16.04 requires running this script in a docker container
+# The Dockerfile in this repository defines a Ubuntu 16.04 container
+if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
+  travis_time_start build_docker_image
+  docker build -t industrial-ci/xenial .ci_config
+  travis_time_end  # build_docker_image
+
+  travis_time_start run_travissh_docker
+  docker run \
+      -e ROS_REPOSITORY_PATH \
+      -e ROS_DISTRO \
+      -e ADDITIONAL_DEBS \
+      -e BEFORE_SCRIPT \
+      -e BUILD_PKGS \
+      -e BUILDER \
+      -e CATKIN_PARALLEL_JOBS \
+      -e CATKIN_PARALLEL_TEST_JOBS \
+      -e CI_PARENT_DIR \
+      -e NOT_TEST_BUILD \
+      -e NOT_TEST_INSTALL \
+      -e PRERELEASE \
+      -e PRERELEASE_DOWNSTREAM_DEPTH \
+      -e PRERELEASE_REPONAME \
+      -e PKGS_DOWNSTREAM \
+      -e ROS_PARALLEL_JOBS \
+      -e ROS_PARALLEL_TEST_JOBS \
+      -e ROS_PARALLEL_JOBS \
+      -e ROSWS \
+      -e TARGET_PKGS \
+      -e USE_DEBROS_DISTRO \
+      -v $(pwd):/root/ci_src industrial-ci/xenial \
+      /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
+  travis_time_end  # run_travissh_docker
+  exit 0
+fi
+
 trap error ERR
 
 git branch --all

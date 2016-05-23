@@ -20,10 +20,12 @@ env:
     - ROS_DISTRO=indigo APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1
+    - ROS_DISTRO=kinetic
 matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
     - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
+    - env: ROS_DISTRO=kinetic
 before_script:
   - CI_DIR=.ci_config
   - mkdir $CI_DIR; cp * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories
