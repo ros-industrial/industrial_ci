@@ -38,12 +38,14 @@
 set -e
 set -x
 
+# Define some env vars that need to come earlier than util.sh
 export CI_SOURCE_PATH=$(pwd)
 export CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
-BUILDER=catkin
-ROSWS=wstool
 
 source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
+
+trap error ERR
+trap success SIGTERM  # So that this script won't terminate without verifying that all necessary steps are done.
 
 # Building in 16.04 requires running this script in a docker container
 # The Dockerfile in this repository defines a Ubuntu 16.04 container
@@ -77,18 +79,15 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e USE_DEBROS_DISTRO \
       -v $(pwd):/root/ci_src industrial-ci/xenial \
       /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
-  travis_time_end  # run_travissh_docker
-  exit 0
+  retval=$?
+  if [ $retval -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else exit; fi  # Call  travis_time_end  run_travissh_docker
 fi
 
-trap error ERR
-
-git branch --all
-if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $CI_PARENT_DIR | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_PARENT_DIR/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
-
-travis_time_start setup_ros
-
-# Define some config vars
+travis_time_start init_travis_environment
+# Define more env vars
+export HIT_ENDOFSCRIPT=false
+BUILDER=catkin
+ROSWS=wstool
 export DOWNSTREAM_REPO_NAME=${PWD##*/}
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -100,6 +99,13 @@ if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://package
 if [ ! "$APTKEY_STORE_HTTPS" ]; then export APTKEY_STORE_HTTPS="https://raw.githubusercontent.com/ros/rosdistro/master/ros.key"; fi
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="0xB01FA116"; fi
+
+git branch --all
+if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $CI_PARENT_DIR | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_PARENT_DIR/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
+
+travis_time_end  # init_travis_environment
+
+travis_time_start setup_ros
 
 echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
 # Set apt repo
@@ -209,7 +215,7 @@ travis_time_start prerelease_from_travis_sh
 if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then
   ${CI_SOURCE_PATH}/${CI_PARENT_DIR}/ros_pre-release.sh
   retval_prerelease=$?
-  if [ $retval_prerelease -eq 0 ]; then success; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
+  if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0 $HIT_ENDOFSCRIPT; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
   # With Prerelease option, we want to stop here without running the rest of the code.
 fi
 
@@ -306,3 +312,5 @@ travis_time_end  # after_script
 cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
 pwd
 
+HIT_ENDOFSCRIPT=true
+success 0
