@@ -45,26 +45,18 @@ function travis_time_start {
 }
 
 #######################################
-# This function wraps up the timer section on Travis CI that's started (mostly by travis_time_start function). Internally this does:
-#
-# * wraps the section that is started by travis_time_start function. When `exit_code` == ERR,  the echo color will be red. Otherwise green.
-# * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
-# * exits the process if non -1 value is passed to `exit_code`.
+# Wraps up the timer section on Travis CI (that's started mostly by travis_time_start function).
 #
 # Globals:
 #   (None)
 # Arguments:
-#   exit_code (default: -1): Unix signal. If -1 then the process continues.
 #   color_wrap (default: 32): Color code for the section delimitter text.
 # Returns:
 #   (None)
 #######################################
 function travis_time_end {
     set +x
-    exit_code=${1:--1}  # If 1st arg is not passed, set -1.
     color_wrap=${2:-32}
-
-    if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
     
     if [ -z $TRAVIS_START_TIME ]; then echo '[travis_time_end] var TRAVIS_START_TIME is not set. You need to call `travis_time_start` in advance. Rerutning.'; return; fi
     TRAVIS_END_TIME=$(date +%s%N)
@@ -73,10 +65,32 @@ function travis_time_end {
     echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
     echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
 
-    if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit.
-
+    unset $TRAVIS_FOLD_NAME
     set -x
-    if [ $exit_code -ne "-1" ]; then exit $exit_code; fi
+}
+
+#######################################
+# This private function can exit the shell process, as well as wrapping up the timer section on Travis CI. Internally this does:
+#
+# * wraps the section that is started by travis_time_start function.
+# * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
+# * exits the process if non -1 value is passed to `exit_code`.
+#######################################
+function _end_fold_script {
+    set +x
+    exit_code=${1:--1}  # If 1st arg is not passed, set -1.
+    color_wrap=${2:-32}
+
+    if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
+    if [ -z $TRAVIS_FOLD_NAME ]; then
+        travis_time_end $color_wrap
+    else
+	echo "Previous Travis fold name not found. Maybe wrong call. Skipping 'travis_time_end'."
+    fi
+
+    if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit. 
+    set -x
+    if [ $exit_code -ne "-1" ]; then exit $exit_code; fi     
 }
 
 #######################################
@@ -93,7 +107,7 @@ function travis_time_end {
 #   (None)
 #######################################
 function error {
-    travis_time_end 1 31
+    _end_fold_script 1 31
 }
 
 #######################################
@@ -112,7 +126,7 @@ function error {
 function success {
     exit_code=${1:-0}  # If 1st arg is not passed, set 0.
     HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
-    if [ $HIT_ENDOFSCRIPT = false ]; then echo "Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn exit_code to 1."; exit_code = 1; fi
-    if [ $exit_code -ne "-1" ] && [ $exit_code -ne "0" ]; then echo "(fuction `success`) error: arg `exit_code` must be either empty, -1 or 0. Returning."; return; fi
-    travis_time_end $exit_code
+    if [ $HIT_ENDOFSCRIPT = false ]; then echo "Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn exit_code to 1."; exit_code=1; fi
+    if [ $exit_code -ne "-1" ] && [ $exit_code -ne "0" ]; then echo "(fuction success) error: arg exit_code must be either empty, -1 or 0. Returning."; return; fi
+    _end_fold_script $exit_code
 }
