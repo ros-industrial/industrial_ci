@@ -85,7 +85,7 @@ function _end_fold_script {
     if [ -z $TRAVIS_FOLD_NAME ]; then
         travis_time_end $color_wrap
     else
-	echo "Previous Travis fold name not found. Maybe wrong call. Skipping 'travis_time_end'."
+	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'travis_time_end' anyway."
     fi
 
     if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit. 
@@ -119,14 +119,21 @@ function error {
 # Globals:
 #   (None)
 # Arguments:
-#   exit_code (default: 0): Unix signal. If -1 passed then the process continues.
+#   _exit_code (default: 0): Unix signal. If -1 passed then the process continues.
 # Returns:
 #   (None)
 #######################################
 function success {
-    exit_code=${1:-0}  # If 1st arg is not passed, set 0.
+    _FUNC_MSG_PREFIX="[fuction success]"
+    _exit_code=${1:-0}  # If 1st arg is not passed, set 0.
     HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
-    if [ $HIT_ENDOFSCRIPT = false ] && [ $exit_code -eq 0 ]; then echo "Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn exit_code to 1."; exit_code=1; fi
-    if [ $exit_code -ne "-1" ] && [ $exit_code -ne "0" ]; then echo "(fuction success) error: arg exit_code must be either empty, -1 or 0. Returning."; return; fi
-    _end_fold_script $exit_code
+    if [ $HIT_ENDOFSCRIPT = false ]; then
+	if [ $_exit_code -eq 0 ]; then
+	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
+	else
+	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
+	fi
+    fi
+    if [ $_exit_code -ne "-1" ] && [ $_exit_code -ne "0" ]; then echo "${_FUNC_MSG_PREFIX} error: arg _exit_code must be either empty, -1 or 0. Returning."; return; fi
+    _end_fold_script $_exit_code
 }
