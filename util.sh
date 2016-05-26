@@ -126,7 +126,7 @@ function error {
 function success {
     exit_code=${1:-0}  # If 1st arg is not passed, set 0.
     HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
-    if [ $HIT_ENDOFSCRIPT = false ]; then echo "Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn exit_code to 1."; exit_code=1; fi
+    if [ $HIT_ENDOFSCRIPT = false ] && [ $exit_code -eq 0 ]; then echo "Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn exit_code to 1."; exit_code=1; fi
     if [ $exit_code -ne "-1" ] && [ $exit_code -ne "0" ]; then echo "(fuction success) error: arg exit_code must be either empty, -1 or 0. Returning."; return; fi
     _end_fold_script $exit_code
 }

@@ -41,6 +41,7 @@ set -x
 # Define some env vars that need to come earlier than util.sh
 export CI_SOURCE_PATH=$(pwd)
 export CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+export HIT_ENDOFSCRIPT=false
 
 source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
 
@@ -85,7 +86,6 @@ fi
 
 travis_time_start init_travis_environment
 # Define more env vars
-export HIT_ENDOFSCRIPT=false
 BUILDER=catkin
 ROSWS=wstool
 export DOWNSTREAM_REPO_NAME=${PWD##*/}
@@ -213,9 +213,9 @@ travis_time_end  # rosdep_install
 # This block needs to be here (i.e. After rosdep is done) because catkin_test_results isn't available until up to this point.
 travis_time_start prerelease_from_travis_sh
 if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then
-  ${CI_SOURCE_PATH}/${CI_PARENT_DIR}/ros_pre-release.sh
+  source ${CI_SOURCE_PATH}/${CI_PARENT_DIR}/ros_pre-release.sh && run_ros_prerelease
   retval_prerelease=$?
-  if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0 $HIT_ENDOFSCRIPT; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
+  if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
   # With Prerelease option, we want to stop here without running the rest of the code.
 fi
 
