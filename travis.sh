@@ -236,10 +236,10 @@ if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_or
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS"); fi
 if [ "$BUILDER" == catkin ]; then
     _COMMAND_CATKINBUILD="catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS"
-    if [ $QUIET_CATKIN_COMMANDS ]; then
-        quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
-    else
+    if [ $VERBOSE_CATKIN_COMMANDS ]; then
         $_COMMAND_CATKINBUILD  # Run catkin build command.
+    else
+        quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
     fi
 fi
 travis_time_end  # catkin_build
@@ -259,10 +259,10 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
 
         _COMMAND_CATKINBUILD="catkin run_tests -i -v --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --"
-        if [ $QUIET_CATKIN_COMMANDS ]; then
-            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
-        else
+        if [ $VERBOSE_CATKIN_COMMANDS ]; then
             $_COMMAND_CATKINBUILD  # Run catkin build command.
+        else
+            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
         fi
 
         catkin_test_results build || error
@@ -281,10 +281,10 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         catkin config --install
 
         _COMMAND_CATKINBUILD="catkin build -i -v --summarize --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS"
-        if [ $QUIET_CATKIN_COMMANDS ]; then
-            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
-        else
+        if [ $VERBOSE_CATKIN_COMMANDS ]; then
             $_COMMAND_CATKINBUILD  # Run catkin build command.
+        else
+            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
         fi
 
         source install/setup.bash
