@@ -40,6 +40,18 @@ FAQ
 
   A- You can check `advanced_industrial_ci <https://github.com/InstitutMaupertuis/advanced_industrial_ci>`_ which provides scripts and binaries for PCL 1.8.0 and the Ceres solver. An integration example can be found `here <https://github.com/InstitutMaupertuis/ensenso_extrinsic_calibration/blob/indigo-devel/.travis.yml>`_.
 
+- Q- How does the target package get installed?
+
+  A- `Travis CI` does this. It pulls in your package to an running instance of an operating system of your choice, and place your package under `/home/travis`.
+
+- Q- The jobs on `Travis CI` are failing. How can I fix them?
+
+  A- (1) Find the section where error occurred that caused CI to stop. Sections are folded nicely and it's colored red when it fails. (2) Then identify whether the issue is pertaining to your package, or something else. Sometimes a cause is in `industrial_ci`, not your package. (3) Reviewing `Common Build Problems for Travis CI <https://docs.travis-ci.com/user/common-build-problems>`_ helps you to isolate the root cause. (4) If you think the root cause is in `industrial_ci`, (or if you're not sure,) ask at its `issue tracker <https://github.com/ros-industrial/industrial_ci/issues>`_.
+
+- Q- How can I customize the jobs?
+
+  A- (1) There are a number of variables to customize your jobs that you can learn the usage `in this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure>`_. (2) You can define pre- and post-processes, in addition to the default scripts (it's `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_ for `Travis CI`). See `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#run-pre-install-custom-commands>`_ for how.
+
 What are checked?
 ------------------------------------
 
