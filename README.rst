@@ -250,11 +250,6 @@ Have multiple .rosinstall files per ROS-distro
 
 By adding `.$ROS_DISTRO` suffix to your `$ROSINSTALL_FILENAME` file, you can specify which file to use per your `$ROS_DISTRO`. E.g. `$ROSINSTALL_FILENAME.$ROS_DISTRO`.
 
-Specify downstream packages by source
-++++++++++++++++++++++++++++++++++++++++++++++
-
-(TBD)
-
 Use .rosinstall from external location
 ++++++++++++++++++++++++++++++++++++++++++++++
 

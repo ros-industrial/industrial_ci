@@ -168,11 +168,6 @@ false) # When USE_DEB is false, the dependended packages that need to be built f
        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
    fi
    ;;
-source)
-   $ROSWS init .
-   $DOWNSTREAM_REPO_NAME/setup_upstream.sh -w ~/ros/ws_$DOWNSTREAM_REPO_NAME
-   $ROSWS update
-   ;;
 http://* | https://*) # When USE_DEB is an http url, use it directly
    $ROSWS init .
    $ROSWS merge $USE_DEB
