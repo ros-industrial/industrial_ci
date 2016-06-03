@@ -99,6 +99,12 @@ if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosins
 if [ ! "$APTKEY_STORE_HTTPS" ]; then export APTKEY_STORE_HTTPS="https://raw.githubusercontent.com/ros/rosdistro/master/ros.key"; fi
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="0xB01FA116"; fi
+if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-industrial/industrial_ci/pull/47#discussion_r64882878 for the discussion.
+    if [ "$USE_DEB" != "true" ]; then export UPSTREAM_WORKSPACE="file";
+    else export UPSTREAM_WORKSPACE="debian";
+    fi
+fi
+if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 
 echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
 # Set apt repo
@@ -156,29 +162,33 @@ travis_time_start setup_rosws
 # Create workspace
 mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
 cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
-case "$USE_DEB" in
-false) # When USE_DEB is false, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
-   $ROSWS init .
-   if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME ]; then
-       # install (maybe unreleased version) dependencies from source
-       $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME
-   fi
-   if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
-       # install (maybe unreleased version) dependencies from source for specific ros version
-       $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
-   fi
-   ;;
-http://* | https://*) # When USE_DEB is an http url, use it directly
-   $ROSWS init .
-   $ROSWS merge $USE_DEB
-   ;;
+case "$UPSTREAM_WORKSPACE" in
+debian)
+    echo "Obtain deb binary for upstream packages."
+    ;;
+file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
+    $ROSWS init .
+    # Prioritize $ROSINSTALL_FILENAME.$ROS_DISTRO if it exists over $ROSINSTALL_FILENAME.
+    if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
+        # install (maybe unreleased version) dependencies from source for specific ros version
+        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
+    fi
+    elif [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME ]; then
+        # install (maybe unreleased version) dependencies from source
+        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME
+    fi
+    ;;
+http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
+    $ROSWS init .
+    $ROSWS merge $UPSTREAM_WORKSPACE
+    ;;
 esac
 
 # download upstream packages into workspace
 if [ -e .rosinstall ]; then
-   # ensure that the downstream is not in .rosinstall
-   $ROSWS rm $DOWNSTREAM_REPO_NAME || true
-   $ROSWS update
+    # ensure that the downstream is not in .rosinstall
+    $ROSWS rm $DOWNSTREAM_REPO_NAME || true
+    $ROSWS update
 fi
 # CI_SOURCE_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
 ln -s $CI_SOURCE_PATH .
