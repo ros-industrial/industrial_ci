@@ -70,10 +70,10 @@ FAQ
 What are checked?
 ------------------------------------
 
-List of the checked items, in the actual order to be run.
+List of the checked items by default, in the actual order to be run. See the `list of optional environment variables <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-environment-variables>`_ to customize the items.
 
-1. If your package builds.
-2. If available tests in the given package pass. Because tests use software from `install` space, it is important that the building step ends without issues (otherwise the tests may not be reached).
+1. If your package builds (into `install` space by default).
+2. If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
 3. If your package gets installed (i.e. built artifact goes into the `install` space).
 4. If downstream packages are designated, the tests in those packages pass.
 
@@ -166,6 +166,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
 * `UPSTREAM_WORKSPACE` (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
 * `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
+* `USE_DEVEL_SPACE` (default: false): If `true`, `devel space <http://wiki.ros.org/catkin/workspaces#Development_.28Devel.29_Space>`_ will be used for checking if packages can be built, separately from checking installability.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
