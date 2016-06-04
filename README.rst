@@ -11,6 +11,15 @@ This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/
 
 As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
+Supported ROS distributions
+----------------------------------
+
+Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
+
+* `Indigo <http://wiki.ros.org/indigo>`_
+* `Jade <http://wiki.ros.org/jade>`_
+* `Kinetic <http://wiki.ros.org/kinetic>`_
+
 Terminology
 ----------------
 
