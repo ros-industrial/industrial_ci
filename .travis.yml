@@ -24,7 +24,7 @@ env:
     - ROS_DISTRO=indigo APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file  # Using default file name for ROSINSTALL_FILENAME
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com//ros-industrial/industrial_ci/blob/master/.travis.rosinstall
+    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall
     - ROS_DISTRO=indigo USE_DEB=true  # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
