@@ -263,7 +263,7 @@ Run pre-install custom commands
 
 You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example:
 
-* A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <<https://github.com/ros-industrial/industrial_ci/issues/14>`_).
+* A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
 
 In this case, add `source`d scripts before `travis.sh` gets called (see below for an example). 
 
