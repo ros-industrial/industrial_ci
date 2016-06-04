@@ -124,9 +124,11 @@ Note that some of these currently tied only to a single option, but we still lea
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
+* `ROSINSTALL_FILENAME` (default: not set): See `UPSTREAM_WORKSPACE` description.
 * `ROSWS` (default: wstool): Currently only `wstool` is available.
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
-* `USE_DEB`: (NOT Implemented yet) When this is true, the dependended packages that need to be built from source are downloaded based on .travis.rosinstall file.
+* `UPSTREAM_WORKSPACE` (default: debian): When this is set `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
+* `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
@@ -251,6 +253,39 @@ In this case, add `source`d scripts before `travis.sh` gets called (see below fo
     - source ./your_custom_POSTprocess.sh
 
 In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.sh` the environment is kept from previous script(s), so whatever is done in previous scripts remains. 
+
+(Optional) Build depended packages from source
+----------------------------------------------
+
+By default the packages your package depend upon are installed via binaries. However, you may want to build them via source in some cases (e.g. when depended binaries are not available). There are a few ways to do so in `industrial_ci`. Examples of all are available in `.travis.yml file on this repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
+
+Use .rosinstall file to specify the depended packages source repository
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Standard way is 1) set `UPSTREAM_WORKSPACE` as `file`, 2) create a file `$ROSINSTALL_FILENAME` using the same file format as `.rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
+
+Have multiple .rosinstall files per ROS-distro
+++++++++++++++++++++++++++++++++++++++++++++++
+
+By adding `.$ROS_DISTRO` suffix to your `$ROSINSTALL_FILENAME` file, you can specify which file to use per your `$ROS_DISTRO`. So the syntax of the file name for this purpose is `$ROSINSTALL_FILENAME.$ROS_DISTRO`.
+For example, let's say you want to test multiple distros (indigo, jade) and you have `.travis.rosinstall` and `.travis.rosinstall.jade` files in your repo. You can define the Travis config as:
+
+::
+
+    env:
+      matrix:
+
+        - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file
+        - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file
+
+With this config, for indigo default file name `.travis.rosinstall` will be seached and used if found. For jade, the file that consists of the default file name plus `.jade` suffix will be prioritized.
+
+When `$ROSINSTALL_FILENAME.$ROS_DISTRO` file isn't found, `$ROSINSTALL_FILENAME` will be used for all jobs that define `UPSTREAM_WORKSPACE`.
+
+Use .rosinstall from external location
+++++++++++++++++++++++++++++++++++++++++++++++
+
+You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
 
 For maintainers of industrial_ci repository
 ================================================
