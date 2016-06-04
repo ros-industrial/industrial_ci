@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>industrial_ci_testpkg</name>
+  <version>0.2.2</version>
+  <description>Test purpose only for industrial_ci package.</description>
+
+  <maintainer email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</maintainer>
+  <author email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</author>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy_tutorials</build_depend>
+  <run_depend>rospy_tutorials</run_depend>
+  <export />
+</package>
