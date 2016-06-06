@@ -91,6 +91,7 @@ ROSWS=wstool
 export DOWNSTREAM_REPO_NAME=${PWD##*/}
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
+if [ ! "$QUIET_SLEEP_LENGTH" ]; then export QUIET_SLEEP_LENGTH="60"; fi
 if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
@@ -253,8 +254,14 @@ source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting enviro
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${CI_SOURCE_PATH} --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS"); fi
-if [ "$BUILDER" == catkin ]; then catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
-
+if [ "$BUILDER" == catkin ]; then
+    _COMMAND_CATKINBUILD="catkin build -i -v --summarize  --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS"
+    if [ $VERBOSE_CATKIN_COMMANDS ]; then
+        $_COMMAND_CATKINBUILD  # Run catkin build command.
+    else
+        quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
+    fi
+fi
 travis_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
@@ -270,7 +277,14 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
 
     if [ "$BUILDER" == catkin ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
-        catkin run_tests -iv --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
+
+        _COMMAND_CATKINBUILD="catkin run_tests -i -v --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --"
+        if [ $VERBOSE_CATKIN_COMMANDS ]; then
+            $_COMMAND_CATKINBUILD  # Run catkin build command.
+        else
+            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
+        fi
+
         catkin_test_results build || error
     fi
 
@@ -285,7 +299,14 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     if [ "$BUILDER" == catkin ]; then
         catkin clean --yes
         catkin config --install
-        catkin build -i -v --summarize --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+
+        _COMMAND_CATKINBUILD="catkin build -i -v --summarize --no-status $BUILD_PKGS $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS"
+        if [ $VERBOSE_CATKIN_COMMANDS ]; then
+            $_COMMAND_CATKINBUILD  # Run catkin build command.
+        else
+            quiet "$_COMMAND_CATKINBUILD" $QUIET_SLEEP_LENGTH  # Command needs to be quoted http://stackoverflow.com/questions/1983048/passing-a-string-with-spaces-as-a-function-argument-in-bash
+        fi
+
         source install/setup.bash
         rospack profile
     fi
