@@ -97,11 +97,11 @@ With the following few short steps, you can start in your client repository usin
 
 1. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
 
-2. In `.travis.yml` file in your client repo, add in `install` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `.travis.yml` file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
 
 ::
 
-  install:
+  before_config:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
     - source .ci_config/travis.sh
