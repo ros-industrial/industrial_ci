@@ -186,7 +186,9 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 (Optional) To use specific version of industrial_ci in your client repo
 -------------------------------------------------------------------------------------
 
-(A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version. The following is an example using `git submodule`.
+(A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version.
+
+The following is an example using `git submodule`. Note that when using this method, you have to manually update the `submodule` every time there's an update in this `industrial_ci` package.
 
 First time you define the dependency to this repo
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
