@@ -1,4 +1,6 @@
-# industrial_ci
+================
+Industrial CI
+================
 Continuous integration repository for ROS-Industrial
 
 .. contents:: Table of Contents
