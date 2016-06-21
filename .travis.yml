@@ -39,13 +39,14 @@ matrix:
     - env: ROS_DISTRO=kinetic
 before_script:
   - CI_DIR=.ci_config
-  - mkdir $CI_DIR; cp * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories
+  - mkdir $CI_DIR; cp -R * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories
   - export BEFORE_SCRIPT="rm -fr common_travis/CATKIN_IGNORE; ${BEFORE_SCRIPT}"
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin build -i -v --limit-status-rate 0.001@catkin_make@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
 script:
-  - source $CI_DIR/pre-process.sh
+  - source $CI_DIR/test/pre-process.sh
   - source $CI_DIR/travis.sh
+  - source $CI_DIR/test/test_inductrial_ci.sh
   - if [ "${AFTER_INSTALL}" != "" ] ; then sudo apt-get install -f ${AFTER_INSTALL}; fi
-  - source $CI_DIR/post-process.sh
+  - source $CI_DIR/test/post-process.sh

@@ -9,9 +9,28 @@ Continuous integration repository for ROS-Industrial
 Introduction
 ============
 
-This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization (calling them as "**client**" repos). ROS-powered repositories in other organizations can potentially utilize the CI config here too.
+This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-(As of December 2015) The CI config in this repository is intended to be used by the client repos by `git clone` feature. This repo provides configuration for `Travis CI`. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+
+For a brief introduction, you could also check a presentation:
+
+* `ROS-Industrial community meeting <http://rosindustrial.org/news/2016/6/14/ros-i-community-web-meeting-june-2016>`_
+
+Supported ROS distributions
+----------------------------------
+
+Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
+
+* `Indigo <http://wiki.ros.org/indigo>`_
+* `Jade <http://wiki.ros.org/jade>`_
+* `Kinetic <http://wiki.ros.org/kinetic>`_
+
+Terminology
+----------------
+
+* **client repository**: The repositories that use the configuration stored in this repo to run CI jobs.
+* **downstream packages**: The software packages that depend on the package that's targetted to be tested using industrial_ci.
 
 FAQ
 ======
@@ -36,15 +55,27 @@ FAQ
 
   A- You can check `advanced_industrial_ci <https://github.com/InstitutMaupertuis/advanced_industrial_ci>`_ which provides scripts and binaries for PCL 1.8.0 and the Ceres solver. An integration example can be found `here <https://github.com/InstitutMaupertuis/ensenso_extrinsic_calibration/blob/indigo-devel/.travis.yml>`_.
 
+- Q- How does the target package get installed?
+
+  A- `Travis CI` does this. It pulls in your package to an running instance of an operating system of your choice, and place your package under `/home/travis`.
+
+- Q- The jobs on `Travis CI` are failing. How can I fix them?
+
+  A- (1) Find the section where error occurred that caused CI to stop. Sections are folded nicely and it's colored red when it fails. (2) Then identify whether the issue is pertaining to your package, or something else. Sometimes a cause is in `industrial_ci`, not your package. (3) Reviewing `Common Build Problems for Travis CI <https://docs.travis-ci.com/user/common-build-problems>`_ helps you to isolate the root cause. (4) If you think the root cause is in `industrial_ci`, (or if you're not sure,) ask at its `issue tracker <https://github.com/ros-industrial/industrial_ci/issues>`_.
+
+- Q- How can I customize the jobs?
+
+  A- (1) There are a number of variables to customize your jobs that you can learn the usage `in this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure>`_. (2) You can define pre- and post-processes, in addition to the default scripts (it's `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_ for `Travis CI`). See `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#run-pre-install-custom-commands>`_ for how.
+
 What are checked?
 ------------------------------------
 
 List of the checked items, in the actual order to be run.
 
 1. If your package builds.
-2. If available tests pass in the package. Because tests use software from `install` space, it is important the building step ends without issues (otherwise tests may not be reached).
+2. If available tests in the given package pass. Because tests use software from `install` space, it is important that the building step ends without issues (otherwise the tests may not be reached).
 3. If your package gets installed (i.e. built artifact goes into the `install` space).
-4. If tests in designated downstream packages pass.
+4. If downstream packages are designated, the tests in those packages pass.
 
 Your client repository does NOT need to pass all of above steps; in fact you can have only some of them tested. To pass the steps without having tested, simply "empty" them. For instance, in your client repository:
 
@@ -72,11 +103,11 @@ With the following few short steps, you can start in your client repository usin
 
 1. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
 
-2. In `.travis.yml` file in your client repo, add in `install` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `.travis.yml` file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
 
 ::
 
-  install:
+  before_config:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
     - source .ci_config/travis.sh
@@ -117,12 +148,12 @@ Note that some of these currently tied only to a single option, but we still lea
 
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
-* `BUILD_PKGS` (default: not set): `PKGS_DOWNSTREAM` will be filled with packages specified with this. Also these packages are to be built when `NOT_TEST_INSTALL` is set.
+* `BUILD_PKGS_WHITELIST` (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
 * `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
-* `NOT_TEST_BUILD` (default: not set): If true, tests in build space won't be run.
+* `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
 * `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
 * `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
 * `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
@@ -161,7 +192,9 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 (Optional) To use specific version of industrial_ci in your client repo
 -------------------------------------------------------------------------------------
 
-(A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version. The following is an example using `git submodule`.
+(A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version.
+
+The following is an example using `git submodule`. Note that when using this method, you have to manually update the `submodule` every time there's an update in this `industrial_ci` package.
 
 First time you define the dependency to this repo
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -247,7 +280,7 @@ Run pre-install custom commands
 
 You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example:
 
-* A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <<https://github.com/ros-industrial/industrial_ci/issues/14>`_).
+* A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
 
 In this case, add `source`d scripts before `travis.sh` gets called (see below for an example). 
 

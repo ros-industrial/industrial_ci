@@ -3,7 +3,7 @@
   <version>0.2.2</version>
   <description>common travis script suite</description>
   <license>BSD</license>
-  <maintainer email="iiysaito@opensource-robotics.tokyo.jp">Isaac I. Y. Saito</maintainer>
+  <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>
   <author email="iiysaito@opensource-robotics.tokyo.jp">Isaac I. Y. Saito</author>
 
   <buildtool_depend>catkin</buildtool_depend>
