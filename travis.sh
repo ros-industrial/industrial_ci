@@ -31,10 +31,13 @@
 
 # This file remains as "travis.sh" at the top directory of industrial_ci repository only to keep backward compatibility between version 0.2.2 and the newer.
 
+# 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 export TARGET_REPO_PATH=$(pwd)
 export TARGET_REPO_NAME=${PWD##*/}
 
 # Call the "core" executable of this repo to run all kinds of tests.
-cd ./industrial_ci
+cd $DIR_THIS/industrial_ci
 source ./travis_ci.sh
-cd ..  # Moves back to the repository root dir.
+cd -  # Moves back to the repository root dir.
