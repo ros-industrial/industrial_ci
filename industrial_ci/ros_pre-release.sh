@@ -33,7 +33,7 @@
 
 set -e
 set -x
-source ${CI_SOURCE_PATH}/$CI_PARENT_DIR/util.sh
+source ${ICI_PKG_PATH}/util.sh
 
 # Environment vars.
 if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="0"; fi

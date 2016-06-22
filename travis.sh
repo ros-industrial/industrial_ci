@@ -31,6 +31,9 @@
 
 # This file remains as "travis.sh" at the top directory of industrial_ci repository only to keep backward compatibility between version 0.2.2 and the newer.
 
+export TARGET_REPO_PATH=$(pwd)
+export TARGET_REPO_NAME=${PWD##*/}
+
 # Call the "core" executable of this repo to run all kinds of tests.
 cd ./industrial_ci
 source ./travis_ci.sh

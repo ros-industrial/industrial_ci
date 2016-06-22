@@ -39,11 +39,11 @@ set -e
 set -x
 
 # Define some env vars that need to come earlier than util.sh
-export CI_SOURCE_PATH=$(pwd)
-export CI_PARENT_DIR=.ci_config  # This is the folder name that is used in downstream repositories in order to point to this repo.
+export ICI_PKG_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) of industrial_ci top dir.
+export CI_MAIN_PKG=industrial_ci
 export HIT_ENDOFSCRIPT=false
 
-source ${CI_SOURCE_PATH}/util.sh
+source ${ICI_PKG_PATH}/util.sh
 
 trap error ERR
 trap success SIGTERM  # So that this script won't terminate without verifying that all necessary steps are done.
@@ -65,7 +65,6 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e BUILDER \
       -e CATKIN_PARALLEL_JOBS \
       -e CATKIN_PARALLEL_TEST_JOBS \
-      -e CI_PARENT_DIR \
       -e NOT_TEST_BUILD \
       -e NOT_TEST_INSTALL \
       -e PRERELEASE \
@@ -87,9 +86,7 @@ fi
 travis_time_start init_travis_environment
 # Define more env vars
 BUILDER=catkin
-CI_MAIN_PKG=industrial_ci
 ROSWS=wstool
-export DOWNSTREAM_REPO_NAME=${PWD##*/}
 if [ ! "$USE_DEVEL_SPACE" == "true" ]; then export CATKIN_TOOLS_CONFIG_ARGS="--install"; fi  # when using devel space, nothing will be set.
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -111,13 +108,13 @@ fi
 if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 
 git branch --all
-if [ "`git diff origin/master FETCH_HEAD $CI_PARENT_DIR`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $CI_PARENT_DIR | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_PARENT_DIR/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
+if [ "`git diff origin/master FETCH_HEAD $ICI_PKG_PATH`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $ICI_PKG_PATH | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_MAIN_PKG/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
 
 travis_time_end  # init_travis_environment
 
 travis_time_start setup_ros
 
-echo "Testing branch $TRAVIS_BRANCH of $DOWNSTREAM_REPO_NAME"
+echo "Testing branch $TRAVIS_BRANCH of $TARGET_REPO_NAME"  # $TARGET_REPO_NAME is the repo where this job is triggered from, and the variable is expected to be passed externally (industrial_ci/travis.sh should be taking care of it)
 # Set apt repo
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 # Common ROS install preparation
@@ -171,8 +168,8 @@ travis_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
-mkdir -p ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
-cd ~/ros/ws_$DOWNSTREAM_REPO_NAME/src
+mkdir -p ~/ros/ws_$TARGET_REPO_NAME/src
+cd ~/ros/ws_$TARGET_REPO_NAME/src
 case "$UPSTREAM_WORKSPACE" in
 debian)
     echo "Obtain deb binary for upstream packages."
@@ -180,12 +177,12 @@ debian)
 file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
     $ROSWS init .
     # Prioritize $ROSINSTALL_FILENAME.$ROS_DISTRO if it exists over $ROSINSTALL_FILENAME.
-    if [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
+    if [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
         # install (maybe unreleased version) dependencies from source for specific ros version
-        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
-    elif [ -e $CI_SOURCE_PATH/$ROSINSTALL_FILENAME ]; then
+        $ROSWS merge file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
+    elif [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME ]; then
         # install (maybe unreleased version) dependencies from source
-        $ROSWS merge file://$CI_SOURCE_PATH/$ROSINSTALL_FILENAME
+        $ROSWS merge file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
@@ -197,19 +194,19 @@ esac
 # download upstream packages into workspace
 if [ -e .rosinstall ]; then
     # ensure that the downstream is not in .rosinstall
-    $ROSWS rm $DOWNSTREAM_REPO_NAME || true
+    $ROSWS rm $TARGET_REPO_NAME || true
     $ROSWS update
 fi
-# CI_SOURCE_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
-ln -s $CI_SOURCE_PATH .
+# TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
+ln -s $TARGET_REPO_PATH .
 
 # Disable metapackage
-find -L . -name package.xml -print -exec ${CI_SOURCE_PATH}/$CI_PARENT_DIR/$CI_MAIN_PKG/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
+find -L . -name package.xml -print -exec ${ICI_PKG_PATH}/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
 
 source /opt/ros/$ROS_DISTRO/setup.bash # ROS_PACKAGE_PATH is important for rosdep
 # Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
 if [ ! -e .rosinstall ]; then
-    echo "- git: {local-name: $DOWNSTREAM_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
+    echo "- git: {local-name: $TARGET_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
 fi
 
 travis_time_end  # setup_rosws
@@ -225,10 +222,8 @@ travis_time_end  # before_script
 travis_time_start rosdep_install
 
 # Run "rosdep install" command. Avoid manifest.xml files if any.
-if [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh ]; then
-    ${CI_SOURCE_PATH}/$CI_PARENT_DIR/rosdep-install.sh
-elif [ -e ${CI_SOURCE_PATH}/rosdep-install.sh ]; then
-    ${CI_SOURCE_PATH}/rosdep-install.sh
+if [ -e ${ICI_PKG_PATH}/rosdep-install.sh ]; then
+    ${ICI_PKG_PATH}/rosdep-install.sh
 fi
 
 travis_time_end  # rosdep_install
@@ -236,8 +231,8 @@ travis_time_end  # rosdep_install
 # Start prerelease, and once it finishs then finish this script too.
 # This block needs to be here (i.e. After rosdep is done) because catkin_test_results isn't available until up to this point.
 travis_time_start prerelease_from_travis_sh
-if [ "$PRERELEASE" == true ] && [ -e ${CI_SOURCE_PATH}/$CI_PARENT_DIR/ros_pre-release.sh ]; then
-  source ${CI_SOURCE_PATH}/${CI_PARENT_DIR}/ros_pre-release.sh && run_ros_prerelease
+if [ "$PRERELEASE" == true ] && [ -e ${ICI_PKG_PATH}/ros_pre-release.sh ]; then
+  source ${ICI_PKG_PATH}/ros_pre-release.sh && run_ros_prerelease
   retval_prerelease=$?
   if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
   # With Prerelease option, we want to stop here without running the rest of the code.
@@ -256,7 +251,7 @@ if [ "$USE_DEVEL_SPACE" == "true" ]; then
     ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
     source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
     # for catkin
-    if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${CI_SOURCE_PATH} --only-names`; fi
+    if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
     if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS"); fi
     if [ "$BUILDER" == catkin ]; then
         catkin init
@@ -334,7 +329,7 @@ PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
 PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
 if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --verbose --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$DOWNSTREAM_REPO_NAME/build/ || error; fi
+if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --verbose --all ~/.ros/test_results/ || error; fi
 
 travis_time_end  # after_script
