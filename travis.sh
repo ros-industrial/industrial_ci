@@ -58,6 +58,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   travis_time_end  # build_docker_image
 
   travis_time_start run_travissh_docker
+  export DOWNSTREAM_REPO_NAME=${PWD##*/}
   docker run \
       -e ROS_REPOSITORY_PATH \
       -e ROS_DISTRO \
@@ -80,8 +81,10 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e ROSWS \
       -e TARGET_PKGS \
       -e USE_DEBROS_DISTRO \
-      -v $(pwd):/root/ci_src industrial-ci/xenial \
-      /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
+      -e UPSTREAM_WORKSPACE \
+      -e ROSINSTALL_FILENAME \
+      -v $(pwd):/root/$DOWNSTREAM_REPO_NAME industrial-ci/xenial \
+      /bin/bash -c "cd /root/$DOWNSTREAM_REPO_NAME; source .ci_config/travis.sh;"
   retval=$?
   if [ $retval -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else exit; fi  # Call  travis_time_end  run_travissh_docker
 fi
@@ -97,8 +100,8 @@ if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"; fi
-# .rosintall file name 
-if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi 
+# .rosintall file name
+if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi
 # For apt key stores
 if [ ! "$APTKEY_STORE_HTTPS" ]; then export APTKEY_STORE_HTTPS="https://raw.githubusercontent.com/ros/rosdistro/master/ros.key"; fi
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
@@ -253,7 +256,7 @@ travis_time_start catkin_build
 ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
 # for catkin
-if [ "${_TARGET_PKGS// }" == "" ]; then export _TARGET_PKGS=`catkin_topological_order ${CI_SOURCE_PATH} --only-names`; fi  # `_TARGET_PKGS` (default: not set): If not set, the packages in the output of `catkin_topological_order` from the source space of your repo are to be set. This is also used to fill `PKGS_DOWNSTREAM` if it is not set. 
+if [ "${_TARGET_PKGS// }" == "" ]; then export _TARGET_PKGS=`catkin_topological_order ${CI_SOURCE_PATH} --only-names`; fi  # `_TARGET_PKGS` (default: not set): If not set, the packages in the output of `catkin_topological_order` from the source space of your repo are to be set. This is also used to fill `PKGS_DOWNSTREAM` if it is not set.
 if [ "${_PKGS_DOWNSTREAM// }" == "" ]; then export _PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$_TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 if [ "$BUILDER" == catkin ]; then catkin build -i -v --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
