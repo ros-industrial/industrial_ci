@@ -161,10 +161,10 @@ Note that some of these currently tied only to a single option, but we still lea
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
-* `ROSINSTALL_FILENAME` (default: not set): See `UPSTREAM_WORKSPACE` description.
 * `ROSWS` (default: wstool): Currently only `wstool` is available.
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
-* `UPSTREAM_WORKSPACE` (default: debian): When this is set `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
+* `UPSTREAM_WORKSPACE` (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
+* `ROSINSTALL_FILENAME` (default: not set): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
 * `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
@@ -183,7 +183,7 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 
 ::
 
-  script: 
+  script:
     - source .ci_config/travis.sh
     - source ./travis.sh
 
@@ -216,7 +216,7 @@ This standard `git submodule` command:
 
 ::
 
-  script: 
+  script:
     - source .ci_config/travis.sh
     #- source ./travis.sh  # Optional. Explained later
 
@@ -282,16 +282,16 @@ You may want to add custom steps prior to the setup defined in `./travis.sh <./t
 
 * A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
 
-In this case, add `source`d scripts before `travis.sh` gets called (see below for an example). 
+In this case, add `source`d scripts before `travis.sh` gets called (see below for an example).
 
 ::
 
-  script: 
+  script:
     - source ./your_custom_PREprocess.sh
     - source .ci_config/travis.sh
     - source ./your_custom_POSTprocess.sh
 
-In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.sh` the environment is kept from previous script(s), so whatever is done in previous scripts remains. 
+In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.sh` the environment is kept from previous script(s), so whatever is done in previous scripts remains.
 
 (Optional) Build depended packages from source
 ----------------------------------------------
@@ -301,7 +301,15 @@ By default the packages your package depend upon are installed via binaries. How
 Use .rosinstall file to specify the depended packages source repository
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Standard way is 1) set `UPSTREAM_WORKSPACE` as `file`, 2) create a file `$ROSINSTALL_FILENAME` using the same file format as `.rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
+For using a rosinstall file located locally within the repository:
+
+1) set `UPSTREAM_WORKSPACE` as `file`
+2) create a file `$ROSINSTALL_FILENAME` using the same file format as `.rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
+
+For using a rosinstall file located externally from the repository:
+
+1) set `UPSTREAM_WORKSPACE` to some URL, for example: `https://github.com/ros-planning/moveit_docs/blob/jade-devel/moveit.rosinstall`
+2) do not specify `$ROSINSTALL_FILENAME`
 
 Have multiple .rosinstall files per ROS-distro
 ++++++++++++++++++++++++++++++++++++++++++++++
