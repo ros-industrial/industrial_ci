@@ -58,6 +58,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   travis_time_end  # build_docker_image
 
   travis_time_start run_travissh_docker
+  export DOWNSTREAM_REPO_NAME=${PWD##*/}
   docker run \
       -e ROS_REPOSITORY_PATH \
       -e ROS_DISTRO \
@@ -82,8 +83,8 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e USE_DEBROS_DISTRO \
       -e UPSTREAM_WORKSPACE \
       -e ROSINSTALL_FILENAME \
-      -v $(pwd):/root/ci_src industrial-ci/xenial \
-      /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
+      -v $(pwd):/root/$DOWNSTREAM_REPO_NAME industrial-ci/xenial \
+      /bin/bash -c "cd /root/$DOWNSTREAM_REPO_NAME; source .ci_config/travis.sh;"
   retval=$?
   if [ $retval -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else exit; fi  # Call  travis_time_end  run_travissh_docker
 fi
