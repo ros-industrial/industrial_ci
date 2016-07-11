@@ -108,6 +108,7 @@ if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-ke
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="0xB01FA116"; fi
 if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-industrial/industrial_ci/pull/47#discussion_r64882878 for the discussion.
     if [ "$USE_DEB" != "true" ]; then export UPSTREAM_WORKSPACE="file";
+    elif [ "$USE_DEB" == true ] && [ "$UPSTREAM_WORKSPACE" == "file" ]; then echo "You have USE_DEB == true AND UPSTREAM_WORKSPACE == file, which is contradictory. Please review https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source for setup. Exiting script."; error;
     else export UPSTREAM_WORKSPACE="debian";
     fi
 fi
