@@ -296,10 +296,16 @@ In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.s
 (Optional) Build depended packages from source
 ----------------------------------------------
 
-By default the packages your package depend upon are installed via binaries. However, you may want to build them via source in some cases (e.g. when depended binaries are not available). There are a few ways to do so in `industrial_ci`. Examples of all are available in `.travis.yml file on this repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
+By default the packages your package depend upon are installed via binaries. However, you may want to build them via source in some cases (e.g. when depended binaries are not available). There are a few ways to do so in `industrial_ci`; By utilizing `rosinstall <http://docs.ros.org/independent/api/rosinstall/html/>`_, you can specify the packages that you want to be built from source.
+
+Note that while building the designated packages from source, other packages are resolved still from binary automatically by `rosdep <http://wiki.ros.org/rosdep>`_.
+
+Examples of how to enable all of the following cases are available in `.travis.yml file on this repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
 
 Use .rosinstall file to specify the depended packages source repository
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+WARNING: In all cases where you want to utilize `.rosinstall` (or similar name) files, be sure to set `USE_DEB` as `false`, or simply not define it.
 
 For using a rosinstall file located locally within the repository:
 
