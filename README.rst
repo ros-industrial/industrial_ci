@@ -278,9 +278,11 @@ Then open a pull request using this branch against the branch that the change is
 Run pre-install custom commands
 -----------------------------------------
 
-You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example:
+You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example usecases:
 
 * A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
+
+* You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
 In this case, add `source`d scripts before `travis.sh` gets called (see below for an example).
 
