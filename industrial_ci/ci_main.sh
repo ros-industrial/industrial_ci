@@ -321,10 +321,14 @@ travis_time_start after_script
 ## BEGIN: travis' after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
 PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
+# For compatibilility with hydro catkin, which has no --verbose flag
+CATKIN_TEST_RESULTS_CMD="catkin_test_results"
+if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
+
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
-if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --verbose --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then catkin_test_results --verbose --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
-if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --verbose --all ~/.ros/test_results/ || error; fi
+if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --all $ROS_LOG_DIR || error; fi
+if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
+if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
 
 travis_time_end  # after_script
 
