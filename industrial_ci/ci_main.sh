@@ -87,6 +87,10 @@ travis_time_start init_travis_environment
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
+# For compatibilility with hydro catkin, which has no --verbose flag
+CATKIN_TEST_RESULTS_CMD="catkin_test_results"
+if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
+
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
 if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
@@ -321,9 +325,6 @@ travis_time_start after_script
 ## BEGIN: travis' after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
 PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
-# For compatibilility with hydro catkin, which has no --verbose flag
-CATKIN_TEST_RESULTS_CMD="catkin_test_results"
-if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
 
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
 if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --all $ROS_LOG_DIR || error; fi
