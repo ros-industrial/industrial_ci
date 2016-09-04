@@ -342,6 +342,18 @@ Use .rosinstall from external location
 
 You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
 
+(Optional) Checking older ROS distros with industrial_ci
+--------------------------------------------------------
+
+For the older ROS distributions than `those that are supported <https://github.com/ros-industrial/industrial_ci#supported-ros-distributions>`_, you may still be able to use `industrial_ci`. Here's how to do so taking ROS `Hydro` as an example.
+
+For `Travis CI`, you need at least the following changes in `.travis.yml`:
+
+* Use `dist: precise` (instead of e.g. "`dist: trusty`").
+* Define `ROS_DISTRO` with  `hydro` (so have `ROS_DISTRO="hydro"`).
+
+A successful example from `swri-robotics/mapviz <https://github.com/swri-robotics/mapviz/blob/49b0c5748950a956804e1976cfd7a224fa3f3f7d/.travis.yml>`_.
+
 For maintainers of industrial_ci repository
 ================================================
 
