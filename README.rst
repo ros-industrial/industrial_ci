@@ -11,11 +11,22 @@ Introduction
 
 This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of August 2016, this repo provides configuration for `Travis CI <https://travis-ci.org/>`_. You can use from private CI server (e.g. in your corporate environment). The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
 For a brief introduction, you could also check a presentation:
 
 * `ROS-Industrial community meeting <http://rosindustrial.org/news/2016/6/14/ros-i-community-web-meeting-june-2016>`_
+
+Capabilities
+------------
+
+* Supported `ROS Indigo` onward. Older distro are experimentally supported.
+* Can be deployed on any CI server that can access the Internet.
+* Customize the pre/post process.
+* `Build certain packages from source <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_, not using their pre-built binary.
+* Downstream (i.e. packages that depends on the package you're testing) test.
+* `ROS Prerelease Test on docker container <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-run-ros-prerelease-test>`_.
+* Much more configuration via `variables <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure>`_
 
 Supported ROS distributions
 ----------------------------------
@@ -49,7 +60,7 @@ FAQ
 
 - Q- In my project there aren't yet test cases. Can I still have it checked using `industrial_ci` and what can I get out of the check?
 
-  A- The `industrial_ci` still provides valuable checks; it ensures if your package builds without issues. Also installation rules if you define. Just as a headsup that making test cases are highly recommended as your ear may hurt.
+  A- The `industrial_ci` still provides valuable checks; it ensures if your package builds and is installable. Just as a headsup that making test cases are highly recommended as your ear may hurt.
 
 - Q- My package uses a custom Point Cloud Library (PCL) version or the `industrial_calibration <https://github.com/ros-industrial/industrial_calibration>`_ package, how do I make build work?
 
@@ -89,7 +100,7 @@ Prerequisite
 In order for your repository to get checked with configurations in `industrial_ci`, it needs:
 
 * To be a `Catkin package <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
-* Build-able on Linux (as of Dec 2015, Ubuntu 14.04/Trusty is used). Although your repository is not necessarilly intended for Linux, checks are run on Linux.
+* Build-able on Linux. Although your repository is not necessarilly intended for Linux, checks are run on Linux.
 
 Usage
 ======
