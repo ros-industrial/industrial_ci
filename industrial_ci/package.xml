@@ -1,7 +1,21 @@
 <package>
   <name>industrial_ci</name>
   <version>0.3.0</version>
-  <description>common travis script suite</description>
+  <description>This repository contains <a href = "https://en.wikipedia.org/wiki/Continuous_integration">CI (Continuous Integration)</a> configuration that can be commonly used by the repositories in <a href = "https://github.com/ros-industrial">ros-industrial</a> organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
+
+As of August 2016, this repo provides configuration for <a href = "https://travis-ci.org/">Travis CI</a>. You can use from private CI server (e.g. in your corporate environment). The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+
+    <h3>Capabilities</h3>
+    <ul>
+      <li>Supported `ROS Indigo` onward. Older distro are experimentally supported.</li>
+      <li>Can be deployed on any CI server that can access the Internet.</li>
+      <li>Customize the pre/post process.</li>
+      <li><a href = "https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source">Build certain packages from source</a>, not using their pre-built binary.</li>
+      <li>Downstream (i.e. packages that depends on the package you're testing) test.</li>
+      <li><a href = "https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-run-ros-prerelease-test">ROS Prerelease Test on docker container</a>.</li>
+      <li>Much more configuration via <a href = "https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure">variables</a></li>
+    </ul>
+  </description>
   <license>BSD</license>
   <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>
   <author email="iiysaito@opensource-robotics.tokyo.jp">Isaac I. Y. Saito</author>
