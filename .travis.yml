@@ -32,6 +32,8 @@ env:
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall
     - ROS_DISTRO=indigo USE_DEB=true  # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
+    - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-indigo-opencv3 ros-indigo-gazebo-ros"
+    - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3 ros-hydro-gazebo-ros" _CI_INVERTERROR=true  # This should fail (trying from a wrong distro), but the test succeeds.
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
     - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
