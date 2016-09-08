@@ -127,7 +127,12 @@ lsb_release -a
 sudo apt-get update || (echo "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"; error)
 sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-rosbash ros-$ROS_DISTRO-rospack
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
-if [ "$ADDITIONAL_DEBS" ]; then sudo apt-get install -q -qq -y $ADDITIONAL_DEBS;  fi
+if [ "$ADDITIONAL_DEBS" ]; then
+    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS
+    if [[ $? > 0 ]]; then
+        echo "One or more additional deb installation is failed. Exiting."; error
+    fi
+fi
 # MongoDB hack - I don't fully understand this but its for moveit_warehouse
 dpkg -s mongodb || echo "ok"; export HAVE_MONGO_DB=$?
 if [ $HAVE_MONGO_DB == 0 ]; then
