@@ -1,6 +1,6 @@
 <package>
   <name>industrial_ci</name>
-  <version>0.2.2</version>
+  <version>0.3.0</version>
   <description>common travis script suite</description>
   <license>BSD</license>
   <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>

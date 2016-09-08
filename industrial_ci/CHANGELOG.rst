@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2016-09-07)
+------------------
 * [fix] Catch apt error for ADDITIONAL_DEB (Fix `#78 <https://github.com/ros-industrial/industrial_ci/issues/78>`_). (`#79 <https://github.com/ros-industrial/industrial_ci/issues/79>`_)
 * [feat] ROS Hydro compatible (Only use catkin_test_results --verbose if it exists, `#77 <https://github.com/ros-industrial/industrial_ci/issues/77>`_)
 * [feat] Allow failure for now the jade source build (see https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764).
