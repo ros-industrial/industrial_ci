@@ -2,6 +2,15 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] Catch apt error for ADDITIONAL_DEB (Fix `#78 <https://github.com/ros-industrial/industrial_ci/issues/78>`_). (`#79 <https://github.com/ros-industrial/industrial_ci/issues/79>`_)
+* [feat] ROS Hydro compatible (Only use catkin_test_results --verbose if it exists, `#77 <https://github.com/ros-industrial/industrial_ci/issues/77>`_)
+* [feat] Allow failure for now the jade source build (see https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764).
+* [improve] Use install space by default (addresses `#54 <https://github.com/ros-industrial/industrial_ci/issues/54>`_).
+* [maintenance] Refactoring `#67 <https://github.com/ros-industrial/industrial_ci/pull/67>`_
+* Contributors: Dave Coleman, Robert Haschke Edward Venator, Isaac I.Y. Saito
+
 0.2.2 (2016-05-13)
 ------------------
 * [fix] Remove wrong duplicate prerelease test code block. `#40 <https://github.com/ros-industrial/industrial_ci/issues/40>`_
