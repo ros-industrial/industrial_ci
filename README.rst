@@ -26,6 +26,7 @@ Capabilities
 * `Build certain packages from source <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_, not using their pre-built binary.
 * Downstream (i.e. packages that depends on the package you're testing) test.
 * `ROS Prerelease Test on docker container <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-run-ros-prerelease-test>`_.
+  * As of September 12, 2016, this feature has an issue. `Ticketed <https://github.com/ros-industrial/industrial_ci/issues/64#issuecomment-246512153>`_.
 * Much more configuration via `variables <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure>`_
 
 Supported ROS distributions
