@@ -52,7 +52,7 @@ function install_ros() {
 }
 
 function setup_docker() {
-    sudo usermod -aG docker ubuntu
+    sudo usermod -aG docker $(whoami)
     # ROS Buildfarm for prerelease http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
     sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo -E apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
