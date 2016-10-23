@@ -2,6 +2,11 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] usermod error on docker-based ROS Prerelease (see https://github.com/ros-industrial/ros_canopen/pull/193#issuecomment-254575036). (`#81 <https://github.com/ros-industrial/industrial_ci/issues/81>`_)
+* Contributors: Mathias Luedtke, Isaac I.Y. Saito
+
 0.3.0 (2016-09-07)
 ------------------
 * [fix] Catch apt error for ADDITIONAL_DEB (Fix `#78 <https://github.com/ros-industrial/industrial_ci/issues/78>`_). (`#79 <https://github.com/ros-industrial/industrial_ci/issues/79>`_)
