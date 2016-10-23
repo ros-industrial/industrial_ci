@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>industrial_ci_testpkg</name>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <description>Test purpose only for industrial_ci package.</description>
 
   <maintainer email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</maintainer>
