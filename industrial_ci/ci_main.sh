@@ -76,7 +76,9 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       -e ROS_PARALLEL_JOBS \
       -e ROSWS \
       -e TARGET_PKGS \
-      -e USE_DEBROS_DISTRO \
+      -e USE_DEB \
+      -e UPSTREAM_WORKSPACE \
+      -e ROSINSTALL_FILENAME \
       -v $TARGET_REPO_PATH/:/root/ci_src industrial-ci/xenial \
       /bin/bash -c "cd /root/ci_src; source .ci_config/travis.sh;"
   retval=$?
