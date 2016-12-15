@@ -48,8 +48,7 @@ matrix:
     - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
     - env: ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall
 before_script:
-  - CI_DIR=.ci_config
-  - mkdir $CI_DIR; cp -R * $CI_DIR  # Need to copy, since directory starting from dot is ignoreed by catkin build. Also this folder name is used for testing both this repo itself and the "client" repositories
+  - CI_DIR=.
   - export BEFORE_SCRIPT="rm -fr common_travis/CATKIN_IGNORE; ${BEFORE_SCRIPT}"
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin build -i -v --limit-status-rate 0.001@catkin_make@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
