@@ -29,7 +29,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-## Author: Isaac I. Y. Saito, Mathias L«ädtke
+## Author: Isaac I. Y. Saito, Mathias LÃ¼dtke
 
 set -e
 set -x
@@ -57,7 +57,7 @@ function setup_docker() {
     sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo -E apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
     # Buildfarm workaround for Python3 http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
-    sudo -E apt-get update && sudo -E apt-get install python3 python3-pip python-ros-buildfarm
+    sudo -E apt-get update && sudo -E apt-get -qq install -y python3 python3-pip python-ros-buildfarm
     sudo python3 -m pip install -U EmPy
 }
 
