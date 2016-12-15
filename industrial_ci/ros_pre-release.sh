@@ -37,7 +37,6 @@ source ${ICI_PKG_PATH}/util.sh
 
 # Environment vars.
 if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="0"; fi
-if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2); fi
 #echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"  # This shouldn't be echoed since this would become a return value of this entire script.
 
 CATKIN_DISTRO=$ROS_DISTRO
@@ -72,11 +71,17 @@ function run_ros_prerelease() {
     travis_time_end  # setup_environment
 
     travis_time_start setup_prerelease_scripts
-    mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${PRERELEASE_OS_CODENAME} amd64 ${PRERELEASE_REPONAME} --level $PRERELEASE_DOWNSTREAM_DEPTH --output-dir ./
+    mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; 
+    if [ ! "$PRERELEASE_REPONAME" ]; then
+        PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2)
+        mkdir -p catkin_workspace/src
+        cp -a $TRAVIS_BUILD_DIR catkin_workspace/src/
+    fi
+    generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${PRERELEASE_OS_CODENAME} amd64 ${PRERELEASE_REPONAME} --level $PRERELEASE_DOWNSTREAM_DEPTH --output-dir ./
     travis_time_end  # setup_prerelease_scripts
 
     travis_time_start run_prerelease
-    ./prerelease.sh;
+    ./prerelease.sh -y;
     travis_time_end  # run_prerelease
     
     travis_time_start show_testresult
