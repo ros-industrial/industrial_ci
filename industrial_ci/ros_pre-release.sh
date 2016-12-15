@@ -40,9 +40,12 @@ if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH
 if [ ! "$PRERELEASE_REPONAME" ]; then PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2); fi
 #echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"  # This shouldn't be echoed since this would become a return value of this entire script.
 
+CATKIN_DISTRO=$ROS_DISTRO
+
 case "$ROS_DISTRO" in
 "kinetic")
     os_code_name="xenial"
+    CATKIN_DISTRO="jade"
     ;;
 *)
     os_code_name=$(lsb_release -sc)
@@ -53,12 +56,12 @@ if [ ! "$PRERELEASE_OS_CODENAME" ]; then PRERELEASE_OS_CODENAME=$os_code_name; f
 # File-global vars and 
 RESULT_PRERELEASE=-1
 
-function install_ros() {
+function install_catkin() {
     # Set apt repo
     sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
     # Common ROS install preparation
     wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-    sudo apt-get -qq install -y ros-$ROS_DISTRO-catkin && source /opt/ros/$ROS_DISTRO/setup.bash || (echo 'ros-latest.list content: \n'; cat /etc/apt/sources.list.d/ros-latest.list; error;)
+    sudo apt-get -qq update && sudo apt-get -qq install -y ros-$CATKIN_DISTRO-catkin && source /opt/ros/$CATKIN_DISTRO/setup.bash || (echo 'ros-latest.list content: \n'; cat /etc/apt/sources.list.d/ros-latest.list; error;)
 }
 
 function setup_docker() {
@@ -73,7 +76,7 @@ function setup_docker() {
 
 function run_ros_prerelease() {
     travis_time_start install_for_display_testresult
-    install_ros
+    install_catkin
     travis_time_end  # install_for_display_testresult
 
     travis_time_start setup_docker
