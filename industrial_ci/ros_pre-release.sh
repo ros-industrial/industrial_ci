@@ -56,32 +56,20 @@ if [ ! "$PRERELEASE_OS_CODENAME" ]; then PRERELEASE_OS_CODENAME=$os_code_name; f
 # File-global vars and 
 RESULT_PRERELEASE=-1
 
-function install_catkin() {
-    # Set apt repo
-    sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-    # Common ROS install preparation
-    wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-    sudo apt-get -qq update && sudo apt-get -qq install -y ros-$CATKIN_DISTRO-catkin && source /opt/ros/$CATKIN_DISTRO/setup.bash || (echo 'ros-latest.list content: \n'; cat /etc/apt/sources.list.d/ros-latest.list; error;)
-}
-
-function setup_docker() {
-    sudo usermod -aG docker $(whoami)
+function setup_environment() {
     # ROS Buildfarm for prerelease http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
     sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo -E apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
     # Buildfarm workaround for Python3 http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
-    sudo -E apt-get update && sudo -E apt-get -qq install -y python3 python3-pip python-ros-buildfarm
+    sudo -E apt-get update && sudo -E apt-get -qq install -y python3 python3-pip python-ros-buildfarm ros-$CATKIN_DISTRO-catkin
     sudo python3 -m pip install -U EmPy
+    source /opt/ros/$CATKIN_DISTRO/setup.bash
 }
 
 function run_ros_prerelease() {
-    travis_time_start install_for_display_testresult
-    install_catkin
-    travis_time_end  # install_for_display_testresult
-
-    travis_time_start setup_docker
-    setup_docker
-    travis_time_end  # setup_docker
+    travis_time_start setup_environment
+    setup_environment
+    travis_time_end  # setup_environment
 
     travis_time_start setup_prerelease_scripts
     mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${PRERELEASE_OS_CODENAME} amd64 ${PRERELEASE_REPONAME} --level $PRERELEASE_DOWNSTREAM_DEPTH --output-dir ./
