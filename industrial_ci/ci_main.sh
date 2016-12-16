@@ -59,28 +59,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   docker_target_repo_path=/root/ci_src
   docker_ici_pkg_path=${ICI_PKG_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
   docker run \
-      -e ROS_REPOSITORY_PATH \
-      -e ROS_DISTRO \
-      -e ADDITIONAL_DEBS \
-      -e BEFORE_SCRIPT \
-      -e BUILD_PKGS \
-      -e BUILDER \
-      -e CATKIN_PARALLEL_JOBS \
-      -e CATKIN_PARALLEL_TEST_JOBS \
-      -e NOT_TEST_BUILD \
-      -e NOT_TEST_INSTALL \
-      -e PRERELEASE \
-      -e PRERELEASE_DOWNSTREAM_DEPTH \
-      -e PRERELEASE_REPONAME \
-      -e PKGS_DOWNSTREAM \
-      -e ROS_PARALLEL_JOBS \
-      -e ROS_PARALLEL_TEST_JOBS \
-      -e ROS_PARALLEL_JOBS \
-      -e ROSWS \
-      -e TARGET_PKGS \
-      -e USE_DEB \
-      -e UPSTREAM_WORKSPACE \
-      -e ROSINSTALL_FILENAME \
+      --env-file ${ICI_PKG_PATH}/docker.env \
       -e TARGET_REPO_PATH=$docker_target_repo_path \
       -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
