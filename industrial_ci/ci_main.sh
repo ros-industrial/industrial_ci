@@ -322,7 +322,7 @@ if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULT
 
 travis_time_end  # after_script
 
-cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
+cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 pwd
 
 HIT_ENDOFSCRIPT=true
