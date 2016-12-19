@@ -48,6 +48,15 @@ source ${ICI_PKG_PATH}/util.sh
 trap error ERR
 trap success SIGTERM  # So that this script won't terminate without verifying that all necessary steps are done.
 
+# Start prerelease, and once it finishs then finish this script too.
+travis_time_start prerelease_from_travis_sh
+if [ "$PRERELEASE" == true ] && [ -e ${ICI_PKG_PATH}/ros_pre-release.sh ]; then
+  source ${ICI_PKG_PATH}/ros_pre-release.sh && run_ros_prerelease
+  retval_prerelease=$?
+  if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
+  # With Prerelease option, we want to stop here without running the rest of the code.
+fi
+
 # Building in 16.04 requires running this script in a docker container
 # The Dockerfile in this repository defines a Ubuntu 16.04 container
 if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
@@ -219,16 +228,6 @@ if [ -e ${ICI_PKG_PATH}/rosdep-install.sh ]; then
 fi
 
 travis_time_end  # rosdep_install
-
-# Start prerelease, and once it finishs then finish this script too.
-# This block needs to be here (i.e. After rosdep is done) because catkin_test_results isn't available until up to this point.
-travis_time_start prerelease_from_travis_sh
-if [ "$PRERELEASE" == true ] && [ -e ${ICI_PKG_PATH}/ros_pre-release.sh ]; then
-  source ${ICI_PKG_PATH}/ros_pre-release.sh && run_ros_prerelease
-  retval_prerelease=$?
-  if [ $retval_prerelease -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else error; fi  # Internally called travis_time_end for prerelease_from_travis_sh
-  # With Prerelease option, we want to stop here without running the rest of the code.
-fi
 
 travis_time_start wstool_info
 $ROSWS --version
