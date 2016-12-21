@@ -43,17 +43,17 @@ CATKIN_DISTRO=$ROS_DISTRO
 
 case "$ROS_DISTRO" in
 "kinetic")
-    os_code_name="xenial"
+    os_code_names=(wily xenial)
     CATKIN_DISTRO="jade"
     ;;
+"indigo"|"jade")
+    os_code_names=(saucy trusty)
+    CATKIN_DISTRO="jade"
+    ;;    
 *)
-    os_code_name=$(lsb_release -sc)
+    os_code_names=$(lsb_release -sc)
     ;;
 esac
-if [ ! "$PRERELEASE_OS_CODENAME" ]; then PRERELEASE_OS_CODENAME=$os_code_name; fi
-
-# File-global vars and 
-RESULT_PRERELEASE=-1
 
 function setup_environment() {
     # ROS Buildfarm for prerelease http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
@@ -65,7 +65,9 @@ function setup_environment() {
     source /opt/ros/$CATKIN_DISTRO/setup.bash
 }
 
-function run_ros_prerelease() {
+# @brief: Entire steps to run ROS prerelease test for single type of OS distro (e.g. Ubuntu Xenial).
+#         For completeness, this function should NOT be directly used except by run_ros_prerelease (public, no prefixing underscore).  
+function _run_ros_prerelease() {
     travis_time_start setup_environment
     setup_environment
     travis_time_end  # setup_environment
@@ -92,4 +94,17 @@ function run_ros_prerelease() {
     pwd
 
     return $RESULT_PRERELEASE
+}
+
+function run_ros_prerelease() {
+	retval_prerelease=-1
+	if [ ! "$PRERELEASE_OS_CODENAME" ]; then
+		for os_code_name in ${$os_code_names[@]}; do
+		    PRERELEASE_OS_CODENAME=$os_code_name;
+		    _run_ros_prerelease
+            $retval_prerelease=$?
+		done
+    fi
+
+    return $retval_prerelease	
 }
