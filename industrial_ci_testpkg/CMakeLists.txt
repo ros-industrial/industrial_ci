@@ -6,3 +6,7 @@ find_package(catkin REQUIRED COMPONENTS rospy_tutorials rostest)
 catkin_package()
 
 # Missing install target on purpose to confirm that industrial_ci fails.
+
+if (CATKIN_ENABLE_TESTING)
+  add_rostest(test/example_ros.test)
+endif()
