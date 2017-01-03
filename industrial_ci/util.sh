@@ -75,6 +75,10 @@ function travis_time_end {
 # * wraps the section that is started by travis_time_start function.
 # * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
 # * exits the process if non -1 value is passed to `exit_code`.
+#
+# Arguments:
+#  exit_code (default: -1): Unix signal. If -1 then the process continues without exiting.
+#  color_wrap (default: 32): Color code for the section delimitter text.
 #######################################
 function _end_fold_script {
     set +x
@@ -119,7 +123,7 @@ function error {
 # Globals:
 #   (None)
 # Arguments:
-#   _exit_code (default: 0): Unix signal. If -1 passed then the process continues.
+#   _exit_code (default: 0): Unix signal. If -1 passed then the process continues without exiting.
 # Returns:
 #   (None)
 #######################################
@@ -128,11 +132,11 @@ function success {
     _exit_code=${1:-0}  # If 1st arg is not passed, set 0.
     HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
     if [ $HIT_ENDOFSCRIPT = false ]; then
-	if [ $_exit_code -eq 0 ]; then
-	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
-	else
-	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
-	fi
+    	if [ $_exit_code -eq 0 ]; then
+    	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
+    	else
+    	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
+    	fi
     fi
     if [ $_exit_code -ne "-1" ] && [ $_exit_code -ne "0" ]; then echo "${_FUNC_MSG_PREFIX} error: arg _exit_code must be either empty, -1 or 0. Returning."; return; fi
     _end_fold_script $_exit_code
