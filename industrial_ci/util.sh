@@ -128,11 +128,11 @@ function success {
     _exit_code=${1:-0}  # If 1st arg is not passed, set 0.
     HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
     if [ $HIT_ENDOFSCRIPT = false ]; then
-	if [ $_exit_code -eq 0 ]; then
-	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
-	else
-	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
-	fi
+    	if [ $_exit_code -eq 0 ]; then
+    	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
+    	else
+    	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
+    	fi
     fi
     if [ $_exit_code -ne "-1" ] && [ $_exit_code -ne "0" ]; then echo "${_FUNC_MSG_PREFIX} error: arg _exit_code must be either empty, -1 or 0. Returning."; return; fi
     _end_fold_script $_exit_code
