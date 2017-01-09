@@ -31,8 +31,9 @@
 #
 ## Author: Isaac I. Y. Saito, Mathias Lüdtke
 
-set -e
-set -x
+set -e # exit script on errors
+set -x # print trace
+
 source ${ICI_PKG_PATH}/util.sh
 
 # Environment vars.
