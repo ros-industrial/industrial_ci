@@ -65,11 +65,20 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   travis_time_end  # build_docker_image
 
   travis_time_start run_travissh_docker
+
+  #forward ssh agent into docker container
+  if [ "$SSH_AUTH_SOCK" ]; then
+      export SSH_DOCKER_CMD="-t -i -v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+  else
+      export SSH_DOCKER_CMD=""
+  fi
+
   docker_target_repo_path=/root/ci_src
   docker_ici_pkg_path=${ICI_PKG_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
   docker run \
       --env-file ${ICI_PKG_PATH}/docker.env \
       -e TARGET_REPO_PATH=$docker_target_repo_path \
+      $SSH_DOCKER_CMD \
       -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
   retval=$?
@@ -77,6 +86,9 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
 fi
 
 travis_time_start init_travis_environment
+#setup github.com ssh key
+mkdir -p ~/.ssh
+ssh-keyscan github.com >> ~/.ssh/known_hosts
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
