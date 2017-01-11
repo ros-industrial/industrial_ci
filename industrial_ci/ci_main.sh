@@ -86,9 +86,6 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
 fi
 
 travis_time_start init_travis_environment
-#setup github.com ssh key
-mkdir -p ~/.ssh
-ssh-keyscan github.com >> ~/.ssh/known_hosts 2> /dev/null
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
