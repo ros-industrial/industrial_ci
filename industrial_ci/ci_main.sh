@@ -68,7 +68,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
 
   #forward ssh agent into docker container
   if [ "$SSH_AUTH_SOCK" ]; then
-      export SSH_DOCKER_CMD="-t -i -v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+      export SSH_DOCKER_CMD="-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
   else
       export SSH_DOCKER_CMD=""
   fi
