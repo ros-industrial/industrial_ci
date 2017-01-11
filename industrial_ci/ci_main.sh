@@ -36,7 +36,7 @@
 ## See ./README.rst for the detailed usage.
 
 set -e # exit script on errors
-set -x # print trace
+if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
 # Define some env vars that need to come earlier than util.sh
 export ICI_PKG_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) of industrial_ci top dir.
