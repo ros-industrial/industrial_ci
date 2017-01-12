@@ -222,11 +222,7 @@ travis_time_end  # before_script
 
 travis_time_start rosdep_install
 
-# Run "rosdep install" command. Avoid manifest.xml files if any.
-if [ -e ${ICI_PKG_PATH}/rosdep-install.sh ]; then
-    ${ICI_PKG_PATH}/rosdep-install.sh
-fi
-
+sudo rosdep install -q --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
 travis_time_end  # rosdep_install
 
 travis_time_start wstool_info
