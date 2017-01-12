@@ -36,6 +36,7 @@
 ## See ./README.rst for the detailed usage.
 
 set -e # exit script on errors
+if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 set -x # print trace
 
 #Define some verbose env vars
@@ -74,15 +75,27 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   travis_time_end  # build_docker_image
 
   travis_time_start run_travissh_docker
+
+  #forward ssh agent into docker container
+  if [ "$SSH_AUTH_SOCK" ]; then
+      export SSH_DOCKER_CMD="-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
+  else
+      export SSH_DOCKER_CMD=""
+  fi
+
   docker_target_repo_path=/root/ci_src
   docker_ici_pkg_path=${ICI_PKG_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
-  docker run \
+  docker create \
+      --name run-industrial-ci \
       --env-file ${ICI_PKG_PATH}/docker.env \
       -e TARGET_REPO_PATH=$docker_target_repo_path \
       -e OPT_I=$OPT_I \
       -e OPT_V=$OPT_V \
+      $SSH_DOCKER_CMD \
       -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
+  docker cp ~/.ssh run-industrial-ci:/root/ # pass SSH settings to container
+  docker start run-industrial-ci
   retval=$?
   if [ $retval -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else exit; fi  # Call  travis_time_end  run_travissh_docker
 fi
