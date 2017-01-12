@@ -168,6 +168,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
 * `UPSTREAM_WORKSPACE` (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
 * `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
+* `USE_MOCKUP` (default: not set): reletive path to mockup packages to be used for the tests
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 

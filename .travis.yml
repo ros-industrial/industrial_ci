@@ -16,8 +16,10 @@ notifications:
 env:
   global:
     - DEBUG_BASH='true' # Print bash trace
+    - USE_MOCKUP='mockups/industrial_ci_testpkg' # add a test package by default
     - VERBOSE_OUTPUT='true'
   matrix:
+    - ROS_DISTRO=indigo USE_MOCKUP=''
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
@@ -56,7 +58,7 @@ before_script:
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
 script:
-  - source $CI_DIR/industrial_ci_testpkg/test/pre-process.sh
+  - source $CI_DIR/mockups/industrial_ci_testpkg/test/pre-process.sh
   - source $CI_DIR/travis.sh
   - if [ "${AFTER_INSTALL}" != "" ] ; then sudo apt-get install -f ${AFTER_INSTALL}; fi
-  - source $CI_DIR/industrial_ci_testpkg/test/post-process.sh
+  - source $CI_DIR/mockups/industrial_ci_testpkg/test/post-process.sh
