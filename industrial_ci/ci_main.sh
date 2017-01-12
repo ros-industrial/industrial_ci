@@ -37,15 +37,12 @@
 
 set -e # exit script on errors
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
-set -x # print trace
 
 #Define some verbose env vars
 if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
-    export OPT_V="-v"
-    export OPT_I="-i"
+    export OPT_VI="-vi"
 else
-    export OPT_V=""
-    export OPT_I=""
+    export OPT_VI=""
 fi
 
 # Define some env vars that need to come earlier than util.sh
@@ -89,8 +86,6 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       --name run-industrial-ci \
       --env-file ${ICI_PKG_PATH}/docker.env \
       -e TARGET_REPO_PATH=$docker_target_repo_path \
-      -e OPT_I=$OPT_I \
-      -e OPT_V=$OPT_V \
       $SSH_DOCKER_CMD \
       -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
@@ -106,9 +101,7 @@ BUILDER=catkin
 ROSWS=wstool
 # For compatibilility with hydro catkin, which has no --verbose flag
 CATKIN_TEST_RESULTS_CMD="catkin_test_results"
-if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then #only check for verbose compatibility if VERBOSE_OUTPUT is active
-    if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
-fi
+if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
 
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -269,7 +262,7 @@ source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting enviro
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
-if [ "$BUILDER" == catkin ]; then catkin build $OPT_I $OPT_V --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
+if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
 travis_time_end  # catkin_build
 
@@ -286,7 +279,7 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
 
     if [ "$BUILDER" == catkin ]; then
         source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
-        catkin run_tests $OPT_I $OPT_V --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
+        catkin run_tests $OPT_VI --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results build || error
     fi
 
@@ -302,7 +295,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     if [ "$BUILDER" == catkin ]; then
         catkin clean --yes
         catkin config --install
-        catkin build $OPT_I $OPT_V --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+        catkin build $OPT_VI --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash
         rospack profile
     fi
