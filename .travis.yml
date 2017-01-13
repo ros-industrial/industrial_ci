@@ -46,7 +46,7 @@ matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
     - env: ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
-    - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='false' # This should fail (trying from a wrong distro).
+    - env: ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='false' # This should fail (trying from a wrong distro).
     - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
     - env: ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall
 before_script:
