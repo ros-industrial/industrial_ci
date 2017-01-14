@@ -67,9 +67,9 @@ fi
 # Building in 16.04 requires running this script in a docker container
 # The Dockerfile in this repository defines a Ubuntu 16.04 container
 if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
-  travis_time_start build_docker_image
+  ici_time_start build_docker_image
   docker build -t industrial-ci/xenial .
-  travis_time_end  # build_docker_image
+  ici_time_end  # build_docker_image
 
   travis_time_start run_travissh_docker
 
@@ -95,7 +95,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   if [ $retval -eq 0 ]; then HIT_ENDOFSCRIPT=true; success 0; else exit; fi  # Call  travis_time_end  run_travissh_docker
 fi
 
-travis_time_start init_travis_environment
+ici_time_start init_ici_environment
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
@@ -125,9 +125,9 @@ if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 git branch --all
 if [ "`git diff origin/master FETCH_HEAD $ICI_PKG_PATH`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $ICI_PKG_PATH | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_MAIN_PKG/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
 
-travis_time_end  # init_travis_environment
+ici_time_end  # init_ici_environment
 
-travis_time_start setup_ros
+ici_time_start setup_ros
 
 echo "Testing branch $TRAVIS_BRANCH of $TARGET_REPO_NAME"  # $TARGET_REPO_NAME is the repo where this job is triggered from, and the variable is expected to be passed externally (industrial_ci/travis.sh should be taking care of it)
 # Set apt repo
@@ -152,9 +152,9 @@ if [ $HAVE_MONGO_DB == 0 ]; then
     sudo apt-get -qq install -y mongodb-clients mongodb-server -o Dpkg::Options::="--force-confdef" || echo "ok"
 fi
 
-travis_time_end  # setup_ros
+ici_time_end  # setup_ros
 
-travis_time_start setup_rosdep
+ici_time_start setup_rosdep
 
 # Setup rosdep
 pip --version
@@ -163,17 +163,17 @@ sudo rosdep init
 ret_rosdep=1
 rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
-travis_time_end  # setup_rosdep
-travis_time_start setup_catkin
+ici_time_end  # setup_rosdep
+ici_time_start setup_catkin
 
 ## BEGIN: travis' before_install: # Use this to prepare the system to install prerequisites or dependencies ##
 # https://github.com/ros/ros_comm/pull/641, https://github.com/jsk-ros-pkg/jsk_travis/pull/110
 sudo apt-get -qq install -y ros-$ROS_DISTRO-roslaunch
 (cd /opt/ros/$ROS_DISTRO/lib/python2.7/dist-packages; wget --no-check-certificate https://patch-diff.githubusercontent.com/raw/ros/ros_comm/pull/641.diff -O /tmp/641.diff; [ "$ROS_DISTRO" == "hydro" ] && sed -i s@items@iteritems@ /tmp/641.diff ; sudo patch -p4 < /tmp/641.diff)
 
-travis_time_end  # setup_catkin
+ici_time_end  # setup_catkin
 
-travis_time_start check_version_ros
+ici_time_start check_version_ros
 
 # Check ROS tool's version
 echo -e "\e[0KROS tool's version"
@@ -182,9 +182,9 @@ rosversion roslaunch
 rosversion rospack
 apt-cache show python-rospkg | grep '^Version:' | awk '{print $2}'
 
-travis_time_end  # check_version_ros
+ici_time_end  # check_version_ros
 
-travis_time_start setup_rosws
+ici_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
@@ -237,29 +237,29 @@ if [ ! -e .rosinstall ]; then
     echo "- git: {local-name: $TARGET_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
 fi
 
-travis_time_end  # setup_rosws
+ici_time_end  # setup_rosws
 
-travis_time_start before_script
+ici_time_start before_script
 
 ## BEGIN: travis' before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
 if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -c "${BEFORE_SCRIPT}"; fi
 
-travis_time_end  # before_script
+ici_time_end  # before_script
 
-travis_time_start rosdep_install
+ici_time_start rosdep_install
 
 sudo rosdep install -q --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
-travis_time_end  # rosdep_install
+ici_time_end  # rosdep_install
 
-travis_time_start wstool_info
+ici_time_start wstool_info
 $ROSWS --version
 $ROSWS info -t .
 cd ../
 
-travis_time_end  # wstool_info
+ici_time_end  # wstool_info
 
-travis_time_start catkin_build
+ici_time_start catkin_build
 
 ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
@@ -268,10 +268,10 @@ if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_or
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
-travis_time_end  # catkin_build
+ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
-    travis_time_start catkin_run_tests
+    ici_time_start catkin_run_tests
 
     # Patches for rostest that are only available in newer codes.
     # Some are already available via DEBs so that patches for them are not needed, but because EOLed distros (e.g. Hydro) where those patches are not released into may be still tested, all known patches are applied here.
@@ -287,13 +287,13 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
         catkin_test_results build || error
     fi
 
-    travis_time_end  # catkin_run_tests
+    ici_time_end  # catkin_run_tests
 fi
 
 
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
-    travis_time_start catkin_install_build
+    ici_time_start catkin_install_build
 
     # Test if the packages in the downstream repo build.
     if [ "$BUILDER" == catkin ]; then
@@ -304,8 +304,8 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         rospack profile
     fi
 
-    travis_time_end  # catkin_install_build
-    travis_time_start catkin_install_run_tests
+    ici_time_end  # catkin_install_build
+    ici_time_start catkin_install_run_tests
 
     export EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
@@ -327,11 +327,11 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
       [ $EXIT_STATUS -eq 0 ] || error  # unless all tests pass, raise error
     fi
 
-    travis_time_end  # catkin_install_run_tests
+    ici_time_end  # catkin_install_run_tests
 
 fi
 
-travis_time_start after_script
+ici_time_start after_script
 
 ## BEGIN: travis' after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
@@ -342,7 +342,7 @@ if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --
 if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
 
-travis_time_end  # after_script
+ici_time_end  # after_script
 
 cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 pwd

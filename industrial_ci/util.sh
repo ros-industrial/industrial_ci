@@ -34,18 +34,18 @@
 ## util.sh
 ## This is a script where the functions commonly used within the industrial_ci repo are defined.
 
-function travis_time_start {
+function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     TRAVIS_START_TIME=$(date +%s%N)
     TRAVIS_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
     TRAVIS_FOLD_NAME=$1
-    echo -e "\e[0Ktravis_fold:start:$TRAVIS_FOLD_NAME"
-    echo -e "\e[0Ktravis_time:start:$TRAVIS_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
+    echo -e "\e[0Kici_fold:start:$TRAVIS_FOLD_NAME"
+    echo -e "\e[0Kici_time:start:$TRAVIS_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
 #######################################
-# Wraps up the timer section on Travis CI (that's started mostly by travis_time_start function).
+# Wraps up the timer section on Travis CI (that's started mostly by ici_time_start function).
 #
 # Globals:
 #   (None)
@@ -54,15 +54,15 @@ function travis_time_start {
 # Returns:
 #   (None)
 #######################################
-function travis_time_end {
+function ici_time_end {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     color_wrap=${2:-32}
 
-    if [ -z $TRAVIS_START_TIME ]; then echo '[travis_time_end] var TRAVIS_START_TIME is not set. You need to call `travis_time_start` in advance. Rerutning.'; return; fi
+    if [ -z $TRAVIS_START_TIME ]; then echo '[ici_time_end] var TRAVIS_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
     TRAVIS_END_TIME=$(date +%s%N)
     TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
-    echo -e "travis_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
-    echo -e "travis_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
+    echo -e "ici_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
+    echo -e "ici_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
     echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
 
     unset $TRAVIS_FOLD_NAME
@@ -72,7 +72,7 @@ function travis_time_end {
 #######################################
 # This private function can exit the shell process, as well as wrapping up the timer section on Travis CI. Internally this does:
 #
-# * wraps the section that is started by travis_time_start function.
+# * wraps the section that is started by ici_time_start function.
 # * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
 # * exits the process if non -1 value is passed to `exit_code`.
 #
@@ -87,9 +87,9 @@ function _end_fold_script {
 
     if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
     if [ -z $TRAVIS_FOLD_NAME ]; then
-        travis_time_end $color_wrap
+        ici_time_end $color_wrap
     else
-	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'travis_time_end' anyway."
+	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'ici_time_end' anyway."
     fi
 
     if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit.
@@ -100,7 +100,7 @@ function _end_fold_script {
 #######################################
 # This calls "exit 1", along with the following. When your script on Travis CI already uses other functions from this file (util.sh), using this is recommended over calling directly "exit 1".
 #
-# * wraps the section that is started by travis_time_start function with the echo color red (31).
+# * wraps the section that is started by ici_time_start function with the echo color red (31).
 # * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
 #
 # Globals:
@@ -117,7 +117,7 @@ function error {
 #######################################
 # Similar to `error` function, this lets you "exit 0" and take care of other things as following, when your script on Travis CI already uses other functions from this file (util.sh).
 #
-# * wraps the section that is started by travis_time_start function with the echo color green.
+# * wraps the section that is started by ici_time_start function with the echo color green.
 # * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
 #
 # Globals:

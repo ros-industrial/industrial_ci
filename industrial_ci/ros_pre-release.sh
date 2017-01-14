@@ -67,11 +67,11 @@ function setup_environment() {
 }
 
 function run_ros_prerelease() {
-    travis_time_start setup_environment
+    ici_time_start setup_environment
     setup_environment
-    travis_time_end  # setup_environment
+    ici_time_end  # setup_environment
 
-    travis_time_start setup_prerelease_scripts
+    ici_time_start setup_prerelease_scripts
     mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; 
     if [ ! "$PRERELEASE_REPONAME" ]; then
         PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2)
@@ -79,15 +79,15 @@ function run_ros_prerelease() {
         cp -a $TRAVIS_BUILD_DIR catkin_workspace/src/
     fi
     generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${PRERELEASE_OS_CODENAME} amd64 ${PRERELEASE_REPONAME} --level $PRERELEASE_DOWNSTREAM_DEPTH --output-dir ./
-    travis_time_end  # setup_prerelease_scripts
+    ici_time_end  # setup_prerelease_scripts
 
-    travis_time_start run_prerelease
+    ici_time_start run_prerelease
     ./prerelease.sh -y;
-    travis_time_end  # run_prerelease
+    ici_time_end  # run_prerelease
     
-    travis_time_start show_testresult
+    ici_time_start show_testresult
     catkin_test_results --verbose && { echo 'ROS Prerelease Test went successful.'; RESULT_PRERELEASE=0; } || { RESULT_PRERELEASE=1; error; }
-    travis_time_end  # show_testresult
+    ici_time_end  # show_testresult
     
     cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
     pwd
