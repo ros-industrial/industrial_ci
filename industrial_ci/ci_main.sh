@@ -220,6 +220,14 @@ fi
 # TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
 ln -s $TARGET_REPO_PATH .
 
+if [ "${USE_MOCKUP// }" != "" ]; then
+    if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
+        echo "mockup directory '$USE_MOCKUP' does not exist"
+        error
+    fi
+    ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
+fi
+
 # Disable metapackage
 find -L . -name package.xml -print -exec ${ICI_PKG_PATH}/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
 
