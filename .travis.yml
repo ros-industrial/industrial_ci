@@ -29,7 +29,7 @@ env:
     - ROS_DISTRO=indigo USE_DEVEL_SPACE='true' NOT_TEST_INSTALL='true'  # Expecting no testing to happen during install.
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
     # - env: ROS_DISTRO=indigo PRERELEASE=true  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
-    - ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+    - ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=std_msgs PRERELEASE_DOWNSTREAM_DEPTH=0
     - ROS_DISTRO=kinetic PRERELEASE=true PRERELEASE_REPONAME=std_msgs
     - ROS_DISTRO=indigo APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian
@@ -42,16 +42,15 @@ env:
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='false' # This should fail (trying from a wrong distro).
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
-    - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
+    - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=i_do_not_exist PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail, to test the capability of capturing Prerelease Test failure.
     - ROS_DISTRO=kinetic
     - ROS_DISTRO=kinetic NOT_TEST_BUILD='true' DEBUG_BASH='false' VERBOSE_OUTPUT='false'
 matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
-    - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
     - env: ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
     - env: ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='false' # This should fail (trying from a wrong distro).
-    - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
+    - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=i_do_not_exist PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
     - env: ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall
 
 before_script:
