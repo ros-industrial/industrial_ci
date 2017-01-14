@@ -4,7 +4,9 @@
   <description>common travis script suite</description>
   <license>BSD</license>
   <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>
-  <author email="iiysaito@opensource-robotics.tokyo.jp">Isaac I. Y. Saito</author>
+  <maintainer email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</maintainer>
+  <author>Isaac I. Y. Saito</author>
+  <author email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
