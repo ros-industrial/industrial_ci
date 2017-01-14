@@ -17,11 +17,13 @@ env:
   global:
     - DEBUG_BASH='true' # Print bash trace
     - VERBOSE_OUTPUT='true'
+    - POST_PROCESS='echo "post processing reached"'
   matrix:
     - ROS_DISTRO=indigo USE_MOCKUP='mockups/industrial_ci_testpkg'
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
+    - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
     - ROS_DISTRO=indigo USE_DEVEL_SPACE='true'
     - ROS_DISTRO=indigo USE_DEVEL_SPACE='true' NOT_TEST_BUILD='true'  # Expecting no testing to happen during build.
     - ROS_DISTRO=indigo USE_DEVEL_SPACE='true' NOT_TEST_INSTALL='true'  # Expecting no testing to happen during install.
@@ -45,11 +47,13 @@ env:
     - ROS_DISTRO=kinetic NOT_TEST_BUILD='true' DEBUG_BASH='false' VERBOSE_OUTPUT='false'
 matrix:
   allow_failures:
+    - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
     - env: ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
     - env: ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
     - env: ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='false' # This should fail (trying from a wrong distro).
     - env: ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=warehouse_ros PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail (as of Apr 2016), to test the capability of capturing Prerelease Test failure.
     - env: ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall
+
 before_script:
   - CI_DIR=.
   - export BEFORE_SCRIPT="rm -fr common_travis/CATKIN_IGNORE; ${BEFORE_SCRIPT}"
@@ -57,7 +61,5 @@ before_script:
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
 script:
-  - source $CI_DIR/mockups/industrial_ci_testpkg/test/pre-process.sh
   - source $CI_DIR/travis.sh
-  - if [ "${AFTER_INSTALL}" != "" ] ; then sudo apt-get install -f ${AFTER_INSTALL}; fi
-  - source $CI_DIR/mockups/industrial_ci_testpkg/test/post-process.sh
+  - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
