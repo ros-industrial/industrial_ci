@@ -347,5 +347,5 @@ travis_time_end  # after_script
 cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 pwd
 
-HIT_ENDOFSCRIPT=true
-# exit code will be 0
+if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi # disable command printing at end of script, TODO: factor out into function
+# exit with code 0
