@@ -348,4 +348,4 @@ cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 pwd
 
 HIT_ENDOFSCRIPT=true
-success  # Process needs to continue to allow custom post process scripts. See https://github.com/ros-industrial/industrial_ci/pull/89
+# exit code will be 0
