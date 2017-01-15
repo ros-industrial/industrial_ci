@@ -197,9 +197,6 @@ if [ "${USE_MOCKUP// }" != "" ]; then
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
 fi
 
-# Disable metapackage
-find -L . -name package.xml -print -exec ${ICI_PKG_PATH}/check_metapackage.py {} \; -a -exec bash -c 'touch `dirname ${1}`/CATKIN_IGNORE' funcname {} \;
-
 source /opt/ros/$ROS_DISTRO/setup.bash # ROS_PACKAGE_PATH is important for rosdep
 # Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
 if [ ! -e .rosinstall ]; then
