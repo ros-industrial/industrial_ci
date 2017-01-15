@@ -114,12 +114,6 @@ fi
 CATKIN_TEST_RESULTS_CMD="catkin_test_results"
 if catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
 
-# MongoDB hack - I don't fully understand this but its for moveit_warehouse
-dpkg -s mongodb || echo "ok"; export HAVE_MONGO_DB=$?
-if [ $HAVE_MONGO_DB == 0 ]; then
-    sudo apt-get -qq remove -y mongodb mongodb-10gen || echo "ok"
-    sudo apt-get -qq install -y mongodb-clients mongodb-server -o Dpkg::Options::="--force-confdef" || echo "ok"
-fi
 
 ici_time_end  # setup_ros
 
