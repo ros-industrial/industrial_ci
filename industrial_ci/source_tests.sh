@@ -173,7 +173,6 @@ if [ "${USE_MOCKUP// }" != "" ]; then
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
 fi
 
-source /opt/ros/$ROS_DISTRO/setup.bash # ROS_PACKAGE_PATH is important for rosdep
 # Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
 if [ ! -e .rosinstall ]; then
     echo "- git: {local-name: $TARGET_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
@@ -183,8 +182,6 @@ ici_time_end  # setup_rosws
 
 ici_time_start before_script
 
-## BEGIN: travis' before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
-source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
 
 # execute BEFORE_SCRIPT in repository, exit on errors
 cd $TARGET_REPO_PATH
@@ -207,8 +204,6 @@ ici_time_start catkin_build
 
 cd $CATKIN_WORKSPACE
 
-## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
-source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
