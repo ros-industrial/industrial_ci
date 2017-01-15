@@ -109,10 +109,6 @@ if [ "$ADDITIONAL_DEBS" ]; then
 fi
 source /opt/ros/$ROS_DISTRO/setup.bash
 
-# For compatibilility with hydro catkin, which has no --verbose flag
-CATKIN_TEST_RESULTS_CMD="catkin_test_results"
-if catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
-
 ici_time_end  # setup_ros
 
 ici_time_start setup_rosdep
@@ -250,13 +246,16 @@ fi
 
 ici_time_start test_results
 
-## BEGIN: travis' after_script
-PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
-PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
+if [ "${ROS_DISTRO}" == "hydro" ]; then
+    PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
+    PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 
-if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
-if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all $CATKIN_WORKSPACE/build/ || error; fi
-if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
+    if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
+    if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --all $ROS_LOG_DIR || error; fi
+    if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then catkin_test_results --all $CATKIN_WORKSPACE/build/ || error; fi
+    if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || error; fi
+else    
+    catkin_test_results --verbose
+fi
 
 ici_time_end  # test_results
