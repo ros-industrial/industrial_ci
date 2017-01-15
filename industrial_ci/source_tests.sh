@@ -85,9 +85,6 @@ if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-ind
 fi
 if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 
-git branch --all
-if [ "`git diff origin/master FETCH_HEAD $ICI_PKG_PATH`" != "" ] ; then DIFF=`git diff origin/master FETCH_HEAD $ICI_PKG_PATH | grep .*Subproject | sed s'@.*Subproject commit @@' | sed 'N;s/\n/.../'`; (cd $CI_MAIN_PKG/;git log --oneline --graph --left-right --first-parent --decorate $DIFF) | tee /tmp/$$-travis-diff.log; grep -c '<' /tmp/$$-travis-diff.log && exit 1; echo "ok"; fi
-
 ici_time_end  # init_ici_environment
 
 ici_time_start setup_ros
