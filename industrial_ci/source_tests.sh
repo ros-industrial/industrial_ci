@@ -136,12 +136,12 @@ ici_time_start setup_rosws
 CATKIN_WORKSPACE=~/catkin_ws
 mkdir -p $CATKIN_WORKSPACE/src
 cd $CATKIN_WORKSPACE/src
+$ROSWS init .
 case "$UPSTREAM_WORKSPACE" in
 debian)
     echo "Obtain deb binary for upstream packages."
     ;;
 file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
-    $ROSWS init .
     # Prioritize $ROSINSTALL_FILENAME.$ROS_DISTRO if it exists over $ROSINSTALL_FILENAME.
     if [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
         # install (maybe unreleased version) dependencies from source for specific ros version
@@ -152,7 +152,6 @@ file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to b
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
-    $ROSWS init .
     $ROSWS merge $UPSTREAM_WORKSPACE
     ;;
 esac
@@ -173,11 +172,6 @@ if [ "${USE_MOCKUP// }" != "" ]; then
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
 fi
 
-# Save .rosinstall file of this tested downstream repo, only during the runtime on travis CI
-if [ ! -e .rosinstall ]; then
-    echo "- git: {local-name: $TARGET_REPO_NAME, uri: 'http://github.com/$TRAVIS_REPO_SLUG'}" >> .rosinstall
-fi
-
 ici_time_end  # setup_rosws
 
 ici_time_start before_script
@@ -193,12 +187,6 @@ ici_time_start rosdep_install
 
 sudo rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
-
-ici_time_start wstool_info
-$ROSWS --version
-$ROSWS info -t $CATKIN_WORKSPACE/src
-
-ici_time_end  # wstool_info
 
 ici_time_start catkin_build
 
