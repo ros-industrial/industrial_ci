@@ -104,16 +104,17 @@ sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
 
 sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
  
-sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-rosbash ros-$ROS_DISTRO-rospack
+sudo apt-get -qq install --no-install-recommends -y build-essential python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin
+
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
     sudo apt-get install -q -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
 fi
+source /opt/ros/$ROS_DISTRO/setup.bash
 
 # For compatibilility with hydro catkin, which has no --verbose flag
 CATKIN_TEST_RESULTS_CMD="catkin_test_results"
 if catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
-
 
 ici_time_end  # setup_ros
 
@@ -127,25 +128,6 @@ ret_rosdep=1
 rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
 ici_time_end  # setup_rosdep
-ici_time_start setup_catkin
-
-## BEGIN: travis' before_install: # Use this to prepare the system to install prerequisites or dependencies ##
-# https://github.com/ros/ros_comm/pull/641, https://github.com/jsk-ros-pkg/jsk_travis/pull/110
-sudo apt-get -qq install -y ros-$ROS_DISTRO-roslaunch
-(cd /opt/ros/$ROS_DISTRO/lib/python2.7/dist-packages; wget --no-check-certificate https://patch-diff.githubusercontent.com/raw/ros/ros_comm/pull/641.diff -O /tmp/641.diff; [ "$ROS_DISTRO" == "hydro" ] && sed -i s@items@iteritems@ /tmp/641.diff ; sudo patch -p4 < /tmp/641.diff)
-
-ici_time_end  # setup_catkin
-
-ici_time_start check_version_ros
-
-# Check ROS tool's version
-echo -e "\e[0KROS tool's version"
-source /opt/ros/$ROS_DISTRO/setup.bash
-rosversion roslaunch
-rosversion rospack
-apt-cache show python-rospkg | grep '^Version:' | awk '{print $2}'
-
-ici_time_end  # check_version_ros
 
 ici_time_start setup_rosws
 
@@ -246,7 +228,7 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
     fi
 
     if [ "$BUILDER" == catkin ]; then
-        source devel/setup.bash ; rospack profile # force to update ROS_PACKAGE_PATH for rostest
+        source devel/setup.bash # force to update ROS_PACKAGE_PATH for rostest
         catkin run_tests $OPT_VI --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results build || error
     fi
@@ -265,7 +247,6 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         catkin config --install
         catkin build $OPT_VI --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash
-        rospack profile
     fi
 
     ici_time_end  # catkin_install_build
