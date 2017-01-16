@@ -57,6 +57,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
   docker cp ~/.ssh run-industrial-ci:/root/ # pass SSH settings to container
   docker start -a run-industrial-ci
+  unset AFTER_SCRIPT # do not run AFTER_SCRIPT again
   return
  fi
 
@@ -301,7 +302,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
 fi
 
-ici_time_start after_script
+ici_time_start test_results
 
 ## BEGIN: travis' after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
@@ -312,4 +313,4 @@ if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --
 if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all $CATKIN_WORKSPACE/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
 
-ici_time_end  # after_script
+ici_time_end  # test_results
