@@ -66,5 +66,4 @@ fi
 cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 pwd
 
-if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi # disable command printing at end of script, TODO: factor out into function
 # exit with code 0

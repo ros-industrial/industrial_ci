@@ -39,5 +39,5 @@ export TARGET_REPO_NAME=${PWD##*/}
 
 # Call the "core" executable of this repo to run all kinds of tests.
 cd $DIR_THIS/industrial_ci
-source ./ci_main.sh
+./ci_main.sh || return $?
 cd $DIR_THIS  # Moves back to the repository root dir.
