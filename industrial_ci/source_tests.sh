@@ -209,7 +209,10 @@ ici_time_start before_script
 
 ## BEGIN: travis' before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
-if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -c "${BEFORE_SCRIPT}"; fi
+
+# execute BEFORE_SCRIPT in repository, exit on errors
+cd $TARGET_REPO_PATH
+if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -e -c "${BEFORE_SCRIPT}"; fi
 
 ici_time_end  # before_script
 
