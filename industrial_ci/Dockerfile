@@ -4,7 +4,7 @@ MAINTAINER "ROS Industrial" "https://github.com/ros-industrial"
 
 # Install packages
 RUN apt-get update -qq \
-    && apt-get -qq install -y \
+    && apt-get -qq install --no-install-recommends -y \
         git \
         sudo \
         lsb-release \
