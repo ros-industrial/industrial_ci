@@ -153,8 +153,9 @@ ici_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
-mkdir -p ~/ros/ws_$TARGET_REPO_NAME/src
-cd ~/ros/ws_$TARGET_REPO_NAME/src
+CATKIN_WORKSPACE=~/catkin_ws
+mkdir -p $CATKIN_WORKSPACE/src
+cd $CATKIN_WORKSPACE/src
 case "$UPSTREAM_WORKSPACE" in
 debian)
     echo "Obtain deb binary for upstream packages."
@@ -214,17 +215,18 @@ ici_time_end  # before_script
 
 ici_time_start rosdep_install
 
-sudo rosdep install -q --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+sudo rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
 
 ici_time_start wstool_info
 $ROSWS --version
-$ROSWS info -t .
-cd ../
+$ROSWS info -t $CATKIN_WORKSPACE/src
 
 ici_time_end  # wstool_info
 
 ici_time_start catkin_build
+
+cd $CATKIN_WORKSPACE
 
 ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
@@ -304,7 +306,7 @@ PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
 if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
+if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all $CATKIN_WORKSPACE/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
 
 ici_time_end  # after_script
