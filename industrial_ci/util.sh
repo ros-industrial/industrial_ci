@@ -56,7 +56,7 @@ function ici_time_start {
 #######################################
 function ici_time_end {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    color_wrap=${2:-32}
+    color_wrap=${1:-32}
 
     if [ -z $TRAVIS_START_TIME ]; then echo '[ici_time_end] var TRAVIS_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
     TRAVIS_END_TIME=$(date +%s%N)
