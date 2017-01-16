@@ -110,7 +110,7 @@ With the following few short steps, you can start in your client repository usin
   before_config:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
-    - source .ci_config/travis.sh
+    - .ci_config/travis.sh
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
@@ -187,8 +187,8 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 ::
 
   script:
-    - source .ci_config/travis.sh
-    - source ./travis.sh
+    - .ci_config/travis.sh
+    - ./travis.sh
 
 2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
 
@@ -220,8 +220,8 @@ This standard `git submodule` command:
 ::
 
   script:
-    - source .ci_config/travis.sh
-    #- source ./travis.sh  # Optional. Explained later
+    - .ci_config/travis.sh
+    #- ./travis.sh  # Optional. Explained later
 
 Also, the example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
 
@@ -287,16 +287,16 @@ You may want to add custom steps prior to the setup defined in `./travis.sh <./t
 
 * You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
-In this case, add `source`d scripts before `travis.sh` gets called (see below for an example).
+In this case, add scripts before `travis.sh` gets called (see below for an example).
 
 ::
 
   script:
-    - source ./your_custom_PREprocess.sh
-    - source .ci_config/travis.sh
-    - source ./your_custom_POSTprocess.sh
+    - ./your_custom_PREprocess.sh
+    - .ci_config/travis.sh
+    - ./your_custom_POSTprocess.sh
 
-In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.sh` the environment is kept from previous script(s), so whatever is done in previous scripts remains.
+Please note: the environment is NOT kept from between script(s).
 
 (Optional) Build depended packages from source
 ----------------------------------------------

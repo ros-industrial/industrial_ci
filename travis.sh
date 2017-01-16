@@ -37,7 +37,12 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export TARGET_REPO_PATH=$(pwd)
 export TARGET_REPO_NAME=${PWD##*/}
 
-# Call the "core" executable of this repo to run all kinds of tests.
-cd $DIR_THIS/industrial_ci
-./ci_main.sh || return $?
-cd $TARGET_REPO_PATH  # Moves back to the repository root dir.
+function  main {
+    # Call the "core" executable of this repo to run all kinds of tests. 
+    cd $DIR_THIS/industrial_ci
+    local ret=0
+    ./ci_main.sh || ret=$?
+    cd $TARGET_REPO_PATH  # Moves back to the repository root dir.
+    return $ret
+}
+main # result of main function if resul of script
