@@ -86,7 +86,7 @@ function _end_fold_script {
     color_wrap=${2:-32}
 
     if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
-    if [ -z $TRAVIS_FOLD_NAME ]; then
+    if ! [ -z $TRAVIS_FOLD_NAME ]; then
         ici_time_end $color_wrap
     else
 	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'ici_time_end' anyway."
