@@ -72,4 +72,4 @@ ici_time_end  # after_script
 
 cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 
-# exit with code 0
+ici_exit 0

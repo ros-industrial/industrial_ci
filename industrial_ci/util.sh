@@ -70,6 +70,29 @@ function ici_time_end {
 }
 
 #######################################
+# exit function with handling for EXPECT_EXIT_CODE
+#
+# Globals:
+#   (None)
+# Arguments:
+#   _exit_code (default: $?)
+# Returns:
+#   (None)
+#######################################
+function ici_exit {
+    _exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
+    trap - ERR  # Reset signal handler since the shell is about to exit.
+
+    if [ "$_exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
+        exit 0
+    elif [ "$_exit_code" == "0" ]; then # 0 was not expected
+        exit 1
+    fi
+
+    exit $_exit_code
+}
+
+#######################################
 # This private function can exit the shell process, as well as wrapping up the timer section on Travis CI. Internally this does:
 #
 # * wraps the section that is started by ici_time_start function.
@@ -92,9 +115,8 @@ function _end_fold_script {
 	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'ici_time_end' anyway."
     fi
 
-    if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit.
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
-    if [ $exit_code -ne "-1" ]; then exit $exit_code; fi
+    if [ $exit_code -ne "-1" ]; then ici_exit $exit_code; fi
 }
 
 #######################################
