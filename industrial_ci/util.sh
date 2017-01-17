@@ -34,6 +34,21 @@
 ## util.sh
 ## This is a script where the functions commonly used within the industrial_ci repo are defined.
 
+#######################################
+# Starts a timer section on Travis CI
+#
+# Globals:
+#   DEBUG_BASH (read-only)
+#   TRAVIS_FOLD_NAME (write-only)
+#   TRAVIS_TIME_ID (write-only)
+#   TRAVIS_START_TIME (write-only)
+# Arguments:
+#   color_wrap (default: 32): Color code for the section delimitter text.
+#   exit_code (default: $?): Exit code for display
+# Returns:
+#   (None)
+#######################################
+
 function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     TRAVIS_START_TIME=$(date +%s%N)
@@ -48,7 +63,10 @@ function ici_time_start {
 # Wraps up the timer section on Travis CI (that's started mostly by ici_time_start function).
 #
 # Globals:
-#   (None)
+#   DEBUG_BASH (read-only)
+#   TRAVIS_FOLD_NAME (from ici_time_start, read-write)
+#   TRAVIS_TIME_ID (from ici_time_start, read-only)
+#   TRAVIS_START_TIME (from ici_time_start, read-only)
 # Arguments:
 #   color_wrap (default: 32): Color code for the section delimitter text.
 #   exit_code (default: $?): Exit code for display
@@ -72,10 +90,11 @@ function ici_time_end {
 }
 
 #######################################
-# exit function with handling for EXPECT_EXIT_CODE
+# exit function with handling for EXPECT_EXIT_CODE, ends the current fold if necessary
 #
 # Globals:
-#   (None)
+#   EXPECT_EXIT_CODE (read-only)
+#   TRAVIS_FOLD_NAME (from ici_time_start, read-only)
 # Arguments:
 #   exit_code (default: $?)
 # Returns:
@@ -103,8 +122,9 @@ function ici_exit {
 #######################################
 # Print an error message and calls "exit"
 #
-# * wraps the section that is started by ici_time_start function with the echo color red (31).
-# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
+# * Wraps the section that is started by ici_time_start function with the echo color red (31).
+# * exit_code is taken from second argument or from the previous comman.
+# * If the final exit_code is 0, this function will exit 1 instead to enforce a test failure
 #
 # Globals:
 #   (None)
