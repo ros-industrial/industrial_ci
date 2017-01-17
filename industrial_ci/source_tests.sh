@@ -65,9 +65,6 @@ ici_time_start init_ici_environment
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
-# For compatibilility with hydro catkin, which has no --verbose flag
-CATKIN_TEST_RESULTS_CMD="catkin_test_results"
-if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
 
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -112,6 +109,11 @@ sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-
 if [ "$ADDITIONAL_DEBS" ]; then
     sudo apt-get install -q -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
 fi
+
+# For compatibilility with hydro catkin, which has no --verbose flag
+CATKIN_TEST_RESULTS_CMD="catkin_test_results"
+if catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
+
 # MongoDB hack - I don't fully understand this but its for moveit_warehouse
 dpkg -s mongodb || echo "ok"; export HAVE_MONGO_DB=$?
 if [ $HAVE_MONGO_DB == 0 ]; then
