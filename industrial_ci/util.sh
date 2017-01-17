@@ -81,7 +81,7 @@ function ici_time_end {
 #######################################
 function ici_exit {
     _exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
-    trap - ERR  # Reset signal handler since the shell is about to exit.
+    trap - EXIT # Reset signal handler since the shell is about to exit.
 
     if [ "$_exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
         exit 0
