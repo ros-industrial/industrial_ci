@@ -128,7 +128,7 @@ function _end_fold_script {
 }
 
 #######################################
-# This calls "exit 1", along with the following. When your script on Travis CI already uses other functions from this file (util.sh), using this is recommended over calling directly "exit 1".
+# Print an error message and calls "exit"
 #
 # * wraps the section that is started by ici_time_start function with the echo color red (31).
 # * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
@@ -136,12 +136,20 @@ function _end_fold_script {
 # Globals:
 #   (None)
 # Arguments:
-#   (None)
+#   message (optional) 
+#   exit_code (default: $?)
 # Returns:
 #   (None)
 #######################################
 function error {
-    _end_fold_script 1 31
+    local exit_code=${2:-$?} #
+    if [ -n $1 ]; then
+        echo "\e[31m$1\e0m" # print error in red
+    fi
+    if [ "$exit_code" == "0" ]; then # 0 is not error
+        exit 1
+    fi
+    ici_exit $exit_code
 }
 
 #######################################

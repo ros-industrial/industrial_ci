@@ -97,19 +97,20 @@ ici_time_start setup_ros
 
 echo "Testing branch $TRAVIS_BRANCH of $TARGET_REPO_NAME"  # $TARGET_REPO_NAME is the repo where this job is triggered from, and the variable is expected to be passed externally (industrial_ci/travis.sh should be taking care of it)
 # Set apt repo
+lsb_release -a
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 # Common ROS install preparation
 # apt key acquisition. Since keyserver may often become accessible, backup method is added.
-sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS || ((echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -) || (echo 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'; error))
-lsb_release -a
-sudo apt-get -qq update || (echo "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"; error)
+sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
+    || { echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -; } \
+    || error 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'
+
+sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
+ 
 sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-rosbash ros-$ROS_DISTRO-rospack
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
-    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS
-    if [[ $? > 0 ]]; then
-        echo "One or more additional deb installation is failed. Exiting."; error
-    fi
+    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
 fi
 # MongoDB hack - I don't fully understand this but its for moveit_warehouse
 dpkg -s mongodb || echo "ok"; export HAVE_MONGO_DB=$?
@@ -189,8 +190,7 @@ ln -s $TARGET_REPO_PATH .
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
-        echo "mockup directory '$USE_MOCKUP' does not exist"
-        error
+        error "mockup directory '$USE_MOCKUP' does not exist"
     fi
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
 fi
