@@ -51,19 +51,21 @@ function ici_time_start {
 #   (None)
 # Arguments:
 #   color_wrap (default: 32): Color code for the section delimitter text.
+#   exit_code (default: $?): Exit code for display
 # Returns:
 #   (None)
 #######################################
 function ici_time_end {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    color_wrap=${1:-32}
+    local color_wrap=${1:-32}
+    local exit_code=${2:-$?}
 
     if [ -z $TRAVIS_START_TIME ]; then echo '[ici_time_end] var TRAVIS_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
     TRAVIS_END_TIME=$(date +%s%N)
     TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
     echo -e "ici_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
     echo -e "ici_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
+    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME returned with code '${exit_code}' after $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec \e[0m"
 
     unset $TRAVIS_FOLD_NAME
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
