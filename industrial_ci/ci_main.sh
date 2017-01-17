@@ -53,7 +53,6 @@ export HIT_ENDOFSCRIPT=false
 source ${ICI_PKG_PATH}/util.sh
 
 trap ici_exit EXIT # install industrial_ci exit handler
-trap success SIGTERM  # So that this script won't terminate without verifying that all necessary steps are done.
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
