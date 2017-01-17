@@ -77,21 +77,27 @@ function ici_time_end {
 # Globals:
 #   (None)
 # Arguments:
-#   _exit_code (default: $?)
+#   exit_code (default: $?)
 # Returns:
 #   (None)
 #######################################
 function ici_exit {
-    _exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
+    local exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
     trap - EXIT # Reset signal handler since the shell is about to exit.
 
-    if [ "$_exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
+    # end fold if needed
+    if [ -n "$TRAVIS_FOLD_NAME" ]; then
+        if [ $exit_code -ne "0" ]; then color_wrap=31; fi  # Red color for errors
+        ici_time_end "$color_wrap" "$exit_code"
+    fi
+
+    if [ "$exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
         exit 0
-    elif [ "$_exit_code" == "0" ]; then # 0 was not expected
+    elif [ "$exit_code" == "0" ]; then # 0 was not expected
         exit 1
     fi
 
-    exit $_exit_code
+    exit $exit_code
 }
 
 #######################################
