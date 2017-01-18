@@ -34,6 +34,21 @@
 ## util.sh
 ## This is a script where the functions commonly used within the industrial_ci repo are defined.
 
+#######################################
+# Starts a timer section on Travis CI
+#
+# Globals:
+#   DEBUG_BASH (read-only)
+#   TRAVIS_FOLD_NAME (write-only)
+#   TRAVIS_TIME_ID (write-only)
+#   TRAVIS_START_TIME (write-only)
+# Arguments:
+#   color_wrap (default: 32): Color code for the section delimitter text.
+#   exit_code (default: $?): Exit code for display
+# Returns:
+#   (None)
+#######################################
+
 function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     TRAVIS_START_TIME=$(date +%s%N)
@@ -48,96 +63,84 @@ function ici_time_start {
 # Wraps up the timer section on Travis CI (that's started mostly by ici_time_start function).
 #
 # Globals:
-#   (None)
+#   DEBUG_BASH (read-only)
+#   TRAVIS_FOLD_NAME (from ici_time_start, read-write)
+#   TRAVIS_TIME_ID (from ici_time_start, read-only)
+#   TRAVIS_START_TIME (from ici_time_start, read-only)
 # Arguments:
 #   color_wrap (default: 32): Color code for the section delimitter text.
+#   exit_code (default: $?): Exit code for display
 # Returns:
 #   (None)
 #######################################
 function ici_time_end {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    color_wrap=${2:-32}
+    local color_wrap=${1:-32}
+    local exit_code=${2:-$?}
 
     if [ -z $TRAVIS_START_TIME ]; then echo '[ici_time_end] var TRAVIS_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
     TRAVIS_END_TIME=$(date +%s%N)
     TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
     echo -e "ici_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
     echo -e "ici_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME took $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec\e[0m"
+    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME returned with code '${exit_code}' after $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec \e[0m"
 
     unset $TRAVIS_FOLD_NAME
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
 #######################################
-# This private function can exit the shell process, as well as wrapping up the timer section on Travis CI. Internally this does:
+# exit function with handling for EXPECT_EXIT_CODE, ends the current fold if necessary
 #
-# * wraps the section that is started by ici_time_start function.
-# * resets signal handler for ERR to the bash default one, when `exit_code` is any error code that exits the shell. This allows subsequent signal handlers for ERR if any to be unaffected by any handlers defined beforehand.
-# * exits the process if non -1 value is passed to `exit_code`.
-#
+# Globals:
+#   EXPECT_EXIT_CODE (read-only)
+#   TRAVIS_FOLD_NAME (from ici_time_start, read-only)
 # Arguments:
-#  exit_code (default: -1): Unix signal. If -1 then the process continues without exiting.
-#  color_wrap (default: 32): Color code for the section delimitter text.
+#   exit_code (default: $?)
+# Returns:
+#   (None)
 #######################################
-function _end_fold_script {
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    exit_code=${1:--1}  # If 1st arg is not passed, set -1.
-    color_wrap=${2:-32}
+function ici_exit {
+    local exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
+    trap - EXIT # Reset signal handler since the shell is about to exit.
 
-    if [ $exit_code -eq "1" ]; then color_wrap=31; fi  # Red color
-    if [ -z $TRAVIS_FOLD_NAME ]; then
-        ici_time_end $color_wrap
-    else
-	echo "Previous Travis fold name not found. It might be either successful termination of the script, or wrong call. Skipping 'ici_time_end' anyway."
+    # end fold if needed
+    if [ -n "$TRAVIS_FOLD_NAME" ]; then
+        if [ $exit_code -ne "0" ]; then color_wrap=31; fi  # Red color for errors
+        ici_time_end "$color_wrap" "$exit_code"
     fi
 
-    if [ $exit_code -eq "1" ]; then trap - ERR; fi  # Reset signal handler since the shell is about to exit.
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
-    if [ $exit_code -ne "-1" ]; then exit $exit_code; fi
+    if [ "$exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
+        exit 0
+    elif [ "$exit_code" == "0" ]; then # 0 was not expected
+        exit 1
+    fi
+
+    exit $exit_code
 }
 
 #######################################
-# This calls "exit 1", along with the following. When your script on Travis CI already uses other functions from this file (util.sh), using this is recommended over calling directly "exit 1".
+# Print an error message and calls "exit"
 #
-# * wraps the section that is started by ici_time_start function with the echo color red (31).
-# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
+# * Wraps the section that is started by ici_time_start function with the echo color red (31).
+# * exit_code is taken from second argument or from the previous comman.
+# * If the final exit_code is 0, this function will exit 1 instead to enforce a test failure
 #
 # Globals:
 #   (None)
 # Arguments:
-#   (None)
+#   message (optional) 
+#   exit_code (default: $?)
 # Returns:
 #   (None)
 #######################################
 function error {
-    _end_fold_script 1 31
-}
-
-#######################################
-# Similar to `error` function, this lets you "exit 0" and take care of other things as following, when your script on Travis CI already uses other functions from this file (util.sh).
-#
-# * wraps the section that is started by ici_time_start function with the echo color green.
-# * reset signal handler for ERR to the bash default one. Subsequent signal handlers for ERR if any are unaffected by any handlers defined prior.
-#
-# Globals:
-#   (None)
-# Arguments:
-#   _exit_code (default: 0): Unix signal. If -1 passed then the process continues without exiting.
-# Returns:
-#   (None)
-#######################################
-function success {
-    _FUNC_MSG_PREFIX="[fuction success]"
-    _exit_code=${1:-0}  # If 1st arg is not passed, set 0.
-    HIT_ENDOFSCRIPT=${HIT_ENDOFSCRIPT:-false}
-    if [ $HIT_ENDOFSCRIPT = false ]; then
-    	if [ $_exit_code -eq 0 ]; then
-    	    echo "${_FUNC_MSG_PREFIX} Arg HIT_ENDOFSCRIPT must be true when this function exit with 0. Turn _exit_code to 1."; _exit_code=1;
-    	else
-    	    echo "${_FUNC_MSG_PREFIX} _exit_code cannot be 0 for this func. Make sure you are calling this in a right context."; _exit_code=1;
-    	fi
+    local exit_code=${2:-$?} #
+    if [ -n $1 ]; then
+        echo "\e[31m$1\e0m" # print error in red
     fi
-    if [ $_exit_code -ne "-1" ] && [ $_exit_code -ne "0" ]; then echo "${_FUNC_MSG_PREFIX} error: arg _exit_code must be either empty, -1 or 0. Returning."; return; fi
-    _end_fold_script $_exit_code
+    if [ "$exit_code" == "0" ]; then # 0 is not error
+        exit 1
+    fi
+    ici_exit $exit_code
 }

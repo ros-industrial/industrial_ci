@@ -53,9 +53,6 @@ case "$ROS_DISTRO" in
 esac
 if [ ! "$PRERELEASE_OS_CODENAME" ]; then PRERELEASE_OS_CODENAME=$os_code_name; fi
 
-# File-global vars and 
-RESULT_PRERELEASE=-1
-
 function setup_environment() {
     # ROS Buildfarm for prerelease http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
     sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -86,11 +83,10 @@ function run_ros_prerelease() {
     ici_time_end  # run_prerelease
     
     ici_time_start show_testresult
-    catkin_test_results --verbose && { echo 'ROS Prerelease Test went successful.'; RESULT_PRERELEASE=0; } || { RESULT_PRERELEASE=1; error; }
+    catkin_test_results --verbose || error 'ROS Prerelease Test failed'
+    echo 'ROS Prerelease Test went successful.'
     ici_time_end  # show_testresult
     
     cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
     pwd
-
-    return $RESULT_PRERELEASE
 }

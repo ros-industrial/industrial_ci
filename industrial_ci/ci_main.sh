@@ -52,8 +52,7 @@ export HIT_ENDOFSCRIPT=false
 
 source ${ICI_PKG_PATH}/util.sh
 
-trap error ERR
-trap success SIGTERM  # So that this script won't terminate without verifying that all necessary steps are done.
+trap ici_exit EXIT # install industrial_ci exit handler
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
@@ -63,8 +62,13 @@ else
   source ${ICI_PKG_PATH}/source_tests.sh
 fi
 
-cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
-pwd
+ici_time_start after_script
 
-if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi # disable command printing at end of script, TODO: factor out into function
-# exit with code 0
+  cd $TARGET_REPO_PATH
+  if [ "${AFTER_SCRIPT// }" != "" ]; then sh -e -c "${AFTER_SCRIPT}"; fi
+
+ici_time_end  # after_script
+
+cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
+
+ici_exit 0

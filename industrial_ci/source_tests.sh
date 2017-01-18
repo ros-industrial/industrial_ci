@@ -57,6 +57,7 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
       /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
   docker cp ~/.ssh run-industrial-ci:/root/ # pass SSH settings to container
   docker start -a run-industrial-ci
+  unset AFTER_SCRIPT # do not run AFTER_SCRIPT again
   return
  fi
 
@@ -64,9 +65,6 @@ ici_time_start init_ici_environment
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
-# For compatibilility with hydro catkin, which has no --verbose flag
-CATKIN_TEST_RESULTS_CMD="catkin_test_results"
-if [ catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
 
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
@@ -96,20 +94,26 @@ ici_time_start setup_ros
 
 echo "Testing branch $TRAVIS_BRANCH of $TARGET_REPO_NAME"  # $TARGET_REPO_NAME is the repo where this job is triggered from, and the variable is expected to be passed externally (industrial_ci/travis.sh should be taking care of it)
 # Set apt repo
+lsb_release -a
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
 # Common ROS install preparation
 # apt key acquisition. Since keyserver may often become accessible, backup method is added.
-sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS || ((echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -) || (echo 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'; error))
-lsb_release -a
-sudo apt-get -qq update || (echo "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"; error)
+sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
+    || { echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -; } \
+    || error 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'
+
+sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
+ 
 sudo apt-get -qq install -y python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-rosbash ros-$ROS_DISTRO-rospack
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
-    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS
-    if [[ $? > 0 ]]; then
-        echo "One or more additional deb installation is failed. Exiting."; error
-    fi
+    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
 fi
+
+# For compatibilility with hydro catkin, which has no --verbose flag
+CATKIN_TEST_RESULTS_CMD="catkin_test_results"
+if catkin_test_results --verbose 1>/dev/null 2>/dev/null; then CATKIN_TEST_RESULTS_CMD="catkin_test_results --verbose"; fi
+
 # MongoDB hack - I don't fully understand this but its for moveit_warehouse
 dpkg -s mongodb || echo "ok"; export HAVE_MONGO_DB=$?
 if [ $HAVE_MONGO_DB == 0 ]; then
@@ -153,8 +157,9 @@ ici_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
-mkdir -p ~/ros/ws_$TARGET_REPO_NAME/src
-cd ~/ros/ws_$TARGET_REPO_NAME/src
+CATKIN_WORKSPACE=~/catkin_ws
+mkdir -p $CATKIN_WORKSPACE/src
+cd $CATKIN_WORKSPACE/src
 case "$UPSTREAM_WORKSPACE" in
 debian)
     echo "Obtain deb binary for upstream packages."
@@ -187,8 +192,7 @@ ln -s $TARGET_REPO_PATH .
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
-        echo "mockup directory '$USE_MOCKUP' does not exist"
-        error
+        error "mockup directory '$USE_MOCKUP' does not exist"
     fi
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" .
 fi
@@ -208,23 +212,27 @@ ici_time_start before_script
 
 ## BEGIN: travis' before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
-if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -c "${BEFORE_SCRIPT}"; fi
+
+# execute BEFORE_SCRIPT in repository, exit on errors
+cd $TARGET_REPO_PATH
+if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -e -c "${BEFORE_SCRIPT}"; fi
 
 ici_time_end  # before_script
 
 ici_time_start rosdep_install
 
-sudo rosdep install -q --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+sudo rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
 
 ici_time_start wstool_info
 $ROSWS --version
-$ROSWS info -t .
-cd ../
+$ROSWS info -t $CATKIN_WORKSPACE/src
 
 ici_time_end  # wstool_info
 
 ici_time_start catkin_build
+
+cd $CATKIN_WORKSPACE
 
 ## BEGIN: travis' script: # All commands must exit with code 0 on success. Anything else is considered failure.
 source /opt/ros/$ROS_DISTRO/setup.bash # re-source setup.bash for setting environmet vairable for package installed via rosdep
@@ -296,7 +304,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
 fi
 
-ici_time_start after_script
+ici_time_start test_results
 
 ## BEGIN: travis' after_script
 PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
@@ -304,7 +312,7 @@ PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 
 if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
 if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then $CATKIN_TEST_RESULTS_CMD --all $ROS_LOG_DIR || error; fi
-if [ "$BUILDER" == catkin -a -e ~/ros/ws_$TARGET_REPO_NAME/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/ros/ws_$TARGET_REPO_NAME/build/ || error; fi
+if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then $CATKIN_TEST_RESULTS_CMD --all $CATKIN_WORKSPACE/build/ || error; fi
 if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then $CATKIN_TEST_RESULTS_CMD --all ~/.ros/test_results/ || error; fi
 
-ici_time_end  # after_script
+ici_time_end  # test_results

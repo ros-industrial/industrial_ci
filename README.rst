@@ -110,7 +110,7 @@ With the following few short steps, you can start in your client repository usin
   before_config:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
-    - source .ci_config/travis.sh
+    - .ci_config/travis.sh
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
@@ -147,12 +147,14 @@ Optional environment variables
 Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
 
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
+* `AFTER_SCRIPT`: (default: not set): Used to specify shell commands that run after all source tests.
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
 * `BUILD_PKGS_WHITELIST` (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
 * `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
+* `EXPECT_EXIT_CODE` (default: 0): exit code must match this value for test to succeed
 * `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
 * `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
 * `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
@@ -187,8 +189,8 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 ::
 
   script:
-    - source .ci_config/travis.sh
-    - source ./travis.sh
+    - .ci_config/travis.sh
+    - ./travis.sh
 
 2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
 
@@ -220,8 +222,8 @@ This standard `git submodule` command:
 ::
 
   script:
-    - source .ci_config/travis.sh
-    #- source ./travis.sh  # Optional. Explained later
+    - .ci_config/travis.sh
+    #- ./travis.sh  # Optional. Explained later
 
 Also, the example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
 
@@ -287,16 +289,27 @@ You may want to add custom steps prior to the setup defined in `./travis.sh <./t
 
 * You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
-In this case, add `source`d scripts before `travis.sh` gets called (see below for an example).
+In this case, add scripts before `travis.sh` gets called (see below for an example).
 
 ::
 
   script:
-    - source ./your_custom_PREprocess.sh
-    - source .ci_config/travis.sh
-    - source ./your_custom_POSTprocess.sh
+    - ./your_custom_PREprocess.sh
+    - .ci_config/travis.sh
+    - ./your_custom_POSTprocess.sh
 
-In the above case, in both `.ci_config/travis.sh` and `your_custom_POSTprocess.sh` the environment is kept from previous script(s), so whatever is done in previous scripts remains.
+Please note: the environment is NOT kept between script(s).
+
+If code needs to be executed in `travis.sh` context, `BEFORE_SCRIPT` and `AFTER_SCRIPT` can be used:
+
+::
+
+  env:
+    global:
+      - BEFORE_SCRIPT:'./your_custom_PREprocess.sh'
+      - AFTER_SCRIPT:'./your_custom_POSTprocess.sh'
+  script:
+    - .ci_config/travis.sh
 
 (Optional) Build depended packages from source
 ----------------------------------------------
