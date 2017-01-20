@@ -10,7 +10,7 @@
       <li>As of January 2017, this repo provides configuration for Travis CI only, although it should be easily deployed from other CI services.</li>
     </ul>
   </description>
-  <license>BSD</license>
+  <license>Apache License 2.0</license>
   <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>
   <maintainer email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</maintainer>
   <author>Isaac I. Y. Saito</author>
