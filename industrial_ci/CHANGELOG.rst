@@ -2,6 +2,24 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [capability] New variables: CATKIN_WORKSPACE, DEBUG_BASH, EXPECT_EXIT_CODE, AFTER_SCRIPT (see `document <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst>`_ for detail)
+* [capability] Choose verbose output `#94 <https://github.com/ros-industrial/industrial_ci/issues/94>`_
+* [capability] enable/disable verbose output (`#94 <https://github.com/ros-industrial/industrial_ci/issues/94>`_)
+* [capability] Support private github repositories on kinetic (`#92 <https://github.com/ros-industrial/industrial_ci/issues/92>`_)
+* [fix, capability] Script terminates when rosdep install fails. Remove manifest.xml handling `#95 <https://github.com/ros-industrial/industrial_ci/issues/95>`_
+* [fix][ci_main.sh] Fix to not terminate falsely. (`#84 <https://github.com/ros-industrial/industrial_ci/issues/84>`_)
+* [fix] ROS prerelease test using code in the pull request. (`#85 <https://github.com/ros-industrial/industrial_ci/pull/85>`_)
+* [fix] ROS prerelease test on Kinetic. (`#83 <https://github.com/ros-industrial/industrial_ci/pull/83>`_)
+* [fix] Kinetic testing fix (environment variables passed to docker container) (`#82 <https://github.com/ros-industrial/industrial_ci/issues/82>`_)
+* [fix] Many build/install issues https://github.com/ros-industrial/industrial_ci/pull/110, https://github.com/ros-industrial/industrial_ci/pull/109 (`#92 <https://github.com/ros-industrial/industrial_ci/issues/92>`_)
+* [doc] Split readme into quick start and detail. More beginner doc. https://github.com/ros-industrial/industrial_ci/pull/113
+* [maintenance] Change license to Apache 2.0 (addresses `#17 <https://github.com/ros-industrial/industrial_ci/issues/17>`_).
+* [maintenance] Major code refactoring. Generalizing function and variable names (removing mention to specific CI system) https://github.com/ros-industrial/industrial_ci/pull/108
+* [maintenance] Add maintainer.
+* Contributors: Benjamin Maidel, Isaac I.Y. Saito, Mathias Luedtke
+
 0.3.1 (2016-10-24)
 ------------------
 * [fix] usermod error on docker-based ROS Prerelease (see https://github.com/ros-industrial/ros_canopen/pull/193#issuecomment-254575036). (`#81 <https://github.com/ros-industrial/industrial_ci/issues/81>`_)
