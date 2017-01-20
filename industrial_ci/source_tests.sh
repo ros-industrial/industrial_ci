@@ -225,7 +225,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     if [ "$BUILDER" == catkin ]; then
       for pkg in $PKGS_DOWNSTREAM; do
         echo "[$pkg] Started testing..."
-        rostest_files=$(find install/share/$pkg -iname '*.test')
+        rostest_files=$(find install/share/$pkg -iname '*.test') || continue # metapackage do not install anything in share
         echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
