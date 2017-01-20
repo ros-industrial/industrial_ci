@@ -1,12 +1,24 @@
 <package>
   <name>industrial_ci</name>
   <version>0.3.1</version>
-  <description>common travis script suite</description>
+  <description>This package contains CI (Continuous Integration) configuration that any ROS-powered packages can commonly use. Some notable feature:
+    <ul>
+      <li>Checks if your package builds, installs without issues. If unit/system tests are defined run them. <a href = "http://wiki.ros.org/bloom/Tutorials/PrereleaseTest">ROS Prerelease Test</a> can optionally be run.</li>
+      <li>Proven to cover the general requirements of the ROS-based robotics repositories. Easily configurable.</li>
+      <li>Users can add custom pre/post processes.</li>
+      <li>Covers ROS Indigo, Jade, Kinetic distribution.</li>
+      <li>As of January 2017, this repo provides configuration for Travis CI only, although it should be easily deployed from other CI services.</li>
+    </ul>
+  </description>
   <license>BSD</license>
   <maintainer email="iisaito@kinugarage.com">Isaac I. Y. Saito</maintainer>
   <maintainer email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</maintainer>
   <author>Isaac I. Y. Saito</author>
   <author email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</author>
+
+  <url type="website">http://wiki.ros.org/industrial_ci</url>
+  <url type="repository">https://github.com/ros-industrial/industrial_ci</url>
+  <url type="bugtracker">https://github.com/ros-industrial/industrial_ci/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
