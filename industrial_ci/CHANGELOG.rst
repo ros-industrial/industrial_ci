@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.2 (2017-01-20)
+------------------
 * [capability] New variables: CATKIN_WORKSPACE, DEBUG_BASH, EXPECT_EXIT_CODE, AFTER_SCRIPT (see `document <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst>`_ for detail)
 * [capability] Choose verbose output `#94 <https://github.com/ros-industrial/industrial_ci/issues/94>`_
 * [capability] enable/disable verbose output (`#94 <https://github.com/ros-industrial/industrial_ci/issues/94>`_)
