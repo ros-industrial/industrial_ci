@@ -15,51 +15,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e # exit script on errors
-set -x # print trace
-
-source ${ICI_PKG_PATH}/util.sh
-
-# Environment vars.
-if [ ! "$PRERELEASE_DOWNSTREAM_DEPTH" ]; then export PRERELEASE_DOWNSTREAM_DEPTH="0"; fi
-#echo "PRERELEASE_REPONAME = ${PRERELEASE_REPONAME}"  # This shouldn't be echoed since this would become a return value of this entire script.
-
-CATKIN_DISTRO=$ROS_DISTRO
-
-case "$ROS_DISTRO" in
-"kinetic")
-    os_code_name="xenial"
-    CATKIN_DISTRO="jade"
-    ;;
-*)
-    os_code_name=$(lsb_release -sc)
-    ;;
-esac
-if [ ! "$PRERELEASE_OS_CODENAME" ]; then PRERELEASE_OS_CODENAME=$os_code_name; fi
-
 function setup_environment() {
     # ROS Buildfarm for prerelease http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
     sudo -E sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo -E apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
     # Buildfarm workaround for Python3 http://wiki.ros.org/regression_tests#How_do_I_setup_my_system_to_run_a_prerelease.3F
-    sudo -E apt-get update && sudo -E apt-get -qq install -y python3 python3-pip python-ros-buildfarm ros-$CATKIN_DISTRO-catkin
+    sudo -E apt-get update && sudo -E apt-get -qq install -y python3 python3-pip python-ros-buildfarm ros-${catkin_distro}-catkin
     sudo python3 -m pip install -U EmPy
-    source /opt/ros/$CATKIN_DISTRO/setup.bash
 }
 
 function run_ros_prerelease() {
+    # Environment vars.
+    local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
+    local catkin_distro=$ROS_DISTRO
+    local os_code_name
+
+    case "$ROS_DISTRO" in
+    "kinetic")
+        os_code_name="xenial"
+        catkin_distro="jade"
+        ;;
+    *)
+        os_code_name=$(lsb_release -sc)
+        ;;
+    esac
+    os_code_name=${PRERELEASE_OS_CODENAME:-$os_code_name}
+
     ici_time_start setup_environment
     setup_environment
     ici_time_end  # setup_environment
 
     ici_time_start setup_prerelease_scripts
     mkdir -p /tmp/prerelease_job; cd /tmp/prerelease_job; 
-    if [ ! "$PRERELEASE_REPONAME" ]; then
-        PRERELEASE_REPONAME=$(echo $TRAVIS_REPO_SLUG | cut -d'/' -f 2)
+    local reponame=$PRERELEASE_REPONAME
+    if [ ! "$reponame" ]; then
+        reponame=$TARGET_REPO_NAME
         mkdir -p catkin_workspace/src
-        cp -a $TRAVIS_BUILD_DIR catkin_workspace/src/
+        cp -a $TARGET_REPO_PATH catkin_workspace/src/
     fi
-    generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${PRERELEASE_OS_CODENAME} amd64 ${PRERELEASE_REPONAME} --level $PRERELEASE_DOWNSTREAM_DEPTH --output-dir ./
+    generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml $ROS_DISTRO default ubuntu ${os_code_name} amd64 ${reponame} --level $downstream_depth --output-dir ./
     ici_time_end  # setup_prerelease_scripts
 
     ici_time_start run_prerelease
@@ -67,10 +61,11 @@ function run_ros_prerelease() {
     ici_time_end  # run_prerelease
     
     ici_time_start show_testresult
+    source /opt/ros/${catkin_distro}/setup.bash
     catkin_test_results --verbose || error 'ROS Prerelease Test failed'
     echo 'ROS Prerelease Test went successful.'
     ici_time_end  # show_testresult
     
-    cd $TRAVIS_BUILD_DIR  # cd back to the repository's home directory with travis
+    cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
     pwd
 }
