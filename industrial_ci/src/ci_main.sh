@@ -41,10 +41,10 @@ trap ici_exit EXIT # install industrial_ci exit handler
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
-  source ${ICI_PKG_PATH}/ros_pre-release.sh
+  source ${ICI_PKG_PATH}/tests/ros_prerelease.sh
   run_ros_prerelease
 else
-  source ${ICI_PKG_PATH}/source_tests.sh
+  source ${ICI_PKG_PATH}/tests/source_tests.sh
 fi
 
 ici_time_start after_script
