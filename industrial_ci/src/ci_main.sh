@@ -23,13 +23,6 @@
 set -e # exit script on errors
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
-#Define some verbose env vars
-if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
-    export OPT_VI="-vi"
-else
-    export OPT_VI=""
-fi
-
 # Define some env vars that need to come earlier than util.sh
 export ICI_PKG_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) of industrial_ci top dir.
 export CI_MAIN_PKG=industrial_ci

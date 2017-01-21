@@ -47,6 +47,13 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   return
  fi
 
+#Define some verbose env vars
+if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
+    OPT_VI="-vi"
+else
+    OPT_VI=""
+fi
+
 ici_time_start init_ici_environment
 # Define more env vars
 BUILDER=catkin
