@@ -33,10 +33,10 @@ if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
   fi
 
   docker_target_repo_path=/root/ci_src
-  docker_ici_pkg_path=${ICI_PKG_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
+  docker_ici_pkg_path=${ICI_SRC_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
   docker create \
       --name run-industrial-ci \
-      --env-file ${ICI_PKG_PATH}/docker.env \
+      --env-file ${ICI_SRC_PATH}/docker.env \
       -e TARGET_REPO_PATH=$docker_target_repo_path \
       $SSH_DOCKER_CMD \
       -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
@@ -82,7 +82,6 @@ ici_time_end  # init_ici_environment
 
 ici_time_start setup_ros
 
-echo "Testing branch $TRAVIS_BRANCH of $TARGET_REPO_NAME"  # $TARGET_REPO_NAME is the repo where this job is triggered from, and the variable is expected to be passed externally (industrial_ci/travis.sh should be taking care of it)
 # Set apt repo
 lsb_release -a
 sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'

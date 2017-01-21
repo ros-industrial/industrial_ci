@@ -24,20 +24,18 @@ set -e # exit script on errors
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
 # Define some env vars that need to come earlier than util.sh
-export ICI_PKG_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) of industrial_ci top dir.
-export CI_MAIN_PKG=industrial_ci
-export HIT_ENDOFSCRIPT=false
+export ICI_SRC_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
 
-source ${ICI_PKG_PATH}/util.sh
+source ${ICI_SRC_PATH}/util.sh
 
 trap ici_exit EXIT # install industrial_ci exit handler
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
-  source ${ICI_PKG_PATH}/tests/ros_prerelease.sh
+  source ${ICI_SRC_PATH}/tests/ros_prerelease.sh
   run_ros_prerelease
 else
-  source ${ICI_PKG_PATH}/tests/source_tests.sh
+  source ${ICI_SRC_PATH}/tests/source_tests.sh
 fi
 
 ici_time_start after_script
