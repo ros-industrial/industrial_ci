@@ -122,7 +122,7 @@ function ici_exit {
 #######################################
 function error {
     local exit_code=${2:-$?} #
-    if [ -n $1 ]; then
+    if [ -n "$1" ]; then
         echo "\e[31m$1\e0m" # print error in red
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
