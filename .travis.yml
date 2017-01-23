@@ -18,6 +18,7 @@ env:
     - VERBOSE_OUTPUT='true'
     - POST_PROCESS='echo "post processing reached"'
   matrix:
+    - ROS_DISTRO=hydro
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=indigo DOCKER_IMAGE='mluedtke/ci-test:indigo'
     - ROS_DISTRO=indigo DOCKER_IMAGE='ros:indigo-ros-core'  ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip"

@@ -150,7 +150,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
     # Test if the packages in the downstream repo build.
     if [ "$BUILDER" == catkin ]; then
-        catkin clean --yes
+        catkin clean --yes || catkin clean -b
         catkin config --install
         catkin build $OPT_VI --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash

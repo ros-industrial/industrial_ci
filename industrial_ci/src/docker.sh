@@ -154,6 +154,9 @@ function ici_build_default_docker_image() {
   local os_code_name=$UBUNTU_CODE_NAME
   if [ -z "$os_code_name" ]; then
     case "$ROS_DISTRO" in
+    "hydro")
+        os_code_name="precise"
+        ;;
     "kinetic")
         os_code_name="xenial"
         ;;
