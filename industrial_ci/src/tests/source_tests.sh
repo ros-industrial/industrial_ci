@@ -52,9 +52,10 @@ ici_time_end  # setup_ros
 ici_time_start setup_rosdep
 
 # Setup rosdep
-pip --version
 rosdep --version
-sudo rosdep init
+if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
+    sudo rosdep init
+fi
 ret_rosdep=1
 rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
