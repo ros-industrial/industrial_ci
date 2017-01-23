@@ -25,9 +25,9 @@
 #
 # Globals:
 #   DEBUG_BASH (read-only)
-#   TRAVIS_FOLD_NAME (write-only)
-#   TRAVIS_TIME_ID (write-only)
-#   TRAVIS_START_TIME (write-only)
+#   ICI_FOLD_NAME (write-only)
+#   ICI_TIME_ID (write-only)
+#   ICI_START_TIME (write-only)
 # Arguments:
 #   color_wrap (default: 32): Color code for the section delimitter text.
 #   exit_code (default: $?): Exit code for display
@@ -37,11 +37,11 @@
 
 function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    TRAVIS_START_TIME=$(date +%s%N)
-    TRAVIS_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-    TRAVIS_FOLD_NAME=$1
-    echo -e "\e[0Kici_fold:start:$TRAVIS_FOLD_NAME"
-    echo -e "\e[0Kici_time:start:$TRAVIS_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
+    ICI_START_TIME=$(date +%s%N)
+    ICI_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+    ICI_FOLD_NAME=$1
+    echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
+    echo -e "\e[0Kici_time:start:$ICI_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
@@ -50,9 +50,9 @@ function ici_time_start {
 #
 # Globals:
 #   DEBUG_BASH (read-only)
-#   TRAVIS_FOLD_NAME (from ici_time_start, read-write)
-#   TRAVIS_TIME_ID (from ici_time_start, read-only)
-#   TRAVIS_START_TIME (from ici_time_start, read-only)
+#   ICI_FOLD_NAME (from ici_time_start, read-write)
+#   ICI_TIME_ID (from ici_time_start, read-only)
+#   ICI_START_TIME (from ici_time_start, read-only)
 # Arguments:
 #   color_wrap (default: 32): Color code for the section delimitter text.
 #   exit_code (default: $?): Exit code for display
@@ -64,14 +64,14 @@ function ici_time_end {
     local color_wrap=${1:-32}
     local exit_code=${2:-$?}
 
-    if [ -z $TRAVIS_START_TIME ]; then echo '[ici_time_end] var TRAVIS_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
-    TRAVIS_END_TIME=$(date +%s%N)
-    TIME_ELAPSED_SECONDS=$(( ($TRAVIS_END_TIME - $TRAVIS_START_TIME)/1000000000 ))
-    echo -e "ici_time:end:$TRAVIS_TIME_ID:start=$TRAVIS_START_TIME,finish=$TRAVIS_END_TIME,duration=$(($TRAVIS_END_TIME - $TRAVIS_START_TIME))\e[0K"
-    echo -e "ici_fold:end:$TRAVIS_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-    echo -e "\e[0K\e[${color_wrap}mFunction $TRAVIS_FOLD_NAME returned with code '${exit_code}' after $(( $TIME_ELAPSED_SECONDS / 60 )) min $(( $TIME_ELAPSED_SECONDS % 60 )) sec \e[0m"
+    if [ -z $ICI_START_TIME ]; then echo '[ici_time_end] var ICI_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
+    local end_time=$(date +%s%N)
+    local elapsed_seconds=$(( ($end_time - $ICI_START_TIME)/1000000000 ))
+    echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$(($end_time - $ICI_START_TIME))\e[0K"
+    echo -e "ici_fold:end:$ICI_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
+    echo -e "\e[0K\e[${color_wrap}mFunction $ICI_FOLD_NAME returned with code '${exit_code}' after $(( $elapsed_seconds / 60 )) min $(( $elapsed_seconds % 60 )) sec \e[0m"
 
-    unset TRAVIS_FOLD_NAME
+    unset ICI_FOLD_NAME
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
@@ -80,7 +80,7 @@ function ici_time_end {
 #
 # Globals:
 #   EXPECT_EXIT_CODE (read-only)
-#   TRAVIS_FOLD_NAME (from ici_time_start, read-only)
+#   ICI_FOLD_NAME (from ici_time_start, read-only)
 # Arguments:
 #   exit_code (default: $?)
 # Returns:
@@ -91,7 +91,7 @@ function ici_exit {
     trap - EXIT # Reset signal handler since the shell is about to exit.
 
     # end fold if needed
-    if [ -n "$TRAVIS_FOLD_NAME" ]; then
+    if [ -n "$ICI_FOLD_NAME" ]; then
         if [ $exit_code -ne "0" ]; then color_wrap=31; fi  # Red color for errors
         ici_time_end "$color_wrap" "$exit_code"
     fi
@@ -122,7 +122,7 @@ function ici_exit {
 #######################################
 function error {
     local exit_code=${2:-$?} #
-    if [ -n $1 ]; then
+    if [ -n "$1" ]; then
         echo "\e[31m$1\e0m" # print error in red
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error

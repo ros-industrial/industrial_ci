@@ -25,9 +25,9 @@ export TARGET_REPO_NAME=${PWD##*/}
 
 function  main {
     # Call the "core" executable of this repo to run all kinds of tests. 
-    cd $DIR_THIS/industrial_ci
+    cd $DIR_THIS/industrial_ci/src
     local ret=0
-    ./ci_main.sh || ret=$?
+    bash ./ci_main.sh || ret=$?
     cd $TARGET_REPO_PATH  # Moves back to the repository root dir.
     return $ret
 }
