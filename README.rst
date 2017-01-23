@@ -45,7 +45,7 @@ With a few steps, you can start in your client repository using CI confiurations
   script:
     - .ci_config/travis.sh
 
-* Note that `.ci_config` is the REQUIRED name of the cloned folder; it is hardcoded on `industrial_ci` side so you must adhere to it.
+* Note: The name `.ci_config` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name as long as the folder is hidden (by being prepended by ".").
 
 Concrete examples of config files
 -------------------------------------
