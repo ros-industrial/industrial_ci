@@ -19,34 +19,9 @@
 ## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis
 
 source ${ICI_SRC_PATH}/env.sh
-# Building in 16.04 requires running this script in a docker container
-# The Dockerfile in this repository defines a Ubuntu 16.04 container
-if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
-  ici_time_start build_docker_image
-  docker build -t industrial-ci/xenial .
-  ici_time_end  # build_docker_image
+source ${ICI_SRC_PATH}/docker.sh
 
-  #forward ssh agent into docker container
-  if [ "$SSH_AUTH_SOCK" ]; then
-      export SSH_DOCKER_CMD="-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
-  else
-      export SSH_DOCKER_CMD=""
-  fi
-
-  docker_target_repo_path=/root/ci_src
-  docker_ici_pkg_path=${ICI_SRC_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
-  docker create \
-      --name run-industrial-ci \
-      --env-file ${ICI_SRC_PATH}/docker.env \
-      -e TARGET_REPO_PATH=$docker_target_repo_path \
-      $SSH_DOCKER_CMD \
-      -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
-      /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
-  docker cp ~/.ssh run-industrial-ci:/root/ # pass SSH settings to container
-  docker start -a run-industrial-ci
-  unset AFTER_SCRIPT # do not run AFTER_SCRIPT again
-  return
- fi
+ici_require_run_in_docker # this script must be run in docker
 
 #Define some verbose env vars
 if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
@@ -64,18 +39,7 @@ ici_time_end  # init_ici_environment
 
 ici_time_start setup_ros
 
-# Set apt repo
-lsb_release -a
-sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-# Common ROS install preparation
-# apt key acquisition. Since keyserver may often become accessible, backup method is added.
-sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
-    || { echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -; } \
-    || error 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'
-
-sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
- 
-sudo apt-get -qq install --no-install-recommends -y build-essential python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin ssh-client
+sudo apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then

@@ -19,6 +19,8 @@ env:
     - POST_PROCESS='echo "post processing reached"'
   matrix:
     - ROS_DISTRO=indigo USE_MOCKUP='mockups/industrial_ci_testpkg'
+    - ROS_DISTRO=indigo DOCKER_IMAGE='mluedtke/ci-test:indigo'
+    - ROS_DISTRO=indigo DOCKER_IMAGE='ros:indigo-ros-core'  ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip"
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
