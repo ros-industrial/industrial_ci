@@ -162,7 +162,8 @@ RUN echo "deb ${ROS_REPOSITORY_PATH} $UBUNTU_OS_CODE_NAME main" > /etc/apt/sourc
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
     || { wget "${APTKEY_STORE_HTTPS}" -O - | sudo apt-key add -; }
 
-RUN apt-get update -qq \
+RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
+    && apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y \
         build-essential \
         python-catkin-tools \
