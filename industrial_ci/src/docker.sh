@@ -151,28 +151,14 @@ function ici_prepare_docker_image() {
 #   (None)
 
 function ici_build_default_docker_image() {
-  local os_code_name=$UBUNTU_CODE_NAME
-  if [ -z "$os_code_name" ]; then
-    case "$ROS_DISTRO" in
-    "hydro")
-        os_code_name="precise"
-        ;;
-    "kinetic")
-        os_code_name="xenial"
-        ;;
-    *)
-        os_code_name=$(lsb_release -sc)
-        ;;
-    esac
-  fi
-  export DOCKER_IMAGE="industrial-ci/$os_code_name"
+  export DOCKER_IMAGE="industrial-ci/$UBUNTU_OS_CODE_NAME"
   
   ici_docker_build - <<EOF > /dev/null
-FROM ubuntu:$os_code_name
+FROM ubuntu:$UBUNTU_OS_CODE_NAME
 
 RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget ca-certificates
 
-RUN echo "deb ${ROS_REPOSITORY_PATH} $os_code_name main" > /etc/apt/sources.list.d/ros-latest.list
+RUN echo "deb ${ROS_REPOSITORY_PATH} $UBUNTU_OS_CODE_NAME main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
     || { wget "${APTKEY_STORE_HTTPS}" -O - | sudo apt-key add -; }
 

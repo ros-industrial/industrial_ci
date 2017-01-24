@@ -18,9 +18,6 @@
 #
 ## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis
 
-source ${ICI_SRC_PATH}/env.sh
-source ${ICI_SRC_PATH}/docker.sh
-
 ici_require_run_in_docker # this script must be run in docker
 
 #Define some verbose env vars

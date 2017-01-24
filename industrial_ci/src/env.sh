@@ -34,3 +34,21 @@ if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-ind
     fi
 fi
 if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
+
+export UBUNTU_OS_CODE_NAME
+if [ -z "$UBUNTU_OS_CODE_NAME" ]; then
+    case "$ROS_DISTRO" in
+    "hydro")
+        UBUNTU_OS_CODE_NAME="precise"
+        ;;
+    "indigo"|"jade")
+        UBUNTU_OS_CODE_NAME="trusty"
+        ;;
+    "kinetic")
+        UBUNTU_OS_CODE_NAME="xenial"
+        ;;
+    *)
+        error "ROS distro '$ROS_DISTRO' is not supported"
+        ;;
+esac
+fi
