@@ -93,7 +93,7 @@ sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
 
 sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
  
-sudo apt-get -qq install --no-install-recommends -y build-essential python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin
+sudo apt-get -qq install --no-install-recommends -y build-essential python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin ssh-client
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
