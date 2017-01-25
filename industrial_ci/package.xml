@@ -22,5 +22,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <run_depend>python-rospkg</run_depend>
+
   <export/>
 </package>
