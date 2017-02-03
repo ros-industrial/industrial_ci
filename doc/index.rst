@@ -91,8 +91,8 @@ In order for your repository to get checked with configurations in `industrial_c
 * To be a `Catkin package <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
 * Build-able on Linux (as of Dec 2015, Ubuntu 14.04/Trusty is used). Although your repository is not necessarilly intended for Linux, checks are run on Linux.
 
-Usage
-======
+Basic Usage
+===========
 
 Here are some operations in your client repositories.
 
@@ -128,6 +128,9 @@ Example client packages
 
 * `ros-industrial/industrial_core <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_
 * `ros-industrial-consortium/descartes <https://github.com/ros-industrial-consortium/descartes/blob/indigo-devel/.travis.yml>`_
+
+Advanced Usage
+==============
 
 Variables you can configure
 ------------------------------------
@@ -182,6 +185,44 @@ Note: You see some `*PKGS*` variables. These make things very flexible but in no
 
 Because of the aforementioned responsibility for the maintainers to watch the changes in `industrial_ci`, `you're encouraged to subscribe to the updates in this repository <https://github.com/ros-industrial/industrial_ci/subscription>`_.
 
+Run ROS Prerelease Test
+-------------------------------------------------------------------------------------
+
+Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your `Travis CI` test.
+
+To do so, add a single line to your Travis config (eg. `.travis.yml`):
+
+::
+
+  ROS_DISTRO=indigo PRERELEASE=true
+
+Or with more configuration:
+
+::
+
+  ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
+
+NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in Travis config.
+
+See the usage sample in `.travis in indusrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
+
+The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
+
+(Workaround) Don't want to always run Prerelease Test
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire Travis jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
+
+::
+
+  :
+  env:
+    matrix:
+      - ROS_DISTRO=indigo PRERELEASE=true
+  :
+
+Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
+
 Add repository-specific CI config in addition
 ----------------------------------------------------------------
 
@@ -197,7 +238,7 @@ Sometimes CI config stored in `industrial_ci` repo may not be sufficient for you
 
 2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
 
-(Optional) To use specific version of industrial_ci in your client repo
+To use specific version of industrial_ci in your client repo
 -------------------------------------------------------------------------------------
 
 (A minor) downside of how you associate your client repo to this `industrial_ci` repository is that you have no control over which version to use (see `discussion in this ticket <https://github.com/ros-industrial/industrial_ci/issues/3>`_). If you wish you can specify the version.
@@ -244,44 +285,6 @@ Maintainers of client repos are responsible for applying the changes that happen
   CLIENTREPO_LOCAL$ git submodule foreach git pull origin master
 
 2. Don't forget to commit the changes the command above makes.
-
-(Optional) Run ROS Prerelease Test
--------------------------------------------------------------------------------------
-
-Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your `Travis CI` test.
-
-To do so, add a single line to your Travis config (eg. `.travis.yml`):
-
-::
-
-  ROS_DISTRO=indigo PRERELEASE=true
-
-Or with more configuration:
-
-::
-
-  ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
-
-NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in Travis config.
-
-See the usage sample in `.travis in indusrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
-
-The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
-
-(Workaround) Don't want to always run Prerelease Test
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire Travis jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
-
-::
-
-  :
-  env:
-    matrix:
-      - ROS_DISTRO=indigo PRERELEASE=true
-  :
-
-Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
 
 Run pre-install custom commands
 -----------------------------------------
@@ -361,7 +364,7 @@ Use .rosinstall from external location
 
 You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
 
-(Optional) Checking older ROS distros with industrial_ci
+Checking older ROS distros with industrial_ci
 --------------------------------------------------------
 
 For the older ROS distributions than `those that are supported <https://github.com/ros-industrial/industrial_ci#supported-ros-distributions>`_, you may still be able to use `industrial_ci`. Here's how to do so taking ROS `Hydro` as an example.
