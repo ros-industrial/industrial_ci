@@ -376,6 +376,27 @@ For `Travis CI`, you need at least the following changes in `.travis.yml`:
 
 A successful example from `swri-robotics/mapviz <https://github.com/swri-robotics/mapviz/blob/49b0c5748950a956804e1976cfd7a224fa3f3f7d/.travis.yml>`_.
 
+Run industrial_ci on local host
+---------------------------------------
+
+Since version 0.3.3, you can run `industrial_ci` on your local host. This can be useful e.g. when you want to integrate industrial_ci into your CI server.
+To do so,
+
+1. Build and install industrial_ci (which is a `catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
+2. Change directory to the package you like to test.
+3. Run `run_ci` script.
+
+Example:
+
+::
+
+  $ cd ~/cws/src && git clone https://github.com/ros-industrial/industrial_ci.git && cd ~/cws
+  $ catkin config --install
+  $ catkin b industrial_ci
+  $ source install/setup.bash
+  $ roscd ros_canopen   (or any package you test)
+  $ rosrun industrial_ci run_ci
+
 For maintainers of industrial_ci repository
 ================================================
 
