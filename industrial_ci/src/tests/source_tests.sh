@@ -114,7 +114,7 @@ ici_time_end  # before_script
 
 ici_time_start rosdep_install
 
-sudo rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
+rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
 
 ici_time_start catkin_build
