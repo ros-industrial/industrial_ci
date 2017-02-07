@@ -62,7 +62,7 @@ ici_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
-CATKIN_WORKSPACE=~/catkin_ws
+export CATKIN_WORKSPACE=~/catkin_ws
 mkdir -p $CATKIN_WORKSPACE/src
 cd $CATKIN_WORKSPACE/src
 $ROSWS init .
