@@ -108,7 +108,7 @@ ici_time_start before_script
 
 # execute BEFORE_SCRIPT in repository, exit on errors
 cd $TARGET_REPO_PATH
-if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -e -c "${BEFORE_SCRIPT}"; fi
+if [ "${BEFORE_SCRIPT// }" != "" ]; then bash -e -c "${BEFORE_SCRIPT}"; fi
 
 ici_time_end  # before_script
 
