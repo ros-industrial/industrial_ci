@@ -18,34 +18,7 @@
 #
 ## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis
 
-# Building in 16.04 requires running this script in a docker container
-# The Dockerfile in this repository defines a Ubuntu 16.04 container
-if [[ "$ROS_DISTRO" == "kinetic" ]] && ! [ "$IN_DOCKER" ]; then
-  ici_time_start build_docker_image
-  docker build -t industrial-ci/xenial .
-  ici_time_end  # build_docker_image
-
-  #forward ssh agent into docker container
-  if [ "$SSH_AUTH_SOCK" ]; then
-      export SSH_DOCKER_CMD="-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) -e SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
-  else
-      export SSH_DOCKER_CMD=""
-  fi
-
-  docker_target_repo_path=/root/ci_src
-  docker_ici_pkg_path=${ICI_SRC_PATH/$TARGET_REPO_PATH/$docker_target_repo_path}
-  docker create \
-      --name run-industrial-ci \
-      --env-file ${ICI_SRC_PATH}/docker.env \
-      -e TARGET_REPO_PATH=$docker_target_repo_path \
-      $SSH_DOCKER_CMD \
-      -v $TARGET_REPO_PATH/:$docker_target_repo_path industrial-ci/xenial \
-      /bin/bash -c "cd $docker_ici_pkg_path; source ./ci_main.sh;"
-  docker cp ~/.ssh run-industrial-ci:/root/ # pass SSH settings to container
-  docker start -a run-industrial-ci
-  unset AFTER_SCRIPT # do not run AFTER_SCRIPT again
-  return
- fi
+ici_require_run_in_docker # this script must be run in docker
 
 #Define some verbose env vars
 if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
@@ -59,41 +32,11 @@ ici_time_start init_ici_environment
 BUILDER=catkin
 ROSWS=wstool
 
-if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
-if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
-if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
-if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
-# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
-if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"; fi
-# .rosintall file name
-if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi
-# For apt key stores
-if [ ! "$APTKEY_STORE_HTTPS" ]; then export APTKEY_STORE_HTTPS="https://raw.githubusercontent.com/ros/rosdistro/master/ros.key"; fi
-if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://ha.pool.sks-keyservers.net"; fi  # Export a variable for SKS URL for break-testing purpose.
-if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="0xB01FA116"; fi
-if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-industrial/industrial_ci/pull/47#discussion_r64882878 for the discussion.
-    if [ "$USE_DEB" != "true" ]; then export UPSTREAM_WORKSPACE="file";
-    else export UPSTREAM_WORKSPACE="debian";
-    fi
-fi
-if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
-
 ici_time_end  # init_ici_environment
 
 ici_time_start setup_ros
 
-# Set apt repo
-lsb_release -a
-sudo -E sh -c 'echo "deb $ROS_REPOSITORY_PATH `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
-# Common ROS install preparation
-# apt key acquisition. Since keyserver may often become accessible, backup method is added.
-sudo apt-key adv --keyserver $APTKEY_STORE_SKS --recv-key $HASHKEY_SKS  \
-    || { echo 'Fetching apt key from SKS keyserver somehow failed. Trying to get one from alternative.\n'; wget $APTKEY_STORE_HTTPS -O - | sudo apt-key add -; } \
-    || error 'Fetching apt key by an alternative method failed too. Exiting since ROS cannot be installed.'
-
-sudo apt-get -qq update || error "ERROR: apt server not responding. This is a rare situation, and usually just waiting for a while clears this. See https://github.com/ros-industrial/industrial_ci/pull/56 for more of the discussion"
- 
-sudo apt-get -qq install --no-install-recommends -y build-essential python-catkin-tools python-rosdep python-wstool ros-$ROS_DISTRO-catkin ssh-client
+sudo apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
@@ -106,9 +49,10 @@ ici_time_end  # setup_ros
 ici_time_start setup_rosdep
 
 # Setup rosdep
-pip --version
 rosdep --version
-sudo rosdep init
+if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
+    sudo rosdep init
+fi
 ret_rosdep=1
 rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
@@ -203,7 +147,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
     # Test if the packages in the downstream repo build.
     if [ "$BUILDER" == catkin ]; then
-        catkin clean --yes
+        catkin clean --yes || catkin clean -b
         catkin config --install
         catkin build $OPT_VI --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
         source install/setup.bash

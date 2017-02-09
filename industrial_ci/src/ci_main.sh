@@ -27,6 +27,8 @@ if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 export ICI_SRC_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
 
 source ${ICI_SRC_PATH}/util.sh
+source ${ICI_SRC_PATH}/env.sh
+source ${ICI_SRC_PATH}/docker.sh
 
 trap ici_exit EXIT # install industrial_ci exit handler
 

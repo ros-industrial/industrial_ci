@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Copyright (c) 2017, Mathias Lüdtke
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ -n "$1" ] && [[ ! "$1" =~ "=" ]]; then
+    if [ -d "$1" ]; then
+        repo_dir=$1
+    else
+        echo "'$1' is not a directory"
+        exit 1
+    fi
+    shift
+else
+    repo_dir=.
+fi
+
+export TARGET_REPO_PATH=$(cd "$repo_dir" && pwd)
+export TARGET_REPO_NAME=${TARGET_REPO_PATH##*/}
+echo "Testing $TARGET_REPO_PATH"
+
+if [ -f "$script_dir/../src/ci_main.sh" ]; then # devel space
+    ci_dir="$script_dir/.."
+elif [ -f "$script_dir/../../share/industrial_ci/src/ci_main.sh" ]; then # install space
+    ci_dir="$script_dir/../../share/industrial_ci/"
+else
+    ci_dir=$(python2 -c "import rospkg; print rospkg.RosPack().get_path('industrial_ci')" 2>/dev/null) || { echo "could not find ci_main.sh"; exit 1; }
+fi
+
+cd "$ci_dir/src"
+env "$@" /bin/bash ci_main.sh
+ret=$?
+
+if [ "$ret" == "0" ]; then
+    echo "All tests succeeded"
+else
+    echo "Tests failed exit code '$ret'"
+fi
+
+exit $ret
