@@ -2,6 +2,11 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [capability] Added a script to run industrial_ci on a local host in a Docker container. `#116 <https://github.com/ros-industrial/industrial_ci/pull/116>`_.
+* Contributors: Mathias Luedtke
+
 0.3.2 (2017-01-20)
 ------------------
 * [capability] New variables: CATKIN_WORKSPACE, DEBUG_BASH, EXPECT_EXIT_CODE, AFTER_SCRIPT (see `document <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst>`_ for detail)
