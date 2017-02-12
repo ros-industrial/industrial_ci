@@ -40,12 +40,14 @@ else
   source ${ICI_SRC_PATH}/tests/source_tests.sh
 fi
 
-ici_time_start after_script
+if [ "${AFTER_SCRIPT// }" != "" ]; then
+  ici_time_start after_script
 
   cd $TARGET_REPO_PATH
-  if [ "${AFTER_SCRIPT// }" != "" ]; then sh -e -c "${AFTER_SCRIPT}"; fi
+  bash -e -c "${AFTER_SCRIPT}"
 
-ici_time_end  # after_script
+  ici_time_end  # after_script
+fi
 
 cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 

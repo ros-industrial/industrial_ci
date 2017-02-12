@@ -103,14 +103,16 @@ fi
 
 ici_time_end  # setup_rosws
 
-ici_time_start before_script
-
 
 # execute BEFORE_SCRIPT in repository, exit on errors
-cd $TARGET_REPO_PATH
-if [ "${BEFORE_SCRIPT// }" != "" ]; then bash -e -c "${BEFORE_SCRIPT}"; fi
+if [ "${BEFORE_SCRIPT// }" != "" ]; then
+  ici_time_start before_script
 
-ici_time_end  # before_script
+  cd $TARGET_REPO_PATH
+  bash -e -c "${BEFORE_SCRIPT}"
+
+  ici_time_end  # before_script
+fi
 
 ici_time_start rosdep_install
 
