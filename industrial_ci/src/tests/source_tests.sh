@@ -62,7 +62,7 @@ ici_time_start setup_rosws
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
-CATKIN_WORKSPACE=~/catkin_ws
+export CATKIN_WORKSPACE=~/catkin_ws
 mkdir -p $CATKIN_WORKSPACE/src
 cd $CATKIN_WORKSPACE/src
 $ROSWS init .
@@ -103,18 +103,20 @@ fi
 
 ici_time_end  # setup_rosws
 
-ici_time_start before_script
-
 
 # execute BEFORE_SCRIPT in repository, exit on errors
-cd $TARGET_REPO_PATH
-if [ "${BEFORE_SCRIPT// }" != "" ]; then sh -e -c "${BEFORE_SCRIPT}"; fi
+if [ "${BEFORE_SCRIPT// }" != "" ]; then
+  ici_time_start before_script
 
-ici_time_end  # before_script
+  cd $TARGET_REPO_PATH
+  bash -e -c "${BEFORE_SCRIPT}"
+
+  ici_time_end  # before_script
+fi
 
 ici_time_start rosdep_install
 
-sudo rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
+rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
 
 ici_time_start catkin_build
