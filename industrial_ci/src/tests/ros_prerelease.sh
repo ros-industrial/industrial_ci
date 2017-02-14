@@ -76,7 +76,7 @@ function run_ros_prerelease() {
     run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default ubuntu "$UBUNTU_OS_CODE_NAME" amd64 "${reponame}" --level "$downstream_depth" --output-dir .
     ici_time_end  # setup_prerelease_scripts
 
-    if [ "$clone_underlay" = true ]; then 
+    if [ "$clone_underlay" = true ]; then
         ici_time_start prerelease_clone_underlay.sh
         run_in_prerelease_docker ./prerelease_clone_underlay.sh
         ici_time_end  # prerelease_clone_underlay
@@ -84,6 +84,7 @@ function run_ros_prerelease() {
 
     ici_time_start prerelease_build_underlay.sh
     run_in_prerelease_docker ./prerelease_build_underlay.sh
+    run_in_prerelease_docker catkin_test_results $WORKSPACE/catkin_workspace/test_results
     ici_time_end  # prerelease_build_underlay.sh
 
     if [ "$downstream_depth" != "0" ]; then
@@ -92,6 +93,7 @@ function run_ros_prerelease() {
         ici_time_end  # run_prerelease_clone_overlay
         ici_time_start prerelease_build_overlay.sh
         run_in_prerelease_docker ./prerelease_build_overlay.sh
+        run_in_prerelease_docker catkin_test_results $WORKSPACE/catkin_workspace_overlay/test_results
         ici_time_end  # prerelease_build_overlay.sh
     fi
 
