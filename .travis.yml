@@ -6,8 +6,6 @@ sudo: required
 dist: trusty
 # Force travis to use its minimal image with default Python settings
 language: generic
-compiler:
-  - gcc
 notifications:
   #  Whoever receives success and/or failure via email
   email:
