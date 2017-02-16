@@ -79,7 +79,7 @@ function ici_run_cmd_in_docker() {
   local ret=0
   wait %% || ret=$?
   trap - INT
-  docker rm "$cid"
+  docker rm "$cid" > /dev/null
   return $ret
 }
 
