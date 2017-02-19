@@ -37,6 +37,7 @@ function ici_require_run_in_docker() {
     ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
                           -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
                           -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
+                          -t \
                           "$DOCKER_IMAGE" \
                           /bin/bash -c "cd $docker_ici_src_path; source ./ci_main.sh;"
     exit
@@ -79,7 +80,7 @@ function ici_run_cmd_in_docker() {
   local ret=0
   wait %% || ret=$?
   trap - INT
-  docker rm "$cid"
+  docker rm "$cid" > /dev/null
   return $ret
 }
 
@@ -152,7 +153,7 @@ function ici_prepare_docker_image() {
 
 function ici_build_default_docker_image() {
   export DOCKER_IMAGE="industrial-ci/$UBUNTU_OS_CODE_NAME"
-  
+
   ici_docker_build - <<EOF > /dev/null
 FROM ubuntu:$UBUNTU_OS_CODE_NAME
 

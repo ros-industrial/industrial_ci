@@ -52,3 +52,5 @@ if [ -z "$UBUNTU_OS_CODE_NAME" ]; then
         ;;
 esac
 fi
+
+export TERM=${TERM:-dumb}
