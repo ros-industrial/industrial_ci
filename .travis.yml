@@ -42,6 +42,7 @@ env:
     - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=i_do_not_exist  EXPECT_EXIT_CODE=1 PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail, to test the capability of capturing Prerelease Test failure.
     - ROS_DISTRO=kinetic AFTER_SCRIPT='catkin --version'
     - ROS_DISTRO=kinetic NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false'
+    - ROS_DISTRO=lunar ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu
 matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
