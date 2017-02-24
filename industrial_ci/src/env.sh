@@ -44,7 +44,7 @@ if [ -z "$UBUNTU_OS_CODE_NAME" ]; then
     "indigo"|"jade")
         UBUNTU_OS_CODE_NAME="trusty"
         ;;
-    "kinetic")
+    "kinetic"|"lunar")
         UBUNTU_OS_CODE_NAME="xenial"
         ;;
     *)
