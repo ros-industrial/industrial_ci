@@ -382,9 +382,10 @@ Run industrial_ci on local host
 Since version 0.3.3, you can run `industrial_ci` on your local host. This can be useful e.g. when you want to integrate industrial_ci into your CI server.
 To do so,
 
+0. `Install Docker <https://docs.docker.com/engine/installation/linux/>`_
 1. Build and install industrial_ci (which is a `catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
 2. Change directory to the package you like to test.
-3. Run `run_ci` script.
+3. Run `run_ci` script with your settings.
 
 Example:
 
@@ -395,7 +396,9 @@ Example:
   $ catkin b industrial_ci
   $ source install/setup.bash
   $ roscd ros_canopen   (or any package you test)
-  $ rosrun industrial_ci run_ci
+  $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
+
+(ROS_DISTRO could be read from your environment as well)
 
 For maintainers of industrial_ci repository
 ================================================
