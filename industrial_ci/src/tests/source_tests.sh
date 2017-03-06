@@ -27,12 +27,10 @@ else
     OPT_VI=""
 fi
 
-ici_time_start init_ici_environment
 # Define more env vars
 BUILDER=catkin
 ROSWS=wstool
 
-ici_time_end  # init_ici_environment
 
 function catkin {
   local cmd=$1
@@ -71,7 +69,7 @@ rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_ro
 
 ici_time_end  # setup_rosdep
 
-ici_time_start setup_rosws
+ici_time_start setup_workspace
 
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
@@ -119,8 +117,8 @@ fi
 catkin config --install
 if [ -n "$CATKIN_CONFIG" ]; then catkin config $CATKIN_CONFIG; fi
 
-ici_time_end  # setup_rosws
 
+ici_time_end  # setup_workspace
 
 # execute BEFORE_SCRIPT in repository, exit on errors
 if [ "${BEFORE_SCRIPT// }" != "" ]; then
@@ -193,8 +191,6 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
 fi
 
-ici_time_start test_results
-
 if [ "${ROS_DISTRO}" == "hydro" ]; then
     PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
     PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
@@ -206,5 +202,3 @@ if [ "${ROS_DISTRO}" == "hydro" ]; then
 else
     catkin_test_results --verbose $CATKIN_WORKSPACE
 fi
-
-ici_time_end  # test_results
