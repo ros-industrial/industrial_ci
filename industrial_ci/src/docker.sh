@@ -184,6 +184,7 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y \
         build-essential \
+        python-catkin-pkg \
         python-catkin-tools \
         python-pip \
         python-rosdep \
