@@ -88,8 +88,8 @@ esac
 
 # download upstream packages into workspace
 if [ -e $CATKIN_WORKSPACE/src/.rosinstall ]; then
-    # ensure that the downstream is not in .rosinstall
-    (cd $CATKIN_WORKSPACE/src; $ROSWS rm $TARGET_REPO_NAME || true)
+    # ensure that the target is not in .rosinstall
+    (cd $CATKIN_WORKSPACE/src; $ROSWS rm $TARGET_REPO_NAME 2> /dev/null || true)
     $ROSWS update -t $CATKIN_WORKSPACE/src
 fi
 # TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
