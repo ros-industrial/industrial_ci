@@ -141,7 +141,6 @@ You can configure the behavior in `.travis.yml` in your client repository.
 
 Required environment variables:
 
-* `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (`http://packages.ros.org/ros/ubuntu`) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_ (`http://packages.ros.org/ros-shadow-fixed/ubuntu`))
 * `ROS_DISTRO`: Version of ROS in all lower case. E.g.: `indigo` / `jade`
 
 Optional environment variables
@@ -171,6 +170,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
 * `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
+* `ROS_REPO` (default: ros-shadow-fixed): `ROS_REPO` can be used to set `ROS_REPOSITORY_PATH` based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
+* `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (`http://packages.ros.org/ros/ubuntu`) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_ (`http://packages.ros.org/ros-shadow-fixed/ubuntu`)). `ROS_REPO` can be used to set the path based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
 * `ROSINSTALL_FILENAME` (default: not set): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
 * `ROSWS` (default: wstool): Currently only `wstool` is available.
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
@@ -396,7 +397,7 @@ Example:
   $ catkin b industrial_ci
   $ source install/setup.bash
   $ roscd ros_canopen   (or any package you test)
-  $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
+  $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPO=ros-shadow-fixed
 
 (ROS_DISTRO could be read from your environment as well)
 

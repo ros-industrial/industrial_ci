@@ -20,8 +20,6 @@ if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
 if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
-# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
-if [ ! "$ROS_REPOSITORY_PATH" ]; then export ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"; fi
 # .rosintall file name
 if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi
 # For apt key stores
@@ -34,6 +32,24 @@ if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-ind
     fi
 fi
 if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
+
+# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
+if [ ! "$ROS_REPOSITORY_PATH" ]; then
+    case "${ROS_REPO:-ros-shadow-fixed}" in
+    "building")
+        ROS_REPOSITORY_PATH="http://repositories.ros.org/ubuntu/building/"
+        ;;
+    "ros"|"main")
+        ROS_REPOSITORY_PATH="http://packages.ros.org/ros/ubuntu"
+        ;;
+    "ros-shadow-fixed"|"testing")
+        ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"
+        ;;
+    *)
+        error "ROS repo '$ROS_REPO' is not supported"
+        ;;
+    esac
+fi
 
 export UBUNTU_OS_CODE_NAME
 if [ -z "$UBUNTU_OS_CODE_NAME" ]; then
