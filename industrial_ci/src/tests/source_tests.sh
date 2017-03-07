@@ -42,7 +42,7 @@ function try_catkin_build {
     if [ $# -gt 1 ]; then
         ici_time_start $1
         shift 1
-        if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status "$@" $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS ; fi
+        if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status --no-deps "$@" $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS ; fi
         ici_time_end #
     fi
 }
@@ -178,16 +178,23 @@ $ICI_SRC_PATH/deps.py > "$tmp_source"
 source "$tmp_source"
 rm $tmp_source
 
-echo "Upstream packages: ${upstream_pkgs[@]}"
-echo "Target packages: ${target_pkgs[@]}"
-echo "Downstream packages: ${downstream_pkgs[@]}"
-echo "Ignored packages: ${ignored_pkgs[@]}"
+
+cat << EOF
+
+Upstream packages: ${upstream_pkgs[@]}
+
+Target packages: ${target_pkgs[@]}
+Target tests: ${target_tests[@]}
+
+Downstream packages: ${downstream_pkgs[@]}
+Downstream tests: ${downstream_tests[@]}
+
+Ignored packages: ${ignored_pkgs[@]}
+
+EOF
 
 ici_time_start rosdep_install
-rosdep_opts=(-q --ignore-src --rosdistro $ROS_DISTRO -y --from-paths "${rosdep_paths[@]})
-if [ -n "$ROSDEP_SKIP_KEYS" ]; then
-  rosdep_opts+=(--skip-keys "$ROSDEP_SKIP_KEYS")
-fi
+rosdep_opts=(-q --ignore-src --rosdistro $ROS_DISTRO -y --skip-keys "${rosdep_skip_keys[*]} $ROSDEP_SKIP_KEYS" --from-paths "${rosdep_paths[@]}")
 set -o pipefail # fail if rosdep install fails
 rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
 set +o pipefail
