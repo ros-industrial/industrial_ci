@@ -152,7 +152,6 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
     ici_time_end  # catkin_run_tests
 fi
 
-
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
     ici_time_start catkin_install_run_tests
@@ -161,8 +160,10 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     # Test if the unit tests in the packages in the downstream repo pass.
     if [ "$BUILDER" == catkin ]; then
       for pkg in $PKGS_DOWNSTREAM; do
+        if [ ! -d "$CATKIN_WORKSPACE/install/share/$pkg" ]; then continue; fi # skip meta-packages
+
         echo "[$pkg] Started testing..."
-        rostest_files=$(find "$CATKIN_WORKSPACE/install/share/$pkg" -iname '*.test') || continue # metapackage do not install anything in share
+        rostest_files=$(find "$CATKIN_WORKSPACE/install/share/$pkg" -iname '*.test')
         echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
