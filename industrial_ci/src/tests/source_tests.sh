@@ -154,7 +154,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
     ici_time_start catkin_install_run_tests
 
-    export EXIT_STATUS=0
+    EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
     if [ "$BUILDER" == catkin ]; then
       for pkg in $PKGS_DOWNSTREAM; do
@@ -163,8 +163,8 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
-          $CATKIN_WORKSPACE/install/env.sh rostest $test_file || export EXIT_STATUS=$?
-          if [ $? != 0 ]; then
+          $CATKIN_WORKSPACE/install/env.sh rostest $test_file || EXIT_STATUS=$?
+          if [ $EXIT_STATUS != 0 ]; then
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
             $CATKIN_WORKSPACE/install/env.sh rostest --text $test_file
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
