@@ -115,7 +115,7 @@ function ici_exit {
 # Globals:
 #   (None)
 # Arguments:
-#   message (optional) 
+#   message (optional)
 #   exit_code (default: $?)
 # Returns:
 #   (None)
@@ -123,7 +123,7 @@ function ici_exit {
 function error {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
-        echo "\e[31m$1\e0m" # print error in red
+        echo -e "\e[31m$1\e[0m" # print error in red
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
         exit 1

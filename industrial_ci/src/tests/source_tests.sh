@@ -78,6 +78,8 @@ file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to b
     elif [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME ]; then
         # install (maybe unreleased version) dependencies from source
         $ROSWS merge file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME
+    else
+        error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/$ROSINSTALL_FILENAME[.$ROS_DISTRO]' does not exist"
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
@@ -192,7 +194,7 @@ if [ "${ROS_DISTRO}" == "hydro" ]; then
     if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --all $ROS_LOG_DIR || error; fi
     if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then catkin_test_results --all $CATKIN_WORKSPACE/build/ || error; fi
     if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || error; fi
-else    
+else
     catkin_test_results --verbose
 fi
 
