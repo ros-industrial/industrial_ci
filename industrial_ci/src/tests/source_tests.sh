@@ -172,7 +172,11 @@ fi
 # downstream_tests: filtered tests for downstream packages
 # rosdep_paths: absolute path of all involved packages
 # ignored_pkgs: packages that get ignores by the build
-source <($ICI_SRC_PATH/deps.py)
+
+tmp_source=$(mktemp) || error "could not create temporary file"
+$ICI_SRC_PATH/deps.py > "$tmp_source"
+source "$tmp_source"
+rm $tmp_source
 
 echo "Upstream packages: ${upstream_pkgs[@]}"
 echo "Target packages: ${target_pkgs[@]}"
