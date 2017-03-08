@@ -39,6 +39,7 @@ env:
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='true' EXPECT_EXIT_CODE=100 # This should fail (trying from a wrong distro).
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
+    - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
     - ROS_DISTRO=jade   PRERELEASE=true PRERELEASE_REPONAME=i_do_not_exist  EXPECT_EXIT_CODE=1 PRERELEASE_DOWNSTREAM_DEPTH=1  # Intended to fail, to test the capability of capturing Prerelease Test failure.
     - ROS_DISTRO=kinetic AFTER_SCRIPT='catkin --version'
     - ROS_DISTRO=kinetic NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false'
