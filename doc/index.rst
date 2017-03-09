@@ -313,8 +313,8 @@ If code needs to be executed in `travis.sh` context, `BEFORE_SCRIPT` and `AFTER_
 
   env:
     global:
-      - BEFORE_SCRIPT:'./your_custom_PREprocess.sh'
-      - AFTER_SCRIPT:'./your_custom_POSTprocess.sh'
+      - BEFORE_SCRIPT='./your_custom_PREprocess.sh'
+      - AFTER_SCRIPT='./your_custom_POSTprocess.sh'
   script:
     - .ci_config/travis.sh
 
