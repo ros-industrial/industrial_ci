@@ -24,7 +24,7 @@ set -e # exit script on errors
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
 # Define some env vars that need to come earlier than util.sh
-export ICI_SRC_PATH=$(pwd)  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
+export ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
 
 source ${ICI_SRC_PATH}/util.sh
 source ${ICI_SRC_PATH}/env.sh
@@ -43,12 +43,9 @@ fi
 if [ "${AFTER_SCRIPT// }" != "" ]; then
   ici_time_start after_script
 
-  cd $TARGET_REPO_PATH
-  bash -e -c "${AFTER_SCRIPT}"
+  bash -e -c "cd $TARGET_REPO_PATH; ${AFTER_SCRIPT}"
 
   ici_time_end  # after_script
 fi
-
-cd $TARGET_REPO_PATH  # cd back to the repository's home directory with travis
 
 ici_exit 0

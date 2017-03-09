@@ -32,14 +32,14 @@ function ici_require_run_in_docker() {
   if ! [ "$IN_DOCKER" ]; then
     ici_prepare_docker_image
 
-    local docker_target_repo_path=/root/$TARGET_REPO_PATH
+    local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
     local docker_ici_src_path=/root/ici
     ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
                           -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
                           -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
                           -t \
                           "$DOCKER_IMAGE" \
-                          /bin/bash -c "cd $docker_ici_src_path; source ./ci_main.sh;"
+                          /bin/bash $docker_ici_src_path/ci_main.sh
     exit
   fi
 }
