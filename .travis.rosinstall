@@ -1,3 +1,6 @@
 - git:
     uri: https://github.com/ros/std_msgs.git
     local-name: ros/std_msgs
+- git:
+    uri: https://github.com/ros-industrial/industrial_ci.git
+    local-name: industrial_ci
