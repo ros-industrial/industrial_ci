@@ -172,7 +172,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
 * `ROS_REPO` (default: ros-shadow-fixed): `ROS_REPO` can be used to set `ROS_REPOSITORY_PATH` based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
 * `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (`http://packages.ros.org/ros/ubuntu`) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_ (`http://packages.ros.org/ros-shadow-fixed/ubuntu`)). `ROS_REPO` can be used to set the path based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
-* `ROSINSTALL_FILENAME` (default: not set): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
+* `ROSINSTALL_FILENAME` (default: .travis.rosinstall): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
 * `ROSWS` (default: wstool): Currently only `wstool` is available.
 * `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
 * `UPSTREAM_WORKSPACE` (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
@@ -332,10 +332,22 @@ Use .rosinstall file to specify the depended packages source repository
 
 WARNING: In all cases where you want to utilize `.rosinstall` (or similar name) files, be sure to set `USE_DEB` as `false`, or simply not define it.
 
-For using a rosinstall file located locally within the repository:
+For using a rosinstall file located locally within the repository, define one or two variables as:
 
-1) set `UPSTREAM_WORKSPACE` as `file`
-2) create a file `$ROSINSTALL_FILENAME` using the same file format as `.rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package.
+1) set `UPSTREAM_WORKSPACE` as `file`.
+2) optionally create a file `$ROSINSTALL_FILENAME` using the same file format as `.rosinstall <http://docs.ros.org/independent/api/rosinstall/html/rosinstall_file_format.html>`_ and place it at the top level directory of your package. Its file name is your choice (typically this file is prefixed with a dot).
+
+Example. This expects a file `.travis.rosinstall` available at the top directory of the repository being tested::
+
+    :
+    - ROS_DISTRO=indigo  UPSTREAM_WORKSPACE=file
+    :
+
+Another example. Now you're specifying the file name as `.your_rosinstall`::
+
+    :
+    - ROS_DISTRO=indigo  UPSTREAM_WORKSPACE=file  $ROSINSTALL_FILENAME=".your_rosinstall"
+    :
 
 For using a rosinstall file located externally from the repository:
 
