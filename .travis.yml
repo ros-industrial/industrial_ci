@@ -27,6 +27,7 @@ env:
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
     # - env: ROS_DISTRO=indigo PRERELEASE=true  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
     - ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=1
+    - ROS_DISTRO=indigo PRERELEASE=true USE_MOCKUP='industrial_ci/mockups/failing_test' EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic PRERELEASE=true PRERELEASE_REPONAME=industrial_ci
     - ROS_DISTRO=indigo APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian
