@@ -72,41 +72,19 @@ function run_ros_prerelease() {
 
     ici_time_start setup_prerelease_scripts
     mkdir -p "$WORKSPACE/catkin_workspace/src/"
-    local reponame=$PRERELEASE_REPONAME
-    local clone_underlay=true
-    if [ -z "$reponame" ]; then
-        reponame=$TARGET_REPO_NAME
-        mkdir -p catkin_workspace/src
-        cp -a "$TARGET_REPO_PATH"/* "$WORKSPACE/catkin_workspace/src/"
-        clone_underlay=false
-    fi
+    local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
+    cp -a "$TARGET_REPO_PATH" "$WORKSPACE/catkin_workspace/src/$reponame"
 
     # ensure access rights
     ici_run_cmd_in_docker $DIND_OPTS -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci $WORKSPACE
 
-    run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default ubuntu "$UBUNTU_OS_CODE_NAME" amd64 "${reponame}" --level "$downstream_depth" --output-dir . 
+
+    run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default ubuntu "$UBUNTU_OS_CODE_NAME" amd64 --level "$downstream_depth" --output-dir . --custom-repo "$reponame::::"
     ici_time_end  # setup_prerelease_scripts
 
-    if [ "$clone_underlay" = true ]; then
-        ici_time_start prerelease_clone_underlay.sh
-        run_in_prerelease_docker ./prerelease_clone_underlay.sh
-        ici_time_end  # prerelease_clone_underlay
-    fi
-
-    ici_time_start prerelease_build_underlay.sh
-    run_in_prerelease_docker ./prerelease_build_underlay.sh
-    run_in_prerelease_docker catkin_test_results $WORKSPACE/catkin_workspace/test_results
-    ici_time_end  # prerelease_build_underlay.sh
-
-    if [ "$downstream_depth" != "0" ]; then
-        ici_time_start run_prerelease_clone_overlay.sh
-        run_in_prerelease_docker ./prerelease_clone_overlay.sh
-        ici_time_end  # run_prerelease_clone_overlay
-        ici_time_start prerelease_build_overlay.sh
-        run_in_prerelease_docker ./prerelease_build_overlay.sh
-        run_in_prerelease_docker catkin_test_results $WORKSPACE/catkin_workspace_overlay/test_results
-        ici_time_end  # prerelease_build_overlay.sh
-    fi
+    ici_time_start prerelease.sh
+    run_in_prerelease_docker env ABORT_ON_TEST_FAILURE=1 ./prerelease.sh -y
+    ici_time_end  # prerelease.sh
 
     echo 'ROS Prerelease Test went successful.'
 }
