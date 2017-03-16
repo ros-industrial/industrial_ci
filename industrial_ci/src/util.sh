@@ -38,7 +38,7 @@
 function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     ICI_START_TIME=$(date +%s%N)
-    ICI_TIME_ID=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+    ICI_TIME_ID=$(printf "%x" $ICI_START_TIME)
     ICI_FOLD_NAME=$1
     echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
     echo -e "\e[0Kici_time:start:$ICI_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
