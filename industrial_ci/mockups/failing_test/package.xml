@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>failing_test</name>
+  <version>0.3.1</version>
+  <description>packages with a failing test</description>
+
+  <maintainer email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</maintainer>
+  <author email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</author>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <test_depend>rostest</test_depend>
+</package>
