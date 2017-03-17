@@ -58,6 +58,7 @@ EOF
 function run_in_prerelease_docker() {
     ici_run_cmd_in_docker $DIND_OPTS \
                           -v "$WORKSPACE:$WORKSPACE:rw" \
+                          -e TRAVIS \
                           "industrial-ci/prerelease" \
                           "$@"
 
