@@ -117,7 +117,10 @@ fi
 
 ici_time_start rosdep_install
 
-rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
+set -o pipefail # fail if rosdep install fails
+rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y | { grep "executing command" || true; }
+set +o pipefail
+
 ici_time_end  # rosdep_install
 
 function catkin {
