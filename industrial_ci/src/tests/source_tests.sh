@@ -34,6 +34,12 @@ ROSWS=wstool
 
 ici_time_end  # init_ici_environment
 
+function catkin {
+  local cmd=$1
+  shift
+  /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
+}
+
 ici_time_start setup_ros
 
 sudo apt-get update -qq
@@ -103,6 +109,8 @@ if [ "${USE_MOCKUP// }" != "" ]; then
     ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" $CATKIN_WORKSPACE/src
 fi
 
+catkin config --install
+
 ici_time_end  # setup_rosws
 
 
@@ -119,12 +127,6 @@ ici_time_start rosdep_install
 
 rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
-
-function catkin {
-  local cmd=$1
-  shift
-  /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
-}
 
 ici_time_start catkin_build
 
@@ -150,17 +152,6 @@ fi
 
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
-    ici_time_start catkin_install_build
-
-    # Test if the packages in the downstream repo build.
-    if [ "$BUILDER" == catkin ]; then
-        catkin clean --yes || catkin clean -b
-        catkin config --install
-        catkin build $OPT_VI --summarize --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
-        source $CATKIN_WORKSPACE/install/setup.bash
-    fi
-
-    ici_time_end  # catkin_install_build
     ici_time_start catkin_install_run_tests
 
     export EXIT_STATUS=0
@@ -172,10 +163,10 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
         echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
-          rostest $test_file || export EXIT_STATUS=$?
+          $CATKIN_WORKSPACE/install/env.sh rostest $test_file || export EXIT_STATUS=$?
           if [ $? != 0 ]; then
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
-            rostest --text $test_file
+            $CATKIN_WORKSPACE/install/env.sh rostest --text $test_file
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
           fi
         done
