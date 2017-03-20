@@ -68,10 +68,13 @@ function ici_run_cmd_in_docker() {
      ssh_docker_opts=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
   fi
 
+  local run_opts=($DOCKER_RUN_OPTS)
+
   local cid
   cid=$(docker create \
       --env-file "${ICI_SRC_PATH}"/docker.env \
       "${ssh_docker_opts[@]}" \
+      "${run_opts[@]}" \
       "$@")
   docker cp ~/.ssh "$cid:/root/" # pass SSH settings to container
 
