@@ -144,7 +144,6 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
     ici_time_start catkin_run_tests
 
     if [ "$BUILDER" == catkin ]; then
-        source $CATKIN_WORKSPACE/devel/setup.bash # force to update ROS_PACKAGE_PATH for rostest
         catkin run_tests $OPT_VI --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         catkin_test_results $CATKIN_WORKSPACE || error
     fi
