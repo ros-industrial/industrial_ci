@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Copyright (c) 2016, Isaac I. Y. Saito
+# Copyright (c) 2017, Mathias Lüdtke
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,4 +24,4 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export TARGET_REPO_PATH=$(pwd)
 export TARGET_REPO_NAME=${PWD##*/}
 
-bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh

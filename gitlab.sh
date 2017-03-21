@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Copyright (c) 2016, Isaac I. Y. Saito
+# Copyright (c) 2017, Mathias Lüdtke
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,4 +25,4 @@ export TARGET_REPO_PATH=$CI_PROJECT_DIR
 export TARGET_REPO_NAME=$CI_PROJECT_NAME
 export _DO_NOT_FOLD=true
 
-bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh

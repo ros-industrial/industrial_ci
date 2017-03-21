@@ -22,6 +22,4 @@ jade:
     PRERELEASE_REPONAME: "std_msgs"
 
 kinetic:
-  script: .ci_config/gitlab.sh
-  variables:
-    ROS_DISTRO: "kinetic"
+  script: .ci_config/gitlab.sh ROS_DISTRO=kinetic # alternate syntax
