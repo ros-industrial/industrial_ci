@@ -1,0 +1,25 @@
+# the following block is needed for the shared Docker-based runner
+image: docker:git # docker and git clients
+variables:
+  DOCKER_DRIVER: "overlay" # recommended for docker-in-docker, needs overlay kernel module loaded on host
+services:
+  - docker:dind # enable docker-in-docker
+
+before_script:
+  - apk add --update bash coreutils # install industrial_ci dependencies
+  - git clone https://github.com/ros-industrial/industrial_ci .ci_config
+
+indigo:
+  script: .ci_config/gitlab.sh
+  variables:
+    ROS_DISTRO: "indigo"
+
+jade:
+  script: .ci_config/gitlab.sh
+  variables:
+    ROS_DISTRO: "jade"
+    PRERELEASE: "true"
+    PRERELEASE_REPONAME: "std_msgs"
+
+kinetic:
+  script: .ci_config/gitlab.sh ROS_DISTRO=kinetic # alternate syntax

@@ -21,7 +21,8 @@
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export TARGET_REPO_PATH=$(pwd)
-export TARGET_REPO_NAME=${PWD##*/}
+export TARGET_REPO_PATH=$CI_PROJECT_DIR
+export TARGET_REPO_NAME=$CI_PROJECT_NAME
+export _DO_NOT_FOLD=true
 
 env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh

@@ -76,7 +76,9 @@ function ici_run_cmd_in_docker() {
       "${ssh_docker_opts[@]}" \
       "${run_opts[@]}" \
       "$@")
-  docker cp ~/.ssh "$cid:/root/" # pass SSH settings to container
+  if [ -d ~/.ssh ]; then
+    docker cp ~/.ssh "$cid:/root/" # pass SSH settings to container
+  fi
 
   docker start -a "$cid" &
   trap 'docker kill $cid' INT

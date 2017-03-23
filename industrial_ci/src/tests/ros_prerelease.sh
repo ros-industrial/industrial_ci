@@ -17,6 +17,18 @@
 # limitations under the License.
 
 function setup_environment() {
+    export WORKSPACE
+    WORKSPACE=$(mktemp -d)
+    echo "WORKSPACE: $WORKSPACE"
+
+    if [ -e /var/run/docker.sock ]; then
+        DIND_OPTS=-"v /var/run/docker.sock:/var/run/docker.sock"
+        user_cmd="groupadd -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
+    else
+        DIND_OPTS="-e DOCKER_HOST=$DOCKER_PORT"
+        user_cmd="useradd ci"
+    fi
+
     docker build -t "industrial-ci/prerelease" - <<EOF > /dev/null
 FROM ubuntu:xenial
 
@@ -35,10 +47,8 @@ RUN apt-get update -qq \
         sudo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-RUN groupadd -g $(stat -c%g /var/run/docker.sock) host_docker \
-    && groupadd -g $(id -g) buildfarm \
-    && useradd -u $(id -u) -g buildfarm -G host_docker buildfarm
-USER buildfarm
+RUN $user_cmd
+USER ci
 ENV WORKSPACE $WORKSPACE
 WORKDIR $WORKSPACE
 ENTRYPOINT ["/opt/ros/kinetic/env.sh"]
@@ -46,7 +56,7 @@ EOF
 }
 
 function run_in_prerelease_docker() {
-    ici_run_cmd_in_docker -v /var/run/docker.sock:/var/run/docker.sock \
+    ici_run_cmd_in_docker $DIND_OPTS \
                           -v "$WORKSPACE:$WORKSPACE:rw" \
                           "industrial-ci/prerelease" \
                           "$@"
@@ -55,9 +65,6 @@ function run_in_prerelease_docker() {
 function run_ros_prerelease() {
     # Environment vars.
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
-    export WORKSPACE
-    WORKSPACE=$(mktemp -d)
-    echo "WORKSPACE: $WORKSPACE:"
 
     ici_time_start setup_environment
     setup_environment
@@ -73,7 +80,11 @@ function run_ros_prerelease() {
         cp -a "$TARGET_REPO_PATH"/* "$WORKSPACE/catkin_workspace/src/"
         clone_underlay=false
     fi
-    run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default ubuntu "$UBUNTU_OS_CODE_NAME" amd64 "${reponame}" --level "$downstream_depth" --output-dir .
+
+    # ensure access rights
+    ici_run_cmd_in_docker $DIND_OPTS -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci $WORKSPACE
+
+    run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default ubuntu "$UBUNTU_OS_CODE_NAME" amd64 "${reponame}" --level "$downstream_depth" --output-dir . 
     ici_time_end  # setup_prerelease_scripts
 
     if [ "$clone_underlay" = true ]; then

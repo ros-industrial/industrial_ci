@@ -40,8 +40,11 @@ function ici_time_start {
     ICI_START_TIME=$(date +%s%N)
     ICI_TIME_ID=$(printf "%x" $ICI_START_TIME)
     ICI_FOLD_NAME=$1
-    echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
-    echo -e "\e[0Kici_time:start:$ICI_TIME_ID\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
+    if [ "$_DO_NOT_FOLD" != "true" ]; then
+        echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
+        echo -en "\e[0Kici_time:start:$ICI_TIME_ID"
+    fi
+    echo -e "\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
@@ -67,8 +70,11 @@ function ici_time_end {
     if [ -z $ICI_START_TIME ]; then echo '[ici_time_end] var ICI_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
     local end_time=$(date +%s%N)
     local elapsed_seconds=$(( ($end_time - $ICI_START_TIME)/1000000000 ))
-    echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$(($end_time - $ICI_START_TIME))\e[0K"
-    echo -e "ici_fold:end:$ICI_FOLD_NAME\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
+    if [ "$_DO_NOT_FOLD" != "true" ]; then
+        echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$(($end_time - $ICI_START_TIME))\e[0K"
+        echo -en "ici_fold:end:$ICI_FOLD_NAME"
+    fi
+        echo -e "\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
     echo -e "\e[0K\e[${color_wrap}mFunction $ICI_FOLD_NAME returned with code '${exit_code}' after $(( $elapsed_seconds / 60 )) min $(( $elapsed_seconds % 60 )) sec \e[0m"
 
     unset ICI_FOLD_NAME
