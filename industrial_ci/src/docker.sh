@@ -157,7 +157,7 @@ function ici_build_default_docker_image() {
   ici_docker_build - <<EOF > /dev/null
 FROM ubuntu:$UBUNTU_OS_CODE_NAME
 
-RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget ca-certificates
+RUN apt-get update -qq && apt-get -qq install -y wget ca-certificates
 
 RUN echo "deb ${ROS_REPOSITORY_PATH} $UBUNTU_OS_CODE_NAME main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
@@ -165,15 +165,16 @@ RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
 
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y \
+    && apt-get -qq install -y \
         build-essential \
         python-catkin-tools \
         python-pip \
         python-rosdep \
-        python-wstool \
         ros-$ROS_DISTRO-catkin \
-        ssh-client \
         sudo \
+    && apt-get -qq install --no-install-recommends -y \
+        python-wstool \
+        ssh-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 EOF
