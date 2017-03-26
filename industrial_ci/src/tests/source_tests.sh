@@ -117,6 +117,18 @@ fi
 
 ici_time_start rosdep_install
 
+# After ROSWS, there may be duplicate packages existent in the workspace.
+# In that case we only want to keep the one from the target repo.
+PKGS_WITH_TARGETREPO_NAME=$(find . -iname $TARGET_REPO_NAME)
+if [ 1 < ${#PKGS_WITH_TARGETREPO_NAME[@]} ]; then
+	# Remove duplicates. Leave only $CATKIN_WORKSPACE/src/$TARGET_REPO_NAME.
+	for pkg in $PKGS_WITH_TARGETREPO_NAME; do
+		if [ ! $pkg = "$CATKIN_WORKSPACE/src/$TARGET_REPO_NAME" ]; then
+			touch "$pkg"/"CATKIN_IGNORE"
+		fi
+	done
+fi
+
 rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y
 ici_time_end  # rosdep_install
 
