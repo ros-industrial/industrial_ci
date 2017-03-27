@@ -16,12 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the entrypoint for Travis CI only.
+# This is the generic entrypoint for CI services.
 
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export TARGET_REPO_PATH=$TRAVIS_BUILD_DIR
-export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
+export TARGET_REPO_PATH=${TARGET_REPO_PATH:-$(pwd)}
+export TARGET_REPO_NAME=${TARGET_REPO_NAME:-${TARGET_REPO_PATH##*/}}
+export _DO_NOT_FOLD=${_DO_NOT_FOLD:-true}
 
 env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
