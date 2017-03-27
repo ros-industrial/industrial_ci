@@ -15,13 +15,16 @@ env:
   global:
     - VERBOSE_OUTPUT='true'
     - POST_PROCESS='echo "post processing reached"'
+    - BEFORE_SCRIPT='echo current dir: $(pwd)'
+
   matrix:
     - ROS_DISTRO=hydro
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=indigo DOCKER_IMAGE='mluedtke/ci-test:indigo'
     - ROS_DISTRO=indigo DOCKER_IMAGE='ros:indigo-ros-core'  ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip"
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true'
-    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true'
+    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_SCRIPT='test -z "${CXX+x}"' # test that CXX is not set
+    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' CXX=/usr/bin/gcc BEFORE_SCRIPT='test -z "${CXX+x}"' EXPECT_EXIT_CODE=1 # test the CXX test
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
@@ -52,7 +55,6 @@ matrix:
 
 before_script:
   - CI_DIR=.
-  - "export BEFORE_SCRIPT='echo current dir: $(pwd)'"
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin build -i -v --limit-status-rate 0.001@catkin_make@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
   - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
