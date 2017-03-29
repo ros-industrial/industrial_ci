@@ -41,11 +41,12 @@ env:
     - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-indigo-opencv3" VERBOSE_OUTPUT='false'
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='true' EXPECT_EXIT_CODE=100 # This should fail (trying from a wrong distro).
-    - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  _DO_NOT_FOLD=true # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
-    - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  _DO_NOT_FOLD=true # Passing wrong SKS URL as a break test. Should still pass.
+    - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1    
     - ROS_DISTRO=kinetic AFTER_SCRIPT='catkin --version'
     - ROS_DISTRO=kinetic NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false'
+    - ROS_DISTRO=kinetic APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed
 matrix:
   allow_failures:
