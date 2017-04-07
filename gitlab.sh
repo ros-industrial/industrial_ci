@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file remains as "travis.sh" at the top directory of industrial_ci repository only to keep backward compatibility between version 0.2.2 and the newer.
+# This is the entrypoint for Gitlab CI only.
 
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
