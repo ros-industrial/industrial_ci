@@ -162,6 +162,8 @@ function ici_build_default_docker_image() {
   ici_docker_build - <<EOF > /dev/null
 FROM ubuntu:$UBUNTU_OS_CODE_NAME
 
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
 RUN apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y apt-utils \
     && apt-get -qq install --no-install-recommends -y wget ca-certificates sudo
