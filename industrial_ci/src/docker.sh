@@ -79,6 +79,9 @@ function ici_run_cmd_in_docker() {
   if [ -d ~/.ssh ]; then
     docker cp ~/.ssh "$cid:/root/" # pass SSH settings to container
   fi
+  if [ -d ~/.subversion ]; then
+    docker cp ~/.subversion "$cid:/root/" # pass svn auth to container
+  fi
 
   docker start -a "$cid" &
   trap 'docker kill $cid' INT
