@@ -65,8 +65,11 @@ if [ -z "$UBUNTU_OS_CODE_NAME" ]; then
     "indigo"|"jade")
         UBUNTU_OS_CODE_NAME="trusty"
         ;;
-    "kinetic"|"lunar")
+    "kinetic")
         UBUNTU_OS_CODE_NAME="xenial"
+        ;;
+    "lunar")
+        UBUNTU_OS_CODE_NAME="zesty"
         ;;
     *)
         error "ROS distro '$ROS_DISTRO' is not supported"
