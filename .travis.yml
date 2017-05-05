@@ -2,8 +2,8 @@
 
 #  Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
 
-sudo: required
-dist: trusty
+services:
+  - docker
 # Force travis to use its minimal image with default Python settings
 language: generic
 notifications:
