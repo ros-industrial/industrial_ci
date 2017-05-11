@@ -163,17 +163,20 @@ function ici_prepare_docker_image() {
 #   (None)
 
 function ici_build_default_docker_image() {
-  export DOCKER_IMAGE="industrial-ci/$UBUNTU_OS_CODE_NAME"
+  export DOCKER_IMAGE="industrial-ci/$OS_CODE_NAME"
+  ici_generate_default_dockerfile | ici_docker_build - > /dev/null
+}
 
-  ici_docker_build - <<EOF > /dev/null
-FROM ubuntu:$UBUNTU_OS_CODE_NAME
+function ici_generate_default_dockerfile() {
+  cat <<EOF
+FROM $DOCKER_BASE_IMAGE
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y apt-utils wget ca-certificates sudo
+    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates sudo
 
-RUN echo "deb ${ROS_REPOSITORY_PATH} $UBUNTU_OS_CODE_NAME main" > /etc/apt/sources.list.d/ros-latest.list
+RUN echo "deb ${ROS_REPOSITORY_PATH} ${OS_CODE_NAME} main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
     || { wget "${APTKEY_STORE_HTTPS}" -O - | sudo apt-key add -; }
 
@@ -191,3 +194,4 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && rm -rf /var/lib/apt/lists/*
 EOF
 }
+
