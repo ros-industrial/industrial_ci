@@ -132,7 +132,7 @@ function error {
         echo -e "\e[31m$1\e[0m" # print error in red
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
-        exit 1
+        ici_exit 1
     fi
     ici_exit $exit_code
 }
