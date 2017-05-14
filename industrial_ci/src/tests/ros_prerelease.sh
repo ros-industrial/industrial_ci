@@ -32,7 +32,7 @@ function setup_environment() {
     docker build -t "industrial-ci/prerelease" - <<EOF > /dev/null
 FROM ubuntu:xenial
 
-RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget ca-certificates
+RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget ca-certificates sudo
 
 RUN echo "deb ${ROS_REPOSITORY_PATH} xenial main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
@@ -44,7 +44,6 @@ RUN apt-get update -qq \
         git \
         python-ros-buildfarm \
         ros-kinetic-catkin \
-        sudo \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 RUN $user_cmd
