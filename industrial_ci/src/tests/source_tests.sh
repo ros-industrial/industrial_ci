@@ -110,6 +110,7 @@ if [ "${USE_MOCKUP// }" != "" ]; then
 fi
 
 catkin config --install
+if [ -n "$CATKIN_CONFIG" ]; then catkin config $CATKIN_CONFIG; fi
 
 ici_time_end  # setup_rosws
 
