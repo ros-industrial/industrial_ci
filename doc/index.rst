@@ -154,6 +154,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
 * `BUILD_PKGS_WHITELIST` (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
 * `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
+* `CATKIN_CONFIG` (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`_.
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
@@ -223,6 +224,30 @@ The jobs that run Prerelease Test may usually take longer than the tests defined
   :
 
 Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
+
+(Optional) Customize `catkin config`
+------------------------------------
+
+By default, `industrial_ci` builds packages with `catkin config --install`, which requires `install` rules to pass CI jobs. This might not be suitable in some cases, e.g. with your experimental packages where you have no plan to make them deployable so that `install` rules are nothing but extra burden. Also, you may want to add addtional configuration for `catkin config`. In these cases define "`CATKIN_CONFIG`" variable.
+
+Example-1::
+
+  CATKIN_CONFIG='--no-install'
+
+This allows you to use `devel` space for the job, instead of `install` space.
+
+Example-2::
+
+  CATKIN_CONFIG='-DMyCustomBuildFlag=true'
+
+This will end up defining the following CMake arg. `install` space is still used::
+
+  Additional CMake Args:       -DMyCustomBuildFlag=true
+
+Reference:
+
+ * `Discussion about install space <https://github.com/ros-industrial/industrial_ci/issues/54>`_
+ * `Detail for catkin config <http://catkin-tools.readthedocs.io/en/latest/verbs/catkin_config.html>`_ for more info about `catkin-tools`.
 
 Add repository-specific CI config in addition
 ----------------------------------------------------------------
