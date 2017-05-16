@@ -2,6 +2,8 @@
 
 #  Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
 
+#sudo: required  # Not required by industrial_ci that uses Docker.
+#dist: trusty    # Not required by industrial_ci that uses Docker.
 services:
   - docker
 # Force travis to use its minimal image with default Python settings
