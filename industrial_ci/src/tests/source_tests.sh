@@ -126,8 +126,11 @@ fi
 
 ici_time_start rosdep_install
 
+if [ "${ROSDEP_INSTALL_OPTS// }" == "" ]; then
+  ROSDEP_INSTALL_OPTS="-q --ignore-src"
+fi
 set -o pipefail # fail if rosdep install fails
-rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y | { grep "executing command" || true; }
+rosdep install --from-paths $CATKIN_WORKSPACE --rosdistro $ROS_DISTRO -y $ROSDEP_INSTALL_OPTS | { grep "executing command" || true; }
 set +o pipefail
 
 ici_time_end  # rosdep_install
