@@ -158,6 +158,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
+* `DOCKER_BASE_IMAGE`: TBD
 * `DOCKER_IMAGE` (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 * `DOCKER_FILE` (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
 * `DOCKER_BUILD_OPTS` (default: not set): Used do specify additional build options for Docker.
@@ -165,6 +166,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * `EXPECT_EXIT_CODE` (default: 0): exit code must match this value for test to succeed
 * `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
 * `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
+* `OS_NAME` (default: ?): Possible options: {`ubuntu`, `debian`}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
+* `OS_CODE_NAME` (default: ?): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
 * `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/add/dockerbased_prerelease/README.rst#optional-run-ros-prerelease-test>`_.
 * `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
 * `PRERELEASE_REPONAME` (default: TARGET_REPO_NAME): The  name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`_). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`_ for more usage.
@@ -401,6 +404,38 @@ Use .rosinstall from external location
 ++++++++++++++++++++++++++++++++++++++++++++++
 
 You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
+
+(Optional) Type of OS and distribution
+--------------------------------------
+
+Ubuntu and its distro are guessed by default from ROS_DISTRO
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+You can specify the OS and its distribution to run the CI job by setting `OS_NAME` and `OS_CODE_NAME`.
+By default users don't need to set this and its value will be automatically guessed according to the value of `ROS_DISTRO`. e.g.::
+
+  `ROS_DISTRO=indigo`  --> `OS_NAME=ubuntu` `OS_CODE_NAME=trusty`
+  `ROS_DISTRO=jade`    --> `OS_NAME=ubuntu` `OS_CODE_NAME=trusty`
+  `ROS_DISTRO=kinetic` --> `OS_NAME=ubuntu` `OS_CODE_NAME=xenial`
+  `ROS_DISTRO=lunar`   --> `OS_NAME=ubuntu` `OS_CODE_NAME=xenial`
+
+Use non-default Ubuntu distro
++++++++++++++++++++++++++++++
+
+E.g. `OS_CODE_NAME=yakkety` or `zesty` for ROS Lunar are available.
+
+Use Debian
+++++++++++
+
+E.g.::
+
+  `OS_NAME=debian` `OS_CODE_NAME=jessie`
+  `OS_NAME=debian` `OS_CODE_NAME=stretch`
+
+All combinations available of OS and distros
+++++++++++++++++++++++++++++++++++++++++++++++
+
+Possible combination of `OS_NAME` and `OS_CODE_NAME` depend on available Docker images. See [ros-industrial/docker/ci](https://github.com/ros-industrial/docker/tree/master/ci).
 
 Checking older ROS distros with industrial_ci
 --------------------------------------------------------
