@@ -60,20 +60,23 @@ function ici_require_run_in_docker() {
 #   (None)
 #######################################
 function ici_run_cmd_in_docker() {
+  local run_opts=($DOCKER_RUN_OPTS)
+
   #forward ssh agent into docker container
  local ssh_docker_opts=()
   if [ "$SSH_AUTH_SOCK" ]; then
      local auth_dir
      auth_dir=$(dirname "$SSH_AUTH_SOCK")
-     ssh_docker_opts=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
+     run_opts+=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
   fi
 
-  local run_opts=($DOCKER_RUN_OPTS)
+  if [ "$CCACHE_DIR" ]; then
+     run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e CCACHE_DIR=/root/.ccache)
+  fi
 
   local cid
   cid=$(docker create \
       --env-file "${ICI_SRC_PATH}"/docker.env \
-      "${ssh_docker_opts[@]}" \
       "${run_opts[@]}" \
       "$@")
   if [ -d ~/.ssh ]; then

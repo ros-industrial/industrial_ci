@@ -40,17 +40,24 @@ function catkin {
   /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
 }
 
-ici_time_start setup_ros
+ici_time_start setup_apt
 
 sudo apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
-    sudo apt-get install -q -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
+    sudo apt-get install -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
 fi
 source /opt/ros/$ROS_DISTRO/setup.bash
 
-ici_time_end  # setup_ros
+ici_time_end  # setup_apt
+
+if [ "$CCACHE_DIR" ]; then
+    ici_time_start setup_ccache
+    sudo apt-get install -qq -y ccache || error "Could not install ccache. Exiting."
+    export PATH="/usr/lib/ccache:$PATH"
+    ici_time_end  # setup_ccache
+fi
 
 ici_time_start setup_rosdep
 
