@@ -157,7 +157,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `CATKIN_CONFIG` (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`_.
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
-* `CCACHE_DIR` (default: unset): Enables ccache for your build. Please make sure to cache this directory with your CI service. Beware, if you use `run_ci`, the files will be owned by root!
+* `CCACHE_DIR` (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-pre-install-custom-commands>`_
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
 * `DOCKER_IMAGE` (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 * `DOCKER_FILE` (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
@@ -250,6 +250,37 @@ Reference:
  * `Discussion about install space <https://github.com/ros-industrial/industrial_ci/issues/54>`_
  * `Detail for catkin config <http://catkin-tools.readthedocs.io/en/latest/verbs/catkin_config.html>`_ for more info about `catkin-tools`.
 
+Cache build artifacts to speed up the subsequent builds (if any)
+----------------------------------------------------------------
+
+If `CCACHE_DIR` is set (not set by default), `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything.
+Recommended value is `$HOME/.ccache`, but any non-used directory works.
+
+https://docs.travis-ci.com/user/caching/#Arbitrary-directories
+
+ * Enable cache. How to do so depends on the CI system of your choice.
+
+   On Travis CI, add as follows (`refrence <https://docs.travis-ci.com/user/caching/#Arbitrary-directories>`_)::
+
+    cache:
+      directories:
+        - $HOME/.ccache  # can be any valid cache location
+  
+
+ * Define `CCACHE_DIR` variable. You can apply to all of your jobs by something like below::
+
+  env:
+    global:
+      - CCACHE_DIR=$HOME/.ccache
+    matrix:
+      :
+
+Or define `CCACHE_DIR` per job.
+
+NOTE:
+  * Beware, if you use `run_ci <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#id39>`_, the files will be owned by root!
+  * Caching may not work for packages with "smaller" number of files (see also `this discussion <https://github.com/ros-industrial/industrial_ci/pull/182>`_).
+    
 Add repository-specific CI config in addition
 ----------------------------------------------------------------
 
