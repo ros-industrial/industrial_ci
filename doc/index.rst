@@ -160,7 +160,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * `CCACHE_DIR` (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-pre-install-custom-commands>`_
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
-* `DOCKER_BASE_IMAGE` (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures.
+* `DOCKER_BASE_IMAGE` (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
 * `DOCKER_IMAGE` (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 * `DOCKER_FILE` (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
 * `DOCKER_BUILD_OPTS` (default: not set): Used do specify additional build options for Docker.
