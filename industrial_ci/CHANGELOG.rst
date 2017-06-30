@@ -2,6 +2,19 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [capability] ROS buildfarm-powered pre-release tests can now run for even the repositories that are not listed in rosdistro https://github.com/ros-industrial/industrial_ci/pull/145
+* [capability] support for ROS lunar
+* [capability] Enable support for gitlab `#120 <https://github.com/ros-industrial/industrial_ci/issues/120>`_
+* [capability] OS selection option https://github.com/ros-industrial/industrial_ci/pull/174
+* [capability] Option for reusing build artifact by ccache https://github.com/ros-industrial/industrial_ci/pull/182
+* [capability] Allow subversion in .rosintall file https://github.com/ros-industrial/industrial_ci/pull/179
+* [enhance] Speed up jobs by building into install space directly https://github.com/ros-industrial/industrial_ci/pull/150    
+* [enhance] Allow passing 'catkin config' parameters (addresses `#176 <https://github.com/ros-industrial/industrial_ci/issues/176>`_). https://github.com/ros-industrial/industrial_ci/pull/177
+* [enhance] apt/deb handling in docker image https://github.com/ros-industrial/industrial_ci/issues/164, https://github.com/ros-industrial/industrial_ci/pull/158
+* Contributors: Benjamin Maidel, Isaac I.Y. Saito, Iñigo Martínez, Jon Azpiazu, Mathias Luedtke, jonazpiazu    
+
 0.3.3 (2017-02-09)
 ------------------
 * [capability] Added a script to run industrial_ci on a local host in a Docker container. `#116 <https://github.com/ros-industrial/industrial_ci/pull/116>`_.
