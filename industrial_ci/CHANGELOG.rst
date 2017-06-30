@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.0 (2017-06-29)
+------------------
 * [capability] ROS buildfarm-powered pre-release tests can now run for even the repositories that are not listed in rosdistro https://github.com/ros-industrial/industrial_ci/pull/145
 * [capability] support for ROS lunar
 * [capability] Enable support for gitlab `#120 <https://github.com/ros-industrial/industrial_ci/issues/120>`_
