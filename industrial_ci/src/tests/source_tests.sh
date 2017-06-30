@@ -133,8 +133,12 @@ fi
 
 ici_time_start rosdep_install
 
+rosdep_opts=(-q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y)
+if [ -n "$ROSDEP_SKIP_KEYS" ]; then
+  rosdep_opts+=(--skip-keys "$ROSDEP_SKIP_KEYS")
+fi
 set -o pipefail # fail if rosdep install fails
-rosdep install -q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y | { grep "executing command" || true; }
+rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
 set +o pipefail
 
 ici_time_end  # rosdep_install
