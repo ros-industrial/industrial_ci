@@ -2,6 +2,7 @@
 image: docker:git # docker and git clients
 variables:
   DOCKER_DRIVER: "overlay" # recommended for docker-in-docker, needs overlay kernel module loaded on host
+  TMPDIR: "${CI_PROJECT_DIR}.tmp" # needed for prerelease tests with Gitlab's docker-in-docker
 services:
   - docker:dind # enable docker-in-docker
 
@@ -20,7 +21,6 @@ jade:
   variables:
     ROS_DISTRO: "jade"
     PRERELEASE: "true"
-    PRERELEASE_REPONAME: "std_msgs"
 
 kinetic:
   script: ../.ci_config/gitlab.sh ROS_DISTRO=kinetic # alternate syntax
