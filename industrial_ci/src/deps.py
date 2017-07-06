@@ -14,6 +14,8 @@ if workspace is None:
     exit(1)
 workspace_src=path.join(workspace, 'src')
 
+strict_test_depends = getenv("STRICT_TEST_DEPENDS","") == "true"
+
 target_pkgs = set(getenv("TARGET_PKGS","").split())
 
 use_mockup = getenv("USE_MOCKUP","")
@@ -68,7 +70,10 @@ class Dependencies(object):
         else:
             self.build_deps = set(d.name for d in chain(p.build_depends, p.buildtool_depends)) & workspace_pkgs
             self.export_deps = set(d.name for d in chain(p.buildtool_export_depends, p.build_export_depends)) & workspace_pkgs
-            self.test_deps = set(d.name for d in chain(p.test_depends)) & workspace_pkgs
+            if strict_test_depends:
+                self.test_deps = set(d.name for d in chain(p.test_depends)) & workspace_pkgs
+            else:
+                self.test_deps = set(d.name for d in chain(p.test_depends, p.exec_depends)) & workspace_pkgs
             self.exec_deps = set(d.name for d in chain(p.exec_depends)) & workspace_pkgs
             self.build_keys = set(d.name for d in chain(p.build_depends, p.buildtool_depends)) # keys needed for build
             self.export_keys = set(d.name for d in chain(p.buildtool_export_depends, p.build_export_depends)) # keys needed for transitive build
