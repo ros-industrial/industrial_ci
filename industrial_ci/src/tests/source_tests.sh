@@ -31,6 +31,39 @@ fi
 BUILDER=catkin
 ROSWS=wstool
 
+# TODO: move theses functions into builder/catkin.sh
+function catkin {
+  local cmd=$1
+  shift
+  /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
+}
+
+function try_catkin_build {
+    if [ $# -gt 1 ]; then
+        ici_time_start $1
+        shift 1
+        if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status "$@" $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS ; fi
+        ici_time_end #
+    fi
+}
+
+function try_catkin_test {
+    if [ $# -gt 1 ]; then
+        ici_time_start $1
+        shift
+        res=1
+        if [ "$BUILDER" == catkin ]; then res=0; catkin run_tests $OPT_VI --no-deps --no-status "$@" $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS -- || res=$?; fi
+        if [ $res -ne 0 ]; then
+            if [ "${ROS_DISTRO}" == "hydro" ]; then
+                catkin_test_results $CATKIN_WORKSPACE
+            else
+                catkin_test_results --verbose $CATKIN_WORKSPACE
+            fi
+            error $res
+        fi
+        ici_time_end #
+    fi
+}
 
 function catkin {
   local cmd=$1
@@ -129,46 +162,51 @@ if [ "${BEFORE_SCRIPT// }" != "" ]; then
   ici_time_end  # before_script
 fi
 
-ici_time_start rosdep_install
+# calculate dependencies
+# upstream_pkgs: auto-detected upstream packages
+# target_pkgs: configured or auto-detected target packages
+# downstream_pkgs:  configured or auto-detected downstream packages
+# target_tests: filtered tests for target packages
+# downstream_tests: filtered tests for downstream packages
+# rosdep_paths: absolute path of all involved packages
+# ignored_pkgs: packages that get ignores by the build
+source <($ICI_SRC_PATH/deps.py)
 
-rosdep_opts=(-q --from-paths $CATKIN_WORKSPACE --ignore-src --rosdistro $ROS_DISTRO -y)
+echo "Upstream packages: ${upstream_pkgs[@]}"
+echo "Target packages: ${target_pkgs[@]}"
+echo "Downstream packages: ${downstream_pkgs[@]}"
+echo "Ignored packages: ${ignored_pkgs[@]}"
+
+ici_time_start rosdep_install
+rosdep_opts=(-q --ignore-src --rosdistro $ROS_DISTRO -y --from-paths "${rosdep_paths[@]})
 if [ -n "$ROSDEP_SKIP_KEYS" ]; then
   rosdep_opts+=(--skip-keys "$ROSDEP_SKIP_KEYS")
 fi
 set -o pipefail # fail if rosdep install fails
 rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
 set +o pipefail
-
 ici_time_end  # rosdep_install
 
-ici_time_start catkin_build
 
-# for catkin
-if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
-if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
-if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
+try_catkin_build catkin_build_upstream "${upstream_pkgs[@]}"
 
-ici_time_end  # catkin_build
-
+try_catkin_build catkin_build_target   "${target_pkgs[@]}"
 if [ "$NOT_TEST_BUILD" != "true" ]; then
-    ici_time_start catkin_run_tests
+     try_catkin_test  catkin_test_target "${target_tests[@]}"
+fi
 
-    if [ "$BUILDER" == catkin ]; then
-        catkin run_tests $OPT_VI --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
-        catkin_test_results $CATKIN_WORKSPACE || error
-    fi
-
-    ici_time_end  # catkin_run_tests
+try_catkin_build catkin_build_downstream   "${downstream_pkgs[@]}"
+if [ "$NOT_TEST_BUILD" != "true" ]; then
+    try_catkin_test catkin_test_downstream "${downstream_tests[@]}"
 fi
 
 if [ "$NOT_TEST_INSTALL" != "true" ]; then
-
     ici_time_start catkin_install_run_tests
 
     EXIT_STATUS=0
     # Test if the unit tests in the packages in the downstream repo pass.
     if [ "$BUILDER" == catkin ]; then
-      for pkg in $PKGS_DOWNSTREAM; do
+      for pkg in "${target_pkgs[@]} ${downstream_pkgs[@]}"; do
         if [ ! -d "$CATKIN_WORKSPACE/install/share/$pkg" ]; then continue; fi # skip meta-packages
 
         echo "[$pkg] Started testing..."
@@ -188,7 +226,6 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
     fi
 
     ici_time_end  # catkin_install_run_tests
-
 fi
 
 if [ "${ROS_DISTRO}" == "hydro" ]; then
