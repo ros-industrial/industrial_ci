@@ -13,12 +13,12 @@ Changelog for package industrial_ci
 * [enhance] Speed up jobs by building into install space directly https://github.com/ros-industrial/industrial_ci/pull/150    
 * [enhance] Allow passing 'catkin config' parameters (addresses `#176 <https://github.com/ros-industrial/industrial_ci/issues/176>`_). https://github.com/ros-industrial/industrial_ci/pull/177
 * [enhance] apt/deb handling in docker image https://github.com/ros-industrial/industrial_ci/issues/164, https://github.com/ros-industrial/industrial_ci/pull/158
-* Contributors: Benjamin Maidel, Isaac I.Y. Saito, I�igo Mart�nez, Jon Azpiazu, Mathias Luedtke, jonazpiazu    
+* Contributors: Benjamin Maidel, Isaac I.Y. Saito, Iñigo Martínez, Jon Azpiazu, Mathias Lüdtke
 
 0.3.3 (2017-02-09)
 ------------------
 * [capability] Added a script to run industrial_ci on a local host in a Docker container. `#116 <https://github.com/ros-industrial/industrial_ci/pull/116>`_.
-* Contributors: Mathias Luedtke
+* Contributors: Mathias Lüdtke
 
 0.3.2 (2017-01-20)
 ------------------
@@ -36,12 +36,12 @@ Changelog for package industrial_ci
 * [maintenance] Change license to Apache 2.0 (addresses `#17 <https://github.com/ros-industrial/industrial_ci/issues/17>`_).
 * [maintenance] Major code refactoring. Generalizing function and variable names (removing mention to specific CI system) https://github.com/ros-industrial/industrial_ci/pull/108
 * [maintenance] Add maintainer.
-* Contributors: Benjamin Maidel, Isaac I.Y. Saito, Mathias Luedtke
+* Contributors: Benjamin Maidel, Isaac I.Y. Saito, Mathias Lüdtke
 
 0.3.1 (2016-10-24)
 ------------------
 * [fix] usermod error on docker-based ROS Prerelease (see https://github.com/ros-industrial/ros_canopen/pull/193#issuecomment-254575036). (`#81 <https://github.com/ros-industrial/industrial_ci/issues/81>`_)
-* Contributors: Mathias Luedtke, Isaac I.Y. Saito
+* Contributors: Mathias Lüdtke, Isaac I.Y. Saito
 
 0.3.0 (2016-09-07)
 ------------------
@@ -56,7 +56,7 @@ Changelog for package industrial_ci
 ------------------
 * [fix] Remove wrong duplicate prerelease test code block. `#40 <https://github.com/ros-industrial/industrial_ci/issues/40>`_
 * [sys] Adjust to ROS Indigo's up-to-date ros.key acquision. `#42 <https://github.com/ros-industrial/industrial_ci/issues/42>`_
-* Contributors: Isaac I.Y. Saito, Gijs van der Hoorn, Mathias Luedtke
+* Contributors: Isaac I.Y. Saito, Gijs van der Hoorn, Mathias Lüdtke
 
 0.2.1 (2016-05-06)
 ------------------
@@ -69,7 +69,7 @@ Changelog for package industrial_ci
 * [sys] Remove meaningless Travis jobs
 * [doc] Some clarifications.
 * [improve] More fold Travis result (wstool version and localname info) `#38 <https://github.com/ros-industrial/industrial_ci/issues/38>`_
-* Contributors: Mathias Luedtke, Dave Coleman, Victor Lamoine, Isaac I.Y. Saito
+* Contributors: Mathias Lüdtke, Dave Coleman, Victor Lamoine, Isaac I.Y. Saito
 
 0.2.0 (2016-04-19)
 ------------------
@@ -97,7 +97,7 @@ Changelog for package industrial_ci
 * [enhance] Output enhancement and cleanup
 * [enhance] Turn off status line (`#4 <https://github.com/ros-industrial/industrial_ci/issues/4>`_)
 * [sys] Remove a tentative workaround for a test location issue (https://github.com/ros/ros_comm/pull/668)
-* Contributors: Isaac I.Y. Saito, Mathias Luedtke
+* Contributors: Isaac I.Y. Saito, Mathias Lüdtke
 
 0.1.0 (2015-12-08)
 ------------------
