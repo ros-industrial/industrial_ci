@@ -40,6 +40,11 @@ else
   source ${ICI_SRC_PATH}/tests/source_tests.sh
 fi
 
+# Check text files (e.g. CHANGELOG.rst, package.xml) encode fine.
+ici_time_start textfile_encoding_check
+./test/textfile_encoding_check.py
+ici_time_end  # textfile_encoding_check
+
 if [ "${AFTER_SCRIPT// }" != "" ]; then
   ici_time_start after_script
 
