@@ -36,7 +36,10 @@ if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 # variables in docker.env without default will be exported with empty string
 # this might break the build, e.g. for Makefile which rely on these variables
 if [ -z "${CC}" ]; then unset CC; fi
+if [ -z "${CFLAGS}" ]; then unset CFLAGS; fi
+if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
 if [ -z "${CXX}" ]; then unset CXX; fi
+if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
 
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 if [ ! "$ROS_REPOSITORY_PATH" ]; then
