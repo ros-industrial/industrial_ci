@@ -158,7 +158,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `CATKIN_CONFIG` (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`_.
 * `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
-* `CCACHE_DIR` (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-pre-install-custom-commands>`_
+* `CCACHE_DIR` (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-pre-post-process-custom-commands>`_
 * `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
 * `DEBUG_BASH` (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
 * `DOCKER_BASE_IMAGE` (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
@@ -351,7 +351,7 @@ Maintainers of client repos are responsible for applying the changes that happen
 
 2. Don't forget to commit the changes the command above makes.
 
-Run pre-install custom commands
+Run pre/post-process custom commands
 -----------------------------------------
 
 You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example usecases:
@@ -360,20 +360,7 @@ You may want to add custom steps prior to the setup defined in `./travis.sh <./t
 
 * You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
-In this case, add scripts before `travis.sh` gets called (see below for an example).
-
-::
-
-  script:
-    - ./your_custom_PREprocess.sh
-    - .ci_config/travis.sh
-    - ./your_custom_POSTprocess.sh
-
-Please note: the environment is NOT kept between script(s).
-
-If code needs to be executed in `travis.sh` context, `BEFORE_SCRIPT` and `AFTER_SCRIPT` can be used:
-
-::
+In such cases, you can specify the script(s) in `BEFORE_SCRIPT` and/or `AFTER_SCRIPT` variables. For example::
 
   env:
     global:
@@ -381,6 +368,13 @@ If code needs to be executed in `travis.sh` context, `BEFORE_SCRIPT` and `AFTER_
       - AFTER_SCRIPT='./your_custom_POSTprocess.sh'
   script:
     - .ci_config/travis.sh
+
+NOTE: If you specify scripts in `script` section without using aforementioned variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
+
+  script:
+    - ./your_custom_PREprocess.sh  <-- Runs on CI server natively.
+    - .ci_config/travis.sh         <-- Runs on Docker on CI server.
+    - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
 
 (Optional) Build depended packages from source
 ----------------------------------------------
