@@ -15,6 +15,7 @@ if workspace is None:
 workspace_src=path.join(workspace, 'src')
 
 strict_test_depends = getenv("STRICT_TEST_DEPENDS","") == "true"
+detect_downstream_pkgs = getenv("DETECT_PKGS_DOWNSTREAM","") == "true"
 
 target_pkgs = set(getenv("TARGET_PKGS","").split())
 
@@ -117,7 +118,7 @@ for p in workspace_pkgs:
         upstream_pkgs |= deps.build_deps
         if p in target_tests:
             upstream_pkgs |= deps.test_deps
-    if p in downstream_pkgs or len((deps.build_deps | deps.test_deps)  & target_pkgs) > 0: # is downstream package
+    if p in downstream_pkgs or (detect_downstream_pkgs  and len((deps.build_deps | deps.test_deps)  & target_pkgs) > 0): # is downstream package
         if p in pkgs_whitelisted or ( not pkgs_whitelisted and not p in pkgs_blacklisted): # match white and blacklist
             downstream_pkgs |= deps.build_deps
             downstream_pkgs.add(p)
