@@ -175,6 +175,7 @@ fi
 
 tmp_source=$(mktemp) || error "could not create temporary file"
 $ICI_SRC_PATH/deps.py > "$tmp_source"
+cat "$tmp_source"
 source "$tmp_source"
 rm $tmp_source
 
@@ -198,7 +199,7 @@ EOF
 ici_time_start rosdep_install
 rosdep_opts=(-q --ignore-src --rosdistro $ROS_DISTRO -y --skip-keys "${rosdep_skip_keys[*]} $ROSDEP_SKIP_KEYS" --from-paths "${rosdep_paths[@]}")
 set -o pipefail # fail if rosdep install fails
-rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
+PYTHONUNBUFFERED=true rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
 set +o pipefail
 ici_time_end  # rosdep_install
 
