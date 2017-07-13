@@ -191,6 +191,8 @@ Downstream tests: ${downstream_tests[@]}
 
 Ignored packages: ${ignored_pkgs[@]}
 
+Skipped keys: ${rosdep_skip_keys[*]} $ROSDEP_SKIP_KEYS
+
 EOF
 
 ici_time_start rosdep_install

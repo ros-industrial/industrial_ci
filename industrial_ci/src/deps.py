@@ -66,30 +66,42 @@ class Dependencies(object):
             self.test_deps = set()
             self.exec_deps = set()
             self.build_keys = set()
+            self.exec_keys = set()
+            self.skip_keys = set()
             self.export_keys = set()
             self.test_keys = set()
         else:
             self.build_deps = set(d.name for d in chain(p.build_depends, p.buildtool_depends)) & workspace_pkgs
             self.export_deps = set(d.name for d in chain(p.buildtool_export_depends, p.build_export_depends)) & workspace_pkgs
             if strict_test_depends:
-                self.test_deps = set(d.name for d in chain(p.test_depends)) & workspace_pkgs
+                self.test_keys = set(d.name for d in chain(p.test_depends))
             else:
-                self.test_deps = set(d.name for d in chain(p.test_depends, p.exec_depends)) & workspace_pkgs
-            self.exec_deps = set(d.name for d in chain(p.exec_depends)) & workspace_pkgs
+                self.test_keys = set(d.name for d in chain(p.test_depends, p.exec_depends))
+
+            self.skip_keys = set()
+            self.exec_keys = set(d.name for d in chain(p.exec_depends))
+            if p.is_metapackage():
+                self.exec_keys, self.skip_keys  = self.skip_keys, self.exec_keys
+            self.exec_deps = self.exec_keys & workspace_pkgs
             self.build_keys = set(d.name for d in chain(p.build_depends, p.buildtool_depends)) # keys needed for build
             self.export_keys = set(d.name for d in chain(p.buildtool_export_depends, p.build_export_depends)) # keys needed for transitive build
-            self.test_keys = set(d.name for d in chain(p.test_depends, p.exec_depends)) # keys needed for tests
+            self.test_deps = self.test_keys & workspace_pkgs
+
     def join(self, other):
         self.build_deps |= other.build_deps | other.export_deps # export_deps turned into build_deps for dependent projects
         self.export_deps |= other.export_deps
         self.test_deps |= other.test_deps | other.exec_deps # exec_deps turned into test_deps for dependent projects
         self.exec_deps |= other.exec_deps
         self.build_keys |= other.build_keys | other.export_keys
+        self.exec_keys |= other.exec_keys
         self.export_keys |= other.export_keys
-        self.test_keys |= other.test_keys
+        self.skip_keys |= other.skip_keys
+        self.test_keys |= other.test_keys | other.exec_keys
         return self
     def getAllDeps(self):
         return self.build_deps | self.export_deps | self.test_deps | self.exec_deps
+    def getAllKeys(self):
+        return self.build_keys | self.exec_keys | self.export_keys | self.skip_keys | self.test_keys
 
 # dependencies of workspace packages within workspace
 workspace_deps = dict((p.name, Dependencies(p)) for p in known_pkgs.values())
@@ -134,7 +146,7 @@ all_pkgs = upstream_pkgs | downstream_pkgs | target_pkgs | target_tests | downst
 skip_keys = set()
 for a in all_pkgs:
     r = get_recursive_deps(a)
-    skip_keys |= r.export_keys | r.test_keys # candidates for skipping
+    skip_keys |= r.getAllKeys() # candidates for skipping
 
 for a in all_pkgs:
     skip_keys -= get_recursive_deps(a).build_keys # don't skip build dependencies
