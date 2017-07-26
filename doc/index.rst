@@ -32,6 +32,7 @@ Terminology
 
 * **client repository**: The repositories that use the configuration stored in this repo to run CI jobs.
 * **downstream packages**: The software packages that depend on the package that's targetted to be tested using industrial_ci.
+* **merge parent**: The branch that your pull/merge request is opened against.
 
 FAQ
 ======
@@ -150,6 +151,9 @@ Optional environment variables
 
 Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
 
+* `ABICHECK_MERGE` (default: not set): Used only when `ABICHECK_URL` is set. For travis it can be set to 'auto' to auto-detect pull requests. If set to 'true' the merge parent (see `Terminology section <#terminology>`_) will be checked against.
+* `ABICHECK_URL` (default: not set): Run binary compatibility check with `ABICC <https://github.com/lvc/abi-compliance-checker>`_. The URL should point to a baseline archive (\*.tar.\*,\*.zip, \*.tgz or \*.tbz2), see more in `the ABI checks section <#abi-checks>`_)
+* `ABICHECK_VERSION` (default: not set): Used only when `ABICHECK_URL` is set. Version name (for display only) of the set of code, which the location is specified in `ABICHECK_URL` of. The version will be automatically read from the URL passed in `ABICHECK_URL` if possible, but for a URL that doesn't point to a version-based file name (e.g. the link for a tagged version on Gitlab doesn't).
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * `AFTER_SCRIPT`: (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`_ where `after_script` doesn't affect the build result, the result in the commands specified with this DOES affect the build result.
 * `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
@@ -254,6 +258,39 @@ The jobs that run Prerelease Test may usually take longer than the tests defined
 
 Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
 
+ABI checks
+----------
+
+Generally speaking, the `ABI <https://en.wikipedia.org/wiki/Application_binary_interface>`_ of a library might break for various reasons. A detailed explanation and a list of DOs and DON'Ts can be found in the `KDE Community Wiki <https://community.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B>`_.
+
+The ABI checks with `industrial_ci` can be enabled by setting 'ABICHECK_URL' to a code archive with your stable version (e.g. tagged version or older tagged versions of your package)
+The following is a few examples of those URL:
+
+  - https://github.com/ros-planning/moveit/archive/0.9.9.tar.gz
+  - https://github.com/ros-industrial-release/ros_canopen-release/archive/upstream.zip
+  - https://gitlab.com/ipa-mdl/ci-example/repository/master/archive.zip
+
+As an alternative the URL can be specified in shortcut form `provider:organization/repository#version`, which is supported for bitbucket, github and gitlab:
+
+  - github:ros-planning/moveit#0.9.9
+  - github:ros-industrial-release/ros_canopen-release#upstream
+  - gitlab:ipa-mdl/ci-example#master
+
+
+ABI check examples:
++++++++++++++++++++
+
+Check against a specific stable version (e.g. stable `kinetic` branch) for push and PR tests:
+::
+  - ROS_DISTRO=kinetic
+    ABICHECK_URL='github:ros-industrial/ros_canopen#kinetic'
+
+If pull requests should be checked against the merge parent instead of the stable version (travis only):
+::
+  - ROS_DISTRO=kinetic
+    ABICHECK_URL='github:ros-industrial/ros_canopen#kinetic'
+    ABICHECK_MERGE=auto
+
 (Optional) Customize `catkin config`
 ------------------------------------
 
@@ -293,7 +330,7 @@ https://docs.travis-ci.com/user/caching/#Arbitrary-directories
     cache:
       directories:
         - $HOME/.ccache  # can be any valid cache location
-  
+
 
  * Define `CCACHE_DIR` variable. You can apply to all of your jobs by something like below::
 
@@ -308,7 +345,7 @@ Or define `CCACHE_DIR` per job.
 NOTE:
   * Beware, if you use `run_ci <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#id39>`_, the files will be owned by root!
   * Caching may not work for packages with "smaller" number of files (see also `this discussion <https://github.com/ros-industrial/industrial_ci/pull/182>`_).
-    
+
 Add repository-specific CI config in addition
 ----------------------------------------------------------------
 

@@ -25,4 +25,9 @@ export TARGET_REPO_PATH=$TRAVIS_BUILD_DIR
 export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
 export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 
+if [ "$ABICHECK_MERGE" = "auto" ]; then
+  export ABICHECK_MERGE=false
+  [ "$TRAVIS_PULL_REQUEST" = "false" ] || ABICHECK_MERGE=true
+fi
+
 env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
