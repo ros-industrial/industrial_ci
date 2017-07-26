@@ -163,7 +163,8 @@ function ici_prepare_docker_image() {
 #   (None)
 
 function ici_build_default_docker_image() {
-  export DOCKER_IMAGE="industrial-ci/$OS_CODE_NAME"
+  # choose a unique image name
+  export DOCKER_IMAGE="industrial-ci/$ROS_DISTRO/$DOCKER_BASE_IMAGE"
   ici_generate_default_dockerfile | ici_docker_build - > /dev/null
 }
 
@@ -174,9 +175,9 @@ FROM $DOCKER_BASE_IMAGE
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates sudo
+    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates sudo lsb-release
 
-RUN echo "deb ${ROS_REPOSITORY_PATH} ${OS_CODE_NAME} main" > /etc/apt/sources.list.d/ros-latest.list
+RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
     || { wget "${APTKEY_STORE_HTTPS}" -O - | sudo apt-key add -; }
 
