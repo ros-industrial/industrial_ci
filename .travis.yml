@@ -65,10 +65,6 @@ matrix:
     - env: ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall
 
 before_script:
-  - CI_DIR=.
-  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin build -i -v --limit-status-rate 0.001@catkin_make@' $CI_DIR/travis.sh; fi
-  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then sed -i 's@catkin run_tests --no-deps --limit-status-rate 0.001@catkin_make run_tests@' $CI_DIR/travis.sh; fi
-  - if [ "${USE_CATKIN_MAKE}" == "true" ] ;then export CATKIN_PARALLEL_JOBS="--no-color" ; fi
 script:
-  - $CI_DIR/travis.sh
+  - industrial_ci/_wrap_test.sh # this script is only for internal use
   - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
