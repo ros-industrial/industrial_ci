@@ -16,6 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ros_prerelease.sh script runs ROS Pre-release Test.
+# It is dependent on environment variables that need to be exported in advance
+# (As of version 0.4.4 most of them are defined in env.sh).
+
 function setup_environment() {
     export WORKSPACE
     WORKSPACE=$(mktemp -d)

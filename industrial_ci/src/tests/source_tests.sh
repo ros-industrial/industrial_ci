@@ -18,6 +18,10 @@
 #
 ## Greatly inspired by JSK travis https://github.com/jsk-ros-pkg/jsk_travis
 
+# source_tests.sh script runs integration tests for the target ROS packages.
+# It is dependent on environment variables that need to be exported in advance
+# (As of version 0.4.4 most of them are defined in env.sh).
+
 ici_require_run_in_docker # this script must be run in docker
 
 #Define some verbose env vars
