@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# docker.sh script sets up Docker image.
+# It is dependent on environment variables that need to be exported in advance
+# (As of version 0.4.4 most of them are defined in ./env.sh).
+
 #######################################
 # rerun the CI script in docker container end exit the outer script
 #
