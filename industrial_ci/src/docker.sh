@@ -169,7 +169,10 @@ function ici_prepare_docker_image() {
 function ici_build_default_docker_image() {
   # choose a unique image name
   export DOCKER_IMAGE="industrial-ci/$ROS_DISTRO/$DOCKER_BASE_IMAGE"
-  ici_generate_default_dockerfile | ici_docker_build - > /dev/null
+  echo "Building image '$DOCKER_IMAGE':"
+  local dockerfile=$(ici_generate_default_dockerfile)
+  echo "$dockerfile"
+  ici_docker_build - <<< "$dockerfile" > /dev/null
 }
 
 function ici_generate_default_dockerfile() {
