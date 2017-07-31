@@ -23,5 +23,6 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export TARGET_REPO_PATH=$TRAVIS_BUILD_DIR
 export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
+export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 
 env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
