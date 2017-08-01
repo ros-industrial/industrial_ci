@@ -15,13 +15,12 @@ notifications:
       - gm130s@gmail.com  # Change this to yours should you copy this file.
 env:
   global:
-    - VERBOSE_OUTPUT='true'
     - POST_PROCESS='echo "post processing reached"'
     - BEFORE_SCRIPT='echo current dir: $(pwd)'
 
   matrix:
-    - ROS_DISTRO=hydro  USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
+    - ROS_DISTRO=hydro  USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true'
+    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true'
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  CATKIN_CONFIG='--no-install -DCMAKE_CXX_FLAGS="-Werror=uninitialized -Werror=return-type"'
