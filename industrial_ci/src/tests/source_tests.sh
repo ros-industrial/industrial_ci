@@ -110,8 +110,13 @@ if [ -e $CATKIN_WORKSPACE/src/.rosinstall ]; then
      && echo "$ROSWS ignored $TARGET_REPO_NAME found in $CATKIN_WORKSPACE/src/.rosinstall file. Its source fetched from your repository is used instead." || true) # TODO: add warn function
     $ROSWS update -t $CATKIN_WORKSPACE/src
 fi
+
 # TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
-ln -s $TARGET_REPO_PATH $CATKIN_WORKSPACE/src
+if [ "$WRITABLE_SOURCE" = true ]; then
+    cp -a "$TARGET_REPO_PATH" "$CATKIN_WORKSPACE/src/"
+else
+    ln -s $TARGET_REPO_PATH $CATKIN_WORKSPACE/src
+fi
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then

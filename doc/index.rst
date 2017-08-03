@@ -187,6 +187,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
 * `USE_MOCKUP` (default: not set): reletive path to mockup packages to be used for the tests
 * `VERBOSE_OUTPUT` (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode.
+* `WRITABLE_SOURCE` (default: false): Set this to true if you need the target source to be writable at build (not recommended).
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
