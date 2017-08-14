@@ -26,8 +26,8 @@ if [ -n "$_EXTERNAL_REPO" ]; then
     repo_name=${_EXTERNAL_REPO%%#*}
     repo_branch=${_EXTERNAL_REPO##*#}
 
-    if [ "$repo_branch" != "$repo_url" ]; then # if branch name was provided
-        clone_opts="-b $repo_branch"
+    if [ "$repo_branch" = "$_EXTERNAL_REPO" ]; then # if branch name was not provided
+        repo_branch="HEAD"
     fi
 
     if [[ "$repo_name" =~ ^[a-zA-Z][\w+-\.]*: ]]; then # stars with scheme (RFC 3986)
@@ -36,7 +36,9 @@ if [ -n "$_EXTERNAL_REPO" ]; then
         repo_url="https://github.com/$repo_name.git" # treat as github repo
     fi
 
-    git clone "$repo_url" -b "${_EXTERNAL_REPO##*#}" "$TRAVIS_BUILD_DIR"
+    git clone "$repo_url" "$TRAVIS_BUILD_DIR"
+    git -C "$TRAVIS_BUILD_DIR" checkout "$repo_branch"
+
     urlbasename=${repo_url##*/}
     urldirname=${repo_url%/$urlbasename}
     export TRAVIS_REPO_SLUG="${urldirname##*/}/${urlbasename%.git}"
