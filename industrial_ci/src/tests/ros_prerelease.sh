@@ -25,12 +25,14 @@ function setup_environment() {
     WORKSPACE=$(mktemp -d)
     echo "WORKSPACE: $WORKSPACE"
 
-    if [ -e /var/run/docker.sock ]; then
+    if [ -n "$DOCKER_PORT" ]; then
+        DIND_OPTS="-e DOCKER_HOST=$DOCKER_PORT"
+        user_cmd="useradd ci"
+    elif [ -e /var/run/docker.sock ]; then
         DIND_OPTS=-"v /var/run/docker.sock:/var/run/docker.sock"
         user_cmd="groupadd -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
     else
-        DIND_OPTS="-e DOCKER_HOST=$DOCKER_PORT"
-        user_cmd="useradd ci"
+        error "Could not detect docker settings"
     fi
 
     docker build -t "industrial-ci/prerelease" - <<EOF > /dev/null
