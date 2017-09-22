@@ -39,8 +39,13 @@ ROSWS=wstool
 ici_time_end  # init_ici_environment
 
 function catkin {
+  PATH_CATKIN=/usr/bin/catkin
+  PKG_CATKIN=python-catkin-tools
   local cmd=$1
   shift
+  if [ ! -f ${PATH_CATKIN} ]; then
+  	echo "[ERR] ${PATH_CATKIN} not available. Make sure ${PKG_CATKIN} is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216";  	
+  fi
   /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
 }
 
