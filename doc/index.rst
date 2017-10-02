@@ -190,6 +190,25 @@ Note that some of these currently tied only to a single option, but we still lea
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
+Use custom Docker images
+------------------------
+
+As you see in the `optional variables section <./index.rst#optional-environment-variables>`_, there are a few different ways to specify `Docker` image if you like. Here are some more detail:
+
+Pulling Docker image from an online hub
++++++++++++++++++++++++++++++++++++++++
+
+You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as long as the following requirement is met:
+
+* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`
+* sources.list set up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`_).
+
+If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
+
+Note-1. This disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
+
+Note-2. For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
+
 (Optional but recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
@@ -465,7 +484,7 @@ E.g.::
 All combinations available of OS and distros
 ++++++++++++++++++++++++++++++++++++++++++++++
 
-Possible combination of `OS_NAME` and `OS_CODE_NAME` depend on available Docker images. See [ros-industrial/docker/ci](https://github.com/ros-industrial/docker/tree/master/ci).
+Possible combination of `OS_NAME` and `OS_CODE_NAME` depend on available Docker images. See `ros-industrial/docker/ci <https://github.com/ros-industrial/docker/tree/master/ci>`_.
 
 Checking older ROS distros with industrial_ci
 --------------------------------------------------------

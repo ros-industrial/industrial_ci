@@ -39,9 +39,11 @@ ROSWS=wstool
 ici_time_end  # init_ici_environment
 
 function catkin {
+  local path
+  path=$(which catkin) || error "catkin not available. Make sure python-catkin-tools is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216"
   local cmd=$1
   shift
-  /usr/bin/catkin "$cmd" -w "$CATKIN_WORKSPACE" "$@"
+  "$path" "$cmd" -w "$CATKIN_WORKSPACE" "$@"
 }
 
 ici_time_start setup_apt
