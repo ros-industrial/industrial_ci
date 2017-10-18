@@ -151,7 +151,8 @@ ici_time_end  # rosdep_install
 
 if [ "$CATKIN_LINT" == "true" ]; then
     ici_time_start catkin_lint
-    catkin_lint --explain $CATKIN_LINT_ARGS $TARGET_REPO_PATH && echo "catkin_lint passed." || error "`catkin_lint --strict` failed by either/both errors and/or warnings"
+    sudo pip install catkin-lint
+    catkin_lint --explain $CATKIN_LINT_ARGS $TARGET_REPO_PATH && echo "catkin_lint passed." || error "catkin_lint failed by either/both errors and/or warnings"
     ici_time_end  # catkin_lint
 fi
 
