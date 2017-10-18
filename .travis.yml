@@ -56,10 +56,10 @@ env:
     - ROS_DISTRO=kinetic OS_NAME=debian OS_CODE_NAME=xenial EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic DOCKER_BASE_IMAGE="ros:kinetic-ros-base" NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false'
     - ROS_DISTRO=kinetic APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
-    - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel' CATKIN_LINT=true CATKIN_LINT_ARGS='--explain'
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE' CATKIN_LINT=true
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1 CATKIN_LINT=true
+    - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=true
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel'
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE'
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ipa320/cob_calibration_data#c0922cc6f87f31641add6ba4e0fb88c93f9a7c6c' ROS_REPO=ros UPSTREAM_WORKSPACE=file AFTER_SCRIPT='./.travis.xacro_test.sh'
 matrix:
   allow_failures:
