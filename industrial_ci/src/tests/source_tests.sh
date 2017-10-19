@@ -149,9 +149,12 @@ set +o pipefail
 
 ici_time_end  # rosdep_install
 
-if [ "$CATKIN_LINT" == "true" ]; then
+if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_start catkin_lint
     sudo pip install catkin-lint
+    if [ "$CATKIN_LINT" == "pedantic" ]; then
+    	CATKIN_LINT_ARGS="$CATKIN_LINT_ARGS --strict -W2"
+    fi
     catkin_lint --explain $CATKIN_LINT_ARGS $TARGET_REPO_PATH && echo "catkin_lint passed." || error "catkin_lint failed by either/both errors and/or warnings"
     ici_time_end  # catkin_lint
 fi
