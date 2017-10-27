@@ -17,10 +17,10 @@ indigo:
     ROS_DISTRO: "indigo"
 
 jade:
-  script: .ci_config/gitlab.sh
-  variables:
-    ROS_DISTRO: "jade"
-    PRERELEASE: "true"
+  script: .ci_config/gitlab.sh ROS_DISTRO=jade  # alternate syntax
 
 kinetic:
-  script: .ci_config/gitlab.sh ROS_DISTRO=kinetic # alternate syntax
+  script: .ci_config/gitlab.sh
+  variables:
+    ROS_DISTRO: "kinetic"
+    PRERELEASE: "true"
