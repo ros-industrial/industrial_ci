@@ -136,3 +136,47 @@ function error {
     fi
     ici_exit $exit_code
 }
+
+#######################################
+# This script is needed to handle ssh key on gitlab CI,
+# and assumes the steps in the tutorial https://docs.gitlab.com/ee/ci/ssh_keys/README.html is followed.
+#
+# Globals:
+#   (None)
+# Arguments:
+#   SSH_PRIVATE_KEY: Content of SSH private key that is defined on gitlab as a "secret variable". See detail at https://docs.gitlab.com/ee/ci/ssh_keys/README.html
+# Returns:
+#   (None)
+#######################################
+inject_sshkey () {
+    set -x
+  
+    if [ -z "$SSH_PRIVATE_KEY" ]; then
+        echo "SSH_PRIVATE_KEY is not found.";
+        return 1;
+    fi      
+    
+    # Install ssh-agent if not already installed, it is required by Docker.
+    # (change apt-get to yum if you use a CentOS-based image)
+    which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    
+    # Run ssh-agent (inside the build environment)
+    eval $(ssh-agent -s)
+    
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    ##ssh-add <(echo "$SSH_PRIVATE_KEY")  # This doesn't work on gitlab ci. So https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_16344569
+    echo "${SSH_PRIVATE_KEY}" | ssh-add -
+    
+    # For Docker builds disable host key checking. Be aware that by adding that
+    # you are suspectible to man-in-the-middle attacks.
+    # WARNING: Use this only with the Docker executor, if you use it with shell
+    # you will overwrite your user's SSH config.
+    mkdir -p ~/.ssh
+    [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    
+    # In order to properly check the server's host key, assuming you created the
+    # SSH_SERVER_HOSTKEYS variable previously, uncomment the following two lines
+    # instead.
+    # - mkdir -p ~/.ssh
+    # - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
+}
