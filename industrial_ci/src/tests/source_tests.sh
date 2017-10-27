@@ -58,6 +58,15 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 
 ici_time_end  # setup_apt
 
+# execute BEFORE_SCRIPT in repository, exit on errors
+if [ "${BEFORE_SCRIPT// }" != "" ]; then
+  ici_time_start before_script
+
+  bash -e -c "cd $TARGET_REPO_PATH; ${BEFORE_SCRIPT}"
+
+  ici_time_end  # before_script
+fi
+
 if [ "$CCACHE_DIR" ]; then
     ici_time_start setup_ccache
     sudo apt-get install -qq -y ccache || error "Could not install ccache. Exiting."
@@ -126,16 +135,6 @@ catkin config --install
 if [ -n "$CATKIN_CONFIG" ]; then eval catkin config $CATKIN_CONFIG; fi
 
 ici_time_end  # setup_rosws
-
-
-# execute BEFORE_SCRIPT in repository, exit on errors
-if [ "${BEFORE_SCRIPT// }" != "" ]; then
-  ici_time_start before_script
-
-  bash -e -c "cd $TARGET_REPO_PATH; ${BEFORE_SCRIPT}"
-
-  ici_time_end  # before_script
-fi
 
 ici_time_start rosdep_install
 
