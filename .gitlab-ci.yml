@@ -1,7 +1,9 @@
-# the following block is needed for the shared Docker-based runner
+# The following block is needed for the shared Docker-based runner
+# For local runners you might want to enable the overlay driver:
+# https://docs.gitlab.com/ce/ci/docker/using_docker_build.html#using-the-overlayfs-driver
+
 image: docker:git # docker and git clients
 variables:
-  DOCKER_DRIVER: "overlay" # recommended for docker-in-docker, needs overlay kernel module loaded on host
   TMPDIR: "${CI_PROJECT_DIR}.tmp" # needed for prerelease tests with Gitlab's docker-in-docker
 services:
   - docker:dind # enable docker-in-docker
