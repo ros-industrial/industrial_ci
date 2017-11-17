@@ -219,7 +219,7 @@ Note-1. This disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as 
 
 Note-2. For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
 
-(Optional but recommended) Subscribe to the change in this repo (industrial_ci)
+(Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
 Because of the aforementioned responsibility for the maintainers to watch the changes in `industrial_ci`, `you're encouraged to subscribe to the updates in this repository <https://github.com/ros-industrial/industrial_ci/subscription>`_.
@@ -312,7 +312,7 @@ It is up to each repository's maintainer for which baseline code you check ABI a
     - ABI check runs per every change/push into your branch, which is superfluous.
     - Reasonable for pull requests.
 
-(Optional) Customize `catkin config`
+Customize `catkin config`
 ------------------------------------
 
 By default, `industrial_ci` builds packages with `catkin config --install`, which requires `install` rules to pass CI jobs. This might not be suitable in some cases, e.g. with your experimental packages where you have no plan to make them deployable so that `install` rules are nothing but extra burden. Also, you may want to add addtional configuration for `catkin config`. In these cases define "`CATKIN_CONFIG`" variable.
@@ -455,7 +455,7 @@ NOTE: If you specify scripts in `script` section without using aforementioned va
     - .ci_config/travis.sh         <-- Runs on Docker on CI server.
     - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
 
-(Optional) Build depended packages from source
+Build depended packages from source
 ----------------------------------------------
 
 By default the packages your package depend upon are installed via binaries. However, you may want to build them via source in some cases (e.g. when depended binaries are not available). There are a few ways to do so in `industrial_ci`; By utilizing `rosinstall <http://docs.ros.org/independent/api/rosinstall/html/>`_, you can specify the packages that you want to be built from source.
@@ -514,7 +514,7 @@ Use .rosinstall from external location
 
 You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
 
-(Optional) Type of OS and distribution
+Type of OS and distribution
 --------------------------------------
 
 Ubuntu and its distro are guessed by default from ROS_DISTRO
