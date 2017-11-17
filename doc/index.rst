@@ -11,7 +11,7 @@ Introduction
 
 This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of November 2017, this repo provides configuration for `Travis CI` and `Gitlab CI`. The CI scripts in this repository are intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
 For a brief introduction, you could also check a presentation:
 
@@ -28,6 +28,11 @@ Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ 
 * `Kinetic <http://wiki.ros.org/kinetic>`_
 * `Lunar <http://wiki.ros.org/lunar>`_
 * `Melodic <http://wiki.ros.org/melodic>`_
+
+Variety of operating system by utilizing Docker
+-----------------------------------------------
+
+After `version 0.3.3 <http://docs.ros.org/kinetic/changelogs/industrial_ci/changelog.html>`_, all checks run on `Docker` so that you can have the variety of the operating system to check your software against, freed from the limitation of your CI platform (e.g. as of 2017 on `Travis CI`, Ubuntu 16.04 isn't available yet).
 
 Terminology
 ----------------
@@ -219,6 +224,14 @@ If your Docker image is missing any of the above libraries, then you can still p
 Note-1. This disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 
 Note-2. For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
+
+Pass custom variables to Docker
+-------------------------------
+
+On CI platform usually some variables are available for the convenience. Since all checks using `industrial_ci` are NOT running directly on the operating system running on CI, but instead running on `Docker` where those variables are not defined, dozens of them are already passed for you (you can see `the list of those variables <https://github.com/ros-industrial/industrial_ci/blob/master/industrial_ci/src/docker.env>`_).
+
+Still, you may want to pass some other vars. `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE'` should do the trick.
+You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=42'` (format varies per CI platform. These are Gitlab CI example).
 
 (Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
