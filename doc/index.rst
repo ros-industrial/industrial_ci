@@ -32,6 +32,7 @@ Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ 
 Terminology
 ----------------
 
+* **CI config**: `.travis.yml` for Travis CI. `.gitlab-ci.yml` for `Gitlab CI`.
 * **client repository**: The repositories that use the configuration stored in this repo to run CI jobs.
 * **downstream packages**: The software packages that depend on the package that's targetted to be tested using industrial_ci.
 * **merge parent**: The branch that your pull/merge request is opened against.
@@ -367,21 +368,6 @@ NOTE:
   * Beware, if you use `run_ci <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#id39>`_, the files will be owned by root!
   * Caching may not work for packages with "smaller" number of files (see also `this discussion <https://github.com/ros-industrial/industrial_ci/pull/182>`_).
 
-Add repository-specific CI config in addition
-----------------------------------------------------------------
-
-Sometimes CI config stored in `industrial_ci` repo may not be sufficient for your purpose. In that case you can add your own config, while you still take advantage of `industrial_ci` repository.
-
-1. In `.travis.yml` file in your client repo, add the portion below:
-
-::
-
-  script:
-    - .ci_config/travis.sh
-    - ./travis.sh
-
-2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
-
 To use specific version of industrial_ci in your client repo
 -------------------------------------------------------------------------------------
 
@@ -433,27 +419,45 @@ Maintainers of client repos are responsible for applying the changes that happen
 Run pre/post-process custom commands
 -----------------------------------------
 
-You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example usecases:
+You may want to add custom steps prior/subsequent to the setup defined in `industrial_ci`. Example usecases:
 
 * A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
 
 * You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
-In such cases, you can specify the script(s) in `BEFORE_SCRIPT` and/or `AFTER_SCRIPT` variables. For example::
+Customize within the CI process
+++++++++++++++++++++++++++++++++
+
+If what you want to customize is within the `CI process <#what-are-checked>`_, you can specify the script(s) in `BEFORE_SCRIPT` and/or `AFTER_SCRIPT` variables. For example::
 
   env:
     global:
       - BEFORE_SCRIPT='./your_custom_PREprocess.sh'
       - AFTER_SCRIPT='./your_custom_POSTprocess.sh'
   script:
-    - .ci_config/travis.sh
+    - .ci_config/ci.sh
 
 NOTE: If you specify scripts in `script` section without using aforementioned variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
 
   script:
     - ./your_custom_PREprocess.sh  <-- Runs on CI server natively.
-    - .ci_config/travis.sh         <-- Runs on Docker on CI server.
+    - .ci_config/ci.sh         <-- Runs on Docker on CI server.
     - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
+
+Customize outside of the CI process
++++++++++++++++++++++++++++++++++++
+
+If your customization is before or after the `CI process <#what-are-checked>`_ defined in `industrial_ci`, you can add your own commands as follows.
+
+1. In your CI config file in your client repo, add the portion below:
+
+::
+
+  script:
+    - .ci_config/ci.sh
+    - ./your_commands.sh
+
+2. Create `your_commands.sh` file and define the checks you wish to add.
 
 Build depended packages from source
 ----------------------------------------------
