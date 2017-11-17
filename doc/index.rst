@@ -173,7 +173,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * `DOCKER_IMAGE` (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 * `DOCKER_FILE` (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
 * `DOCKER_BUILD_OPTS` (default: not set): Used do specify additional build options for Docker.
-* `DOCKER_RUN_OPTS` (default: not set): Used do specify additional run options for Docker.
+* `DOCKER_RUN_OPTS` (default: not set): Used to specify additional run options for Docker.
 * `EXPECT_EXIT_CODE` (default: 0): exit code must match this value for test to succeed
 * `INJECT_QEMU` (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
 * `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
