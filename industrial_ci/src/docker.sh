@@ -182,11 +182,11 @@ FROM $DOCKER_BASE_IMAGE
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates sudo lsb-release
+    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates lsb-release
 
 RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
-    || { wget "${APTKEY_STORE_HTTPS}" -O - | sudo apt-key add -; }
+    || { wget "${APTKEY_STORE_HTTPS}" -O - | apt-key add -; }
 
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && apt-get update -qq \
@@ -202,4 +202,3 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && rm -rf /var/lib/apt/lists/*
 EOF
 }
-
