@@ -392,12 +392,16 @@ In such cases, you can specify the command(s) in `BEFORE_SCRIPT` and/or `AFTER_S
 
 Multiple commands can be passed, as in a general `bash` manner. Using semi-colon as a delimitter,::
 
-    - BEFORE_SCRIPT="ls /tmp/1; ls /tmp/2"
+    - BEFORE_SCRIPT='ls /tmp/1; ls /tmp/2'
 
 Or making a chain of commands::
 
-    - BEFORE_SCRIPT="ls /tmp/1 && ls /tmp/2 || ls /tmp/3"
-      
+    - BEFORE_SCRIPT='ls /tmp/1 && ls /tmp/2 || ls /tmp/3'
+
+For more complicated cases the commands should go into a dedicated script::
+
+    - BEFORE_SCRIPT='./my_before_script.sh'
+
 NOTE: If you specify scripts in `script` section without using aforementioned variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
 
   script:
