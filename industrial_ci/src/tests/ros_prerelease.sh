@@ -30,7 +30,7 @@ function setup_environment() {
         user_cmd="useradd ci"
     elif [ -e /var/run/docker.sock ]; then
         DIND_OPTS=-"v /var/run/docker.sock:/var/run/docker.sock"
-        user_cmd="groupadd -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
+        user_cmd="groupadd -o -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
     else
         error "Could not detect docker settings"
     fi
