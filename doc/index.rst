@@ -402,12 +402,19 @@ For more complicated cases the commands should go into a dedicated script::
 
     - BEFORE_SCRIPT='./my_before_script.sh'
 
-NOTE: If you specify scripts in `script` section without using aforementioned variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
+NOTE: If you specify scripts in `script` section without using aforementioned `BEFORE/AFTER_SCRIPT` variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
 
   script:
     - ./your_custom_PREprocess.sh  <-- Runs on CI server natively.
     - .ci_config/travis.sh         <-- Runs on Docker on CI server.
     - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
+
+Use CI system's pre-defined variable in your dedicated script
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+To use the variables your CI system defines (e.g. those defined in `Travis CI <https://docs.travis-ci.com/user/environment-variables/>`_, `Gitlab CI <https://docs.gitlab.com/ce/ci/variables/README.html>`_) in your dedicated script, you need to explicitly pass them, as internally it's spun off on a new shell.::
+
+    - BEFORE_SCRIPT='./my_before_script.sh $CI_VAR1 $CI_VAR2'
 
 (Optional) Build depended packages from source
 ----------------------------------------------
