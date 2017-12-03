@@ -152,7 +152,7 @@ Optional environment variables
 Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
 
 * `ABICHECK_MERGE` (default: not set): Used only when `ABICHECK_URL` is set. For travis it can be set to 'auto' to auto-detect pull requests. If set to 'true' the merge parent (see `Terminology section <#terminology>`_) will be checked against.
-* `ABICHECK_URL` (default: not set): Run binary compatibility check with `ABICC <https://github.com/lvc/abi-compliance-checker>`_. The URL should point to a baseline archive (\*.tar.\*,\*.zip, \*.tgz or \*.tbz2), see more in `the ABI checks section <#abi-checks>`_)
+* `ABICHECK_URL` (default: not set): Run binary compatibility check with `ABICC <https://github.com/lvc/abi-compliance-checker>`_. The URL should point to a baseline archive (\*.tar.\*,\*.zip, \*.tgz or \*.tbz2). See more in `the ABI checks section <#abi-checks>`_)
 * `ABICHECK_VERSION` (default: not set): Used only when `ABICHECK_URL` is set. Version name (for display only) of the set of code, which the location is specified in `ABICHECK_URL` of. The version will be automatically read from the URL passed in `ABICHECK_URL` if possible, but for a URL that doesn't point to a version-based file name (e.g. the link for a tagged version on Gitlab doesn't).
 * `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * `AFTER_SCRIPT`: (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`_ where `after_script` doesn't affect the build result, the result in the commands specified with this DOES affect the build result.
@@ -261,35 +261,52 @@ Then open a pull request using this branch against the branch that the change is
 ABI checks
 ----------
 
-Generally speaking, the `ABI <https://en.wikipedia.org/wiki/Application_binary_interface>`_ of a library might break for various reasons. A detailed explanation and a list of DOs and DON'Ts can be found in the `KDE Community Wiki <https://community.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B>`_.
+Generally speaking, the `ABI <https://en.wikipedia.org/wiki/Application_binary_interface>`_ of a library can break for various reasons. A detailed explanation and a list of DOs and DON'Ts can be found in the `KDE Community Wiki <https://community.kde.org/Policies/Binary_Compatibility_Issues_With_C%2B%2B>`_.
 
-The ABI checks with `industrial_ci` can be enabled by setting 'ABICHECK_URL' to a code archive with your stable version (e.g. tagged version or older tagged versions of your package)
-The following is a few examples of those URL:
+The ABI checks with `industrial_ci` can be enabled by setting 'ABICHECK_URL' to the **stable version** of your code.
 
-  - https://github.com/ros-planning/moveit/archive/0.9.9.tar.gz
-  - https://github.com/ros-industrial-release/ros_canopen-release/archive/upstream.zip
-  - https://gitlab.com/ipa-mdl/ci-example/repository/master/archive.zip
+ABI check example configs
++++++++++++++++++++++++++
 
-As an alternative the URL can be specified in shortcut form `provider:organization/repository#version`, which is supported for bitbucket, github and gitlab:
+Simplest example: Check against a specific stable branch (e.g. `kinetic` branch) for push and pull request tests::
 
-  - github:ros-planning/moveit#0.9.9
-  - github:ros-industrial-release/ros_canopen-release#upstream
-  - gitlab:ipa-mdl/ci-example#master
-
-
-ABI check examples:
-+++++++++++++++++++
-
-Check against a specific stable version (e.g. stable `kinetic` branch) for push and PR tests:
-::
   - ROS_DISTRO=kinetic
     ABICHECK_URL='github:ros-industrial/ros_canopen#kinetic'
 
-If pull requests should be checked against the merge parent instead of the stable version (travis only):
-::
+If pull requests should be checked against the merge parent instead of the stable version (Travis CI only). The only benefit is that PRs might pass even if the target branch breaks the ABI to the stable version.::
+
   - ROS_DISTRO=kinetic
     ABICHECK_URL='github:ros-industrial/ros_canopen#kinetic'
     ABICHECK_MERGE=auto
+
+URL can be specified in shortcut form `provider:organization/repository#version`, which is supported for bitbucket, github and gitlab. "`version`" can be either one of the name of the branch, the tagged version, or even a commit. Some (more) concrete examples:
+
+- github:ros-industrial-release/ros_canopen-release#upstream           
+- gitlab:ipa-mdl/ci-example#master
+- github:ros-planning/moveit#0.9.9
+  
+Alternatively you can use the following forms as URL.:
+
+- https://github.com/ros-industrial/ros_canopen/archive/kinetic.zip
+- https://github.com/ros-industrial-release/ros_canopen-release/archive/upstream.zip
+- https://gitlab.com/ipa-mdl/ci-example/repository/master/archive.zip
+- https://github.com/ros-planning/moveit/archive/0.9.9.tar.gz
+
+With this format, the URL needs to point to an actual archive. E.g. on GitHub, URL for a branch's archive can be https://github.com/organization/repository/archive/branch.zip
+
+Tips for ABI check feature
+++++++++++++++++++++++++++
+
+It is up to each repository's maintainer for which baseline code you check ABI against. Here are some recommendations per possible situation:
+
+- Development branch and stable branch (i.e. mirroring the released code) are separately maintained --> checking against stable branch.
+- No stable branch -->
+
+  - Check against the stable tagged version.
+  - Or you could check against the same branch. This way:
+
+    - ABI check runs per every change/push into your branch, which is superfluous.
+    - Reasonable for pull requests.
 
 (Optional) Customize `catkin config`
 ------------------------------------
