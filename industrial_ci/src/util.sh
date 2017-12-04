@@ -136,3 +136,9 @@ function error {
     fi
     ici_exit $exit_code
 }
+
+if ! which sudo > /dev/null; then
+  function sudo {
+    "$@"
+  }
+fi
