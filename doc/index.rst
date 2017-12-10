@@ -99,7 +99,7 @@ Prerequisite
 In order for your repository to get checked with configurations in `industrial_ci`, it needs:
 
 * To be a `Catkin package <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
-* Build-able on Linux (as of Dec 2015, Ubuntu 14.04/Trusty is used). Although your repository is not necessarilly intended for Linux, checks are run on Linux.
+* Docker image for the targeted operating system is available on a Docker registry (e.g. http://hub.docker.com, Gitlab registry) either publicly or privately.
 
 Basic Usage
 ===========
