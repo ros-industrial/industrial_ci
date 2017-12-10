@@ -412,7 +412,7 @@ This standard `git submodule` command:
 
   script:
     - .ci_config/ci.sh
-    #- ./your_custom_POSTprocess.sh  # Optional. Explained later
+    #- ./your_non-docker_after.sh  # Optional. Explained later
 
 Also, the example of entire file `CI config <#terminology>`_ can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
 
@@ -462,17 +462,18 @@ NOTE: If you specify scripts in `script` section without using aforementioned va
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
 
-If your customization is before or after the `CI process <#what-are-checked>`_ defined in `industrial_ci`, you can add your own commands as follows.
+As `explained in Docker's usage <#use-custom-docker-images>`_ section, `main CI processes of industrial_ci <#what-are-checked>`_ run on `Docker`. There may be situtions where you want to run additional processes before or after the main pipeline. This could be particularly the case when you'd like to take advantage of CI's native resources (e.g. environment variables your CI platform defines) more easily.
 
-1. In your CI config file in your client repo, add the portion below:
+You can add your own commands before/after the main processes as follows.
 
 ::
 
   script:
+    - ./your_non-docker_before.sh
     - .ci_config/ci.sh
-    - ./your_commands.sh
+    - ./your_non-docker_after.sh
 
-2. Create `your_commands.sh` file and define the checks you wish to add.
+NOTE. CI native env vars can be sent to Docker (see `this section <#pass-custom-variables-to-docker>`_). The example above is useful e.g. when you have many variables to deal with. Anyways, both ways are valid.
 
 Build depended packages from source
 ----------------------------------------------
