@@ -223,9 +223,10 @@ You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as lon
 
 If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
 
-Note-1. This disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
-
-Note-2. For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
+Some more notes:
+- Specifying Docker image disables the handling of `ROS_REPO` (and non-recommended `ROS_REPOSITORY_PATH`), and `ROS_DISTRO` as ROS needs to be installed in the image.
+- For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
+- Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
 
 Pass custom variables to Docker
 -------------------------------
@@ -464,12 +465,7 @@ Multiple commands are easier to be handled if they are put into a dedicated scri
 
     - BEFORE_SCRIPT='./my_before_script.sh'
 
-NOTE: If you specify scripts in `script` section without using aforementioned `BEFORE/AFTER_SCRIPT` variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
-
-  script:
-    - ./your_custom_PREprocess.sh  <-- Runs on CI server natively.
-    - .ci_config/ci.sh         <-- Runs on Docker on CI server.
-    - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
+NOTE: In general the scripts are run as root in a Docker container. If you configures a different (base) Docker image, the user could be changed to non-root. But since we need to install packages the (base) image should set-up `sudo` for this user.
 
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
@@ -481,9 +477,9 @@ You can add your own commands before/after the main processes as follows.
 ::
 
   script:
-    - ./your_non-docker_before.sh
-    - .ci_config/ci.sh
-    - ./your_non-docker_after.sh
+    - ./your_non-docker_before.sh  <-- Runs on CI server natively.
+    - .ci_config/ci.sh             <-- Runs on Docker on CI server.
+    - ./your_non-docker_after.sh   <-- Runs on CI server natively.
 
 NOTE. CI native env vars can be sent to Docker (see `this section <#pass-custom-variables-to-docker>`_). The example above is useful e.g. when you have many variables to deal with. Anyways, both ways are valid.
 
