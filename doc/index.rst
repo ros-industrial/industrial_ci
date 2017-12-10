@@ -111,16 +111,18 @@ To start using CI config stored in this repo
 
 With the following few short steps, you can start in your client repository using CI confiurations stored in here (`industrial_ci` repository).
 
-1. Don't forget to activate Travis CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
+1. Don't forget to activate CI for your repository.
+ - For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
 
-2. In `.travis.yml` file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `CI config <#terminology>`_ file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
 
 ::
 
   before_config:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
-    - .ci_config/travis.sh
+    - .ci_config/ci.sh  (Travis CI with GitHub)
+    - .ci_config/gitlab.sh   (Gitlab CI)
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
@@ -146,7 +148,7 @@ Advanced Usage
 Variables you can configure
 ------------------------------------
 
-You can configure the behavior in `.travis.yml` in your client repository.
+You can configure the behavior in `CI config <#terminology>`_ in your client repository.
 
 * OS to use. Defined at `dist` tag.
 
@@ -241,9 +243,9 @@ Because of the aforementioned responsibility for the maintainers to watch the ch
 Run ROS Prerelease Test
 -------------------------------------------------------------------------------------
 
-Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your `Travis CI` test.
+Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your CI.
 
-To do so, add a single line to your Travis config (eg. `.travis.yml`):
+To do so, add a single line to your `CI config <#terminology>`_:
 
 ::
 
@@ -255,16 +257,16 @@ Or with more configuration:
 
   ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
 
-NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in Travis config.
+NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in `CI config <#terminology>`_.
 
 See the usage sample in `.travis in indusrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
 
-The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
+The following is some tips to be shared for running Prerelease Test on CI using `industrial_ci`.
 
 (Workaround) Don't want to always run Prerelease Test
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire Travis jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
+The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire CI jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the CI result that eagerly (besides that, most CI servers limit the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `CI config <#terminology>`_ only defines a check entry with `PRERELEASE` turned on. E.g.:
 
 ::
 
@@ -274,7 +276,7 @@ The jobs that run Prerelease Test may usually take longer than the tests defined
       - ROS_DISTRO=indigo PRERELEASE=true
   :
 
-Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
+Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the CI  result is. This branch is solely for Prerelease Test purpose.
 
 ABI checks
 ----------
@@ -404,15 +406,15 @@ This standard `git submodule` command:
 
 2. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_USER).
 
-3. In `.travis.yml` file in your client repo, add the portion below:
+3. In `CI config <#terminology>`_ file in your client repo, add the portion below:
 
 ::
 
   script:
-    - .ci_config/travis.sh
-    #- ./travis.sh  # Optional. Explained later
+    - .ci_config/ci.sh
+    #- ./your_custom_POSTprocess.sh  # Optional. Explained later
 
-Also, the example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
+Also, the example of entire file `CI config <#terminology>`_ can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
 
 That's it.
 
