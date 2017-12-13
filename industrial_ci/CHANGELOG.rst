@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2017-12-12)
+------------------
 * [fix] ROS Prerelease Test by updating to the latest Docker CE `#238 <https://github.com/ros-industrial/industrial_ci/pull/238>`_
 * [capability] ABI check based on abi-compliance-checker `#199 <https://github.com/ros-industrial/industrial_ci/issues/199>`_
 * [capability] catkin_lint feature. `#219 <https://github.com/ros-industrial/industrial_ci/issues/219>`_
