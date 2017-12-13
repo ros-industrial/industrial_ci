@@ -73,8 +73,18 @@ Metrics
 
 There might not an easy way to precisely count how many repositories out there are using `industrial_ci`. Counting that number isn't even our priority at all, but we're often simply curious. Here's some ways that give us some clues for the usage metrics:
 
-- `Searching Github repos that contain string industrial_ci <https://github.com/search?p=1&q=industrial_ci+-repo%3Aros-industrial%2Findustrial_ci&ref=searchresults&type=Code&utf8=%E2%9C%93>`_) (with some duplicates. Excluding industrial_ci repo): As of Jan 20, 2017, it returns 142 repos.
-- Github-->`Graphs`-->`Traffic` view (visible only to admins). Below is taken on Jan 20, 2017:
+- `Searching Github repos that contain string industrial_ci <https://github.com/search?p=1&q=industrial_ci+-repo%3Aros-industrial%2Findustrial_ci&ref=searchresults&type=Code&utf8=%E2%9C%93>`_) (with some duplicates. Excluding industrial_ci repo):
+
+  - 457 (Dec 12, 2017)
+  - 142 (Jan 20, 2017)
+
+- Github--> `Graphs` --> `Traffic` view (visible only to admins).
+
+  - Dec 12, 2017
+
+  .. figure:: doc/industrial_ci_traffic_20171212.png
+
+  - Jan 20, 2017
 
   .. figure:: doc/industrial_ci_traffic_20170120.png
 
