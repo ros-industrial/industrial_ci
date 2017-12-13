@@ -2,6 +2,16 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] ROS Prerelease Test by updating to the latest Docker CE `#238 <https://github.com/ros-industrial/industrial_ci/pull/238>`_
+* [capability] ABI check based on abi-compliance-checker `#199 <https://github.com/ros-industrial/industrial_ci/issues/199>`_
+* [capability] catkin_lint feature. `#219 <https://github.com/ros-industrial/industrial_ci/issues/219>`_
+* [capability] implemented ROSDEP_SKIP_KEYS feature `#184 <https://github.com/ros-industrial/industrial_ci/pull/184>`_
+* [enhance] Add support for ARM platform `#236 <https://github.com/ros-industrial/industrial_ci/issues/236>`_
+* Many more bug fixes.
+* Contributors: Mathias Lüdtke, Miguel Prada, Isaac I.Y. Saito
+
 0.4.0 (2017-06-29)
 ------------------
 * [capability] ROS buildfarm-powered pre-release tests can now run for even the repositories that are not listed in rosdistro https://github.com/ros-industrial/industrial_ci/pull/145
