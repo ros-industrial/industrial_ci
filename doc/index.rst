@@ -109,13 +109,13 @@ Here are some operations in your client repositories.
 To start using CI config stored in this repo
 --------------------------------------------------
 
-With the following few short steps, you can start in your client repository using CI confiurations stored in here (`industrial_ci` repository).
+With the following few short steps, you can start in your client repository using CI configurations stored in here (`industrial_ci` repository).
 
 1. Don't forget to activate CI for your repository.
- - For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
+
+- For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
 
 2. In `CI config <#terminology>`_ file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
-
 ::
 
   before_config:
@@ -372,11 +372,11 @@ https://docs.travis-ci.com/user/caching/#Arbitrary-directories
 
  * Define `CCACHE_DIR` variable. You can apply to all of your jobs by something like below::
 
-  env:
-    global:
-      - CCACHE_DIR=$HOME/.ccache
-    matrix:
-      :
+    env:
+      global:
+        - CCACHE_DIR=$HOME/.ccache
+      matrix:
+       :
 
 Or define `CCACHE_DIR` per job.
 
@@ -470,7 +470,7 @@ NOTE: In general the scripts are run as root in a Docker container. If you confi
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
 
-As `explained in Docker's usage <#use-custom-docker-images>`_ section, `main CI processes of industrial_ci <#what-are-checked>`_ run on `Docker`. There may be situtions where you want to run additional processes before or after the main pipeline. This could be particularly the case when you'd like to take advantage of CI's native resources (e.g. environment variables your CI platform defines) more easily.
+As `explained in Docker's usage <#use-custom-docker-images>`_ section, `main CI processes of industrial_ci <#what-are-checked>`_ run on `Docker`. There may be situations where you want to run additional processes before or after the main pipeline. This could be particularly the case when you'd like to take advantage of CI's native resources (e.g. environment variables your CI platform defines) more easily.
 
 You can add your own commands before/after the main processes as follows.
 
@@ -601,7 +601,7 @@ NOTE that this way the CI config (e.g. `.travis.yml`, `.gitlab-ci.yml`) are not 
 To do so,
 
 0. `Install Docker <https://docs.docker.com/engine/installation/linux/>`_
-1. Build and install industrial_ci (which is a `catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
+1. Build and install industrial_ci (which is `a catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
 2. Change directory to the package you like to test.
 3. Run `run_ci` script with your settings.
 
