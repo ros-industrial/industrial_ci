@@ -3,15 +3,22 @@
 # https://docs.gitlab.com/ce/ci/docker/using_docker_build.html#using-the-overlayfs-driver
 
 image: docker:git # docker and git clients
+
+# The docker runner does not expose /tmp to the docker-in-docker service
+# This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
 variables:
-  TMPDIR: "${CI_PROJECT_DIR}.tmp" # needed for prerelease tests with Gitlab's docker-in-docker
+  TMPDIR: "${CI_PROJECT_DIR}.tmp" #
+
+# enable docker-in-docker
 services:
-  - docker:dind # enable docker-in-docker
+  - docker:dind
 
 before_script:
   - apk add --update bash coreutils # install industrial_ci dependencies
   # for regular users: - git clone https://github.com/ros-industrial/industrial_ci .ci_config
   - mkdir .ci_config && cp -a * .ci_config # this is only needed for branch testing of industrial_ci itself
+
+# setup the actual tests
 
 indigo:
   script: .ci_config/gitlab.sh

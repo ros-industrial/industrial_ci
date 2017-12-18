@@ -25,4 +25,22 @@ export TARGET_REPO_PATH=$CI_PROJECT_DIR
 export TARGET_REPO_NAME=$CI_PROJECT_NAME
 export _DO_NOT_FOLD=true
 
+if [ -n "$SSH_PRIVATE_KEY" ]; then
+  if [ "$CI_DISPOSABLE_ENVIRONMENT" != true ] && ! [ -f /.dockerenv ] ; then
+    echo "SSH auto set-up cannot be used in non-disposable environments"
+    exit 1
+  fi
+
+  # start SSH agent
+  eval $(ssh-agent -s)
+  # add key to agent
+  ssh-add <(echo "$SSH_PRIVATE_KEY") || { res=$?; echo "could not add ssh key"; exit $res; }
+
+  if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
+    mkdir -p ~/.ssh
+    # setup known hosts
+    echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts
+  fi
+fi
+
 env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
