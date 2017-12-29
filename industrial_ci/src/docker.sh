@@ -103,6 +103,8 @@ function ici_run_cmd_in_docker() {
   return $ret
 }
 
+# work-around for https://github.com/moby/moby/issues/34096
+# ensures that the permissions of copied files are owned by the target user
 function docker_cp {
   set -o pipefail
   tar --owner=${docker_uid:-root} --group=${docker_gid:-root} -c -f - -C "$(dirname $1)" "$(basename $1)" | docker cp - $2
