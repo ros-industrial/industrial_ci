@@ -2,6 +2,13 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] Workaround for the regression in "docker cp" `moby/moby#34096 <https://github.com/moby/moby/issues/34096>`_ (`#248 <https://github.com/ros-industrial/industrial_ci/issues/248>`_).
+  * Gitlab CI users need to take an action. See `this post <https://github.com/ros-industrial/industrial_ci/pull/248#pullrequestreview-85975989>`_
+* [improve] Verbose catkin test results `#251 <https://github.com/ros-industrial/industrial_ci/issues/251>`_
+* Contributors: Mathias Lüdtke
+
 0.5.0 (2017-12-12)
 ------------------
 * [fix] ROS Prerelease Test by updating to the latest Docker CE `#238 <https://github.com/ros-industrial/industrial_ci/pull/238>`_
