@@ -236,6 +236,41 @@ On CI platform usually some variables are available for the convenience. Since a
 Still, you may want to pass some other vars. `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE'` should do the trick.
 You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=42'` (format varies per CI platform. These are Gitlab CI example).
 
+(Gitlab CI) Access to private repositories
+------------------------------------------
+
+Every one who opens PRs/MRs (merge requests, that's what Gitlab calls pull requests) to repositories where CI jobs access private Gitlab repos are now required to add ssh private keys on their repos, including the forks (the following steps are cumbersome workaround, hopefully only temporary).
+
+#. If you haven't done so, create SSH key pair (`reference on gitlab.com <https://docs.gitlab.com/ce/ssh/README.html#generating-a-new-ssh-key-pair>`_).
+#. Open your fork with your account filled in in the repo's URLs below (the rest of the steps need to be done for these URLs). `%YOUR_GITLAB_DOMAIN%` can be `gitlab.com` if you're using the hosted version of Gitlab.
+
+   #. https://%YOUR_GITLAB_DOMAIN%/%YOUR_ACCOUNT%/%REPO_YOUR_BRANCH_RESIDES%/settings/ci_cd
+   #. https://%YOUR_GITLAB_DOMAIN%/%YOUR_ACCOUNT%/%REPO_YOUR_BRANCH_RESIDES%_test/settings/ci_cd
+#. Expand "`Secret variables`" section.
+#. In "Add a variable" section, fill in the following text field/area.
+
+   #. **Key**: `SSH_PRIVATE_KEY`
+   #. **Value**: Copy paste the entire content of your private key file.
+
+     #. Include the header and footer, i.e.  `-----BEGIN/END RSA PRIVATE KEY-----`.
+#. In "Add a variable" section again, fill in the following text field/area.
+
+   #. **Key**: `SSH_SERVER_HOSTKEYS`
+   #. **Value**: Copy paste the entire line of the following: On your Linux computer, run `ssh-keyscan gitlab.com`. You should get a hash key entry/ies. Copy the entire line that is NOT commented out. For example, the author gets the following, and copied the 2nd line (, which may render as separate lines on your web browser, but it's a long single line):
+
+     ::
+
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+      gitlab.com ssh-rsa RandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequence
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+      gitlab.com ecdsa-sha2-nistp256 RandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequence
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+
+References:
+
+- https://docs.gitlab.com/ce/ssh/README.html
+- https://docs.gitlab.com/ee/ci/ssh_keys/README.html
+
 (Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
