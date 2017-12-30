@@ -218,15 +218,15 @@ Pulling Docker image from an online hub
 
 You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as long as the following requirement is met:
 
-* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`
 * sources.list set up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`_).
-
-If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
+* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`. If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
 
 Some more notes:
-- Specifying Docker image disables the handling of `ROS_REPO` (and non-recommended `ROS_REPOSITORY_PATH`), and `ROS_DISTRO` as ROS needs to be installed in the image.
-- For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
-- Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
+
+* Setting `DOCKER_IMAGE` is a bit tricky:
+   * disables the set-up of ROS based on `ROS_REPO` (or non-recommended `ROS_REPOSITORY_PATH`), and ROS_DISTRO.
+   * but `ROS_DISTRO` still needs to be set.  
+* Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
 
 Pass custom variables to Docker
 -------------------------------
