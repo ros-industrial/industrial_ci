@@ -36,9 +36,6 @@ function ici_require_run_in_docker() {
   if ! [ "$IN_DOCKER" ]; then
     ici_prepare_docker_image
 
-    docker_uid=$(docker run --rm $DOCKER_IMAGE id -u)
-    docker_gid=$(docker run --rm $DOCKER_IMAGE id -g)
-
     local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
     local docker_ici_src_path=/root/ici
     ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
@@ -81,11 +78,23 @@ function ici_run_cmd_in_docker() {
      run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e CCACHE_DIR=/root/.ccache)
   fi
 
+  if [ -n "$INJECT_QEMU" ]; then
+    local qemu_path
+    qemu_path=$(which "qemu-$INJECT_QEMU-static") || error "please install qemu-user-static"
+    run_opts+=(-v "$qemu_path:$qemu_path:ro")
+  fi
+
   local cid
   cid=$(docker create \
       --env-file "${ICI_SRC_PATH}"/docker.env \
       "${run_opts[@]}" \
       "$@")
+
+  # detect user inside container
+  local docker_image
+  docker_image=$(docker inspect --format='{{.Config.Image}}' "$cid")
+  docker_uid=$(docker run --rm "${run_opts[@]}" "$docker_image" id -u)
+  docker_gid=$(docker run --rm "${run_opts[@]}" "$docker_image" id -g)
 
   # pass common credentials to container
   for d in .docker .ssh .subversion; do
@@ -104,10 +113,10 @@ function ici_run_cmd_in_docker() {
 }
 
 # work-around for https://github.com/moby/moby/issues/34096
-# ensures that the permissions of copied files are owned by the target user
+# ensures that copied files are owned by the target user
 function docker_cp {
   set -o pipefail
-  tar --owner=${docker_uid:-root} --group=${docker_gid:-root} -c -f - -C "$(dirname $1)" "$(basename $1)" | docker cp - $2
+  tar --numeric-owner --owner=${docker_uid:-root} --group=${docker_gid:-root} -c -f - -C "$(dirname $1)" "$(basename $1)" | docker cp - $2
   set +o pipefail
 }
 #######################################
@@ -178,6 +187,22 @@ function ici_prepare_docker_image() {
 #   (None)
 
 function ici_build_default_docker_image() {
+  if [ -n "$INJECT_QEMU" ]; then
+    local qemu_path
+    qemu_path=$(which "qemu-$INJECT_QEMU-static") || error "please install qemu-user-static"
+    echo "Inject qemu..."
+    local qemu_temp
+    qemu_temp=$(mktemp -d)
+    cat <<EOF > "$qemu_temp/Dockerfile"
+    FROM $DOCKER_BASE_IMAGE
+    COPY '$(basename $qemu_path)' '$qemu_path'
+EOF
+    cp "$qemu_path" "$qemu_temp"
+    unset INJECT_QEMU
+    export DOCKER_BASE_IMAGE="$DOCKER_BASE_IMAGE-qemu"
+    DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_docker_build "$qemu_temp" > /dev/null
+    rm -rf "$qemu_temp"
+  fi
   # choose a unique image name
   export DOCKER_IMAGE="industrial-ci/$ROS_DISTRO/$DOCKER_BASE_IMAGE"
   echo "Building image '$DOCKER_IMAGE':"
