@@ -171,8 +171,13 @@ if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status 
 ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
-    ici_time_start catkin_run_tests
+    ici_time_start catkin_build_downstream_pkgs
+    if [ "$BUILDER" == catkin ]; then
+        catkin build $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+    fi
+    ici_time_end  # catkin_build_downstream_pkgs
 
+    ici_time_start catkin_run_tests
     if [ "$BUILDER" == catkin ]; then
         catkin run_tests $OPT_VI --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         if [ "${ROS_DISTRO}" == "hydro" ]; then
@@ -187,7 +192,6 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
             catkin_test_results --verbose $CATKIN_WORKSPACE || error
         fi
     fi
-
     ici_time_end  # catkin_run_tests
 fi
 
