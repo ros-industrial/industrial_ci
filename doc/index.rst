@@ -17,8 +17,11 @@ For a brief introduction, you could also check a presentation:
 
 * `ROS-Industrial community meeting <http://rosindustrial.org/news/2016/6/14/ros-i-community-web-meeting-june-2016>`_
 
-Supported ROS distributions
-----------------------------------
+Supported Platform
+------------------
+
+Supported ROS Distributions
++++++++++++++++++++++++++++
 
 Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
 
@@ -28,6 +31,14 @@ Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ 
 * `Kinetic <http://wiki.ros.org/kinetic>`_
 * `Lunar <http://wiki.ros.org/lunar>`_
 * `Melodic <http://wiki.ros.org/melodic>`_
+
+Supported CIs
++++++++++++++
+
+* Gitlab CI
+* Travis CI
+
+As of January 2018, this document uses the format of `Travis CI` by default, unless specified.
 
 Variety of operating system by utilizing Docker
 -----------------------------------------------
@@ -115,14 +126,13 @@ With the following few short steps, you can start in your client repository usin
 
 - For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
 
-2. In `CI config <#terminology>`_ file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `CI config <#terminology>`_ file in your client repo, add a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
 ::
 
-  before_config:
+  install:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
-    - .ci_config/ci.sh  (Travis CI with GitHub)
-    - .ci_config/gitlab.sh   (Gitlab CI)
+    - .ci_config/travis.sh    
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
