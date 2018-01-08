@@ -132,7 +132,7 @@ With the following few short steps, you can start in your client repository usin
   install:
     - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
   script:
-    - .ci_config/travis.sh    
+    - .ci_config/travis.sh
 
 * Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
@@ -328,7 +328,7 @@ The jobs that run Prerelease Test may usually take longer than the tests defined
       - ROS_DISTRO=indigo PRERELEASE=true
   :
 
-Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the CI  result is. This branch is solely for Prerelease Test purpose.
+Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the CI result is. This branch is solely for Prerelease Test purpose.
 
 ABI checks
 ----------
@@ -504,11 +504,7 @@ If what you want to customize is within the `CI process <#what-are-checked>`_, y
   script:
     - .ci_config/ci.sh
 
-Multiple commands can be passed, as in a general `bash` manner. Using semi-colon as a delimitter,::
-
-    - BEFORE_SCRIPT='ls /tmp/1; ls /tmp/2'
-
-Or making a chain of commands::
+Multiple commands can be passed, as in a general `bash` manner.::
 
     - BEFORE_SCRIPT='ls /tmp/1 && ls /tmp/2 || ls /tmp/3'
 
