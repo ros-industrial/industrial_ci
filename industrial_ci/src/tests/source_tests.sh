@@ -83,7 +83,9 @@ ici_time_start setup_rosws
 # Create workspace
 export CATKIN_WORKSPACE=~/catkin_ws
 mkdir -p $CATKIN_WORKSPACE/src
-$ROSWS init $CATKIN_WORKSPACE/src
+if [ ! -f $CATKIN_WORKSPACE/src/.rosinstall ]; then
+  $ROSWS init $CATKIN_WORKSPACE/src
+fi
 case "$UPSTREAM_WORKSPACE" in
 debian)
     echo "Obtain deb binary for upstream packages."
