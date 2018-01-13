@@ -2,6 +2,13 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [capability] You can run industrial_ci locally on your computer using configuration in your .travis.yml `#230 <https://github.com/ros-industrial/industrial_ci/issues/230>`_
+* [capability] Inject QEMU `#237 <https://github.com/ros-industrial/industrial_ci/issues/237>`_ from ipa-mdl/feature/inject-qemu
+* [improve] Easier to use your custom Docker image `#259 <https://github.com/ros-industrial/industrial_ci/issues/259>`_
+* Contributors: Isaac I.Y. Saito, Mathias Lüdtke
+
 0.5.1 (2017-12-29)
 ------------------
 * [fix] Workaround for the regression in "docker cp" `moby/moby#34096 <https://github.com/moby/moby/issues/34096>`_ (`#248 <https://github.com/ros-industrial/industrial_ci/issues/248>`_).
