@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2018-01-13)
+------------------
 * [capability] You can run industrial_ci locally on your computer using configuration in your .travis.yml `#230 <https://github.com/ros-industrial/industrial_ci/issues/230>`_
 * [capability] Inject QEMU `#237 <https://github.com/ros-industrial/industrial_ci/issues/237>`_ from ipa-mdl/feature/inject-qemu
 * [improve] Easier to use your custom Docker image `#259 <https://github.com/ros-industrial/industrial_ci/issues/259>`_
