@@ -558,7 +558,15 @@ A successful example from `swri-robotics/mapviz <https://github.com/swri-robotic
 Run industrial_ci on local host
 ---------------------------------------
 
+There are a few ways to run CI jobs locally.
+
+Simplest way to run locally
+++++++++++++++++++++++++++++++++
+
 Since version 0.3.3, you can run `industrial_ci` on your local host. This can be useful e.g. when you want to integrate industrial_ci into your CI server.
+
+NOTE that this way the CI config (e.g. `.travis.yml`, `.gitlab-ci.yml`) are not used. So whatever configurations you have in your CI configs need to be added manually.
+
 To do so,
 
 0. `Install Docker <https://docs.docker.com/engine/installation/linux/>`_
