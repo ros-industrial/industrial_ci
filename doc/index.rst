@@ -587,6 +587,15 @@ Example:
 
 (ROS_DISTRO could be read from your environment as well)
 
+Run locally using Travis config
+++++++++++++++++++++++++++++++++
+
+Since v0.6.0, you can run locally using `.travis.yml` you already defined for your repository, using [`industrial_ci/scripts/run_travis` script](https://github.com/ros-industrial/industrial_ci/blob/master/industrial_ci/scripts/run_travis). See the help of that script.
+
+::
+
+   rosrun industrial_ci run_travis --help
+
 For maintainers of industrial_ci repository
 ================================================
 
