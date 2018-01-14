@@ -558,7 +558,15 @@ A successful example from `swri-robotics/mapviz <https://github.com/swri-robotic
 Run industrial_ci on local host
 ---------------------------------------
 
+There are a few ways to run CI jobs locally.
+
+Simplest way to run locally
+++++++++++++++++++++++++++++++++
+
 Since version 0.3.3, you can run `industrial_ci` on your local host. This can be useful e.g. when you want to integrate industrial_ci into your CI server.
+
+NOTE that this way the CI config (e.g. `.travis.yml`, `.gitlab-ci.yml`) are not used. So whatever configurations you have in your CI configs need to be added manually.
+
 To do so,
 
 0. `Install Docker <https://docs.docker.com/engine/installation/linux/>`_
@@ -578,6 +586,15 @@ Example:
   $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPO=ros-shadow-fixed
 
 (ROS_DISTRO could be read from your environment as well)
+
+Run locally using Travis config
+++++++++++++++++++++++++++++++++
+
+Since v0.6.0, you can run locally using `.travis.yml` you already defined for your repository, using [`industrial_ci/scripts/run_travis` script](https://github.com/ros-industrial/industrial_ci/blob/master/industrial_ci/scripts/run_travis). See the help of that script.
+
+::
+
+   rosrun industrial_ci run_travis --help
 
 For maintainers of industrial_ci repository
 ================================================
