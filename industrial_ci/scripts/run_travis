@@ -164,7 +164,7 @@ def main(scripts_dir, argv):
         proc.communicate(cmd)
         if proc.returncode:
             print('\033[1;41mFailed job %d: %s\033[1;m' %(i+1, cmd))
-            sys.exit(bash.proc)
+            sys.exit(proc.returncode)
 
 if __name__ == "__main__":
     main(os.path.abspath(os.path.dirname(__file__)), sys.argv)
