@@ -165,16 +165,29 @@ ici_time_start catkin_build
 
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
+# fall-back to all workspace packages if target repo does not contain any packages (#232) 
+if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order $CATKIN_WORKSPACE/src --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
 ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
-    ici_time_start catkin_run_tests
-
+    ici_time_start catkin_build_downstream_pkgs
     if [ "$BUILDER" == catkin ]; then
-        catkin run_tests $OPT_VI --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
+        catkin build $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+    fi
+    ici_time_end  # catkin_build_downstream_pkgs
+
+    ici_time_start catkin_build_tests
+    if [ "$BUILDER" == catkin ]; then
+        catkin build --no-deps --catkin-make-args tests -- $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS --
+    fi
+    ici_time_end  # catkin_build_tests
+
+    ici_time_start catkin_run_tests
+    if [ "$BUILDER" == catkin ]; then
+        catkin run_tests --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         if [ "${ROS_DISTRO}" == "hydro" ]; then
             PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
             PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
@@ -187,7 +200,6 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
             catkin_test_results --verbose $CATKIN_WORKSPACE || error
         fi
     fi
-
     ici_time_end  # catkin_run_tests
 fi
 
