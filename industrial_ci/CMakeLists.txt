@@ -9,6 +9,9 @@ install(PROGRAMS scripts/run_ci
 catkin_install_python(PROGRAMS scripts/run_travis
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+install(PROGRAMS scripts/_wrap_test.sh
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 install(DIRECTORY src
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
        )

@@ -74,5 +74,5 @@ matrix:
 install:
   - sudo apt-get install qemu-user-static
 script:
-  - industrial_ci/_wrap_test.sh # this script is only for internal use
+  - industrial_ci/scripts/_wrap_test.sh # this script is only for internal use
   - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
