@@ -187,7 +187,7 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
 
     ici_time_start catkin_run_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin run_tests --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
+        catkin build --verbose --catkin-make-args run_tests -- --no-deps --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
         if [ "${ROS_DISTRO}" == "hydro" ]; then
             PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
             PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
