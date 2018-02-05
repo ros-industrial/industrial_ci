@@ -32,9 +32,10 @@ Quick Start
 
 With a few steps, you can start in your client repository using CI confiurations stored in `industrial_ci`.
 
-1. Activate CI on your github repository.
+For Travis CI
+--------------
 
-- For `Travis CI <https://travis-ci.org/>`_), you may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
+1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`_). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
 
 2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
 
@@ -47,9 +48,22 @@ With a few steps, you can start in your client repository using CI confiurations
 
 * Note: The name `.ci_config` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name as long as the folder is hidden (by being prepended by ".").
 
+For Gitlab CI
+-------------
+
+1. In `.gitlab-ci.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+
+::
+
+  install:
+    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+  script:
+    - .ci_config/gitlab.sh
+
 Concrete examples of config files
 -------------------------------------
 
+- A `template for Travis CI <doc/sample.travis.yml>`_.
 - For development branch intended for ROS Indigo: `ros_canopen <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
 - For development branch intended for ROS Indigo onward:
    - `example 1 <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_ (Indigo and Jade compatible).
