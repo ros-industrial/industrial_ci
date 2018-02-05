@@ -50,23 +50,12 @@ With a few steps, you can start in your client repository using CI confiurations
 Concrete examples of config files
 -------------------------------------
 
-For most of the cases, 
-For development branch intended for ROS Indigo:
-
-- `ros_canopen/.travis.yml <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
-
-For development branch intended for ROS Indigo and newer distros:
-
-- `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_: Indigo and Jade compatible.
-- `leap_motion/.travis.yml <https://github.com/ros-drivers/leap_motion/blob/954924befd2a6755f9d310f4a8b57aa526056a80/.travis.yml>`_: Indigo, Jade, Kinetic compatible. Also runs `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`_.
-
-For development branch intended for ROS Kinetic:
-
-- `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/a07f9089b0f6c8a931bab80b7fca959dd6bba05b/.travis.yml>`_
-
-For more complexed example:
-
-- `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/d09b8dd40d7f1fa1ad5b62323a1d6b2ca836e558/.travis.yml>`_ from the same repo. You can see how options are used.
+- For development branch intended for ROS Indigo: `ros_canopen <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
+- For development branch intended for ROS Indigo onward:
+   - `example 1 <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_ (Indigo and Jade compatible).
+   - `example 2 <https://github.com/ros-drivers/leap_motion/blob/954924befd2a6755f9d310f4a8b57aa526056a80/.travis.yml>`_ (Indigo, Jade, Kinetic compatible. Also runs `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`_).
+- For development branch intended for ROS Kinetic: `industrial_core <https://github.com/ros-industrial/industrial_core/blob/a07f9089b0f6c8a931bab80b7fca959dd6bba05b/.travis.yml>`_
+- For more complexed example: `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/d09b8dd40d7f1fa1ad5b62323a1d6b2ca836e558/.travis.yml>`_ from the same repo. You can see how options are used.
 
 Metrics
 ========
