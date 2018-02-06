@@ -249,17 +249,13 @@ You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=
 (Gitlab CI) Access to private repositories
 ------------------------------------------
 
-If your development involves private Gitlab repos, additional setting is needed both on:
+If your Gitlab CI jobs require access to private repos, additional settings are needed both on:
 
-- Your repo (i.e. where PRs/MRs targets): Add ssh private keys. Add in the CI settings.
-- The private repos your PRs/MRs (pull/merge requests) access: Matching public keys must be set as `Deploy Key`.
+- Your repo: Add ssh private keys in the CI settings.
+- The private repos the CI jobs access: Matching public keys must be set as `Deploy Key`.
 
 #. If you haven't done so, create SSH key pair (`reference on gitlab.com <https://docs.gitlab.com/ce/ssh/README.html#generating-a-new-ssh-key-pair>`_).
-#. Open your fork with your account filled in in the repo's URLs below (the rest of the steps need to be done for these URLs). `%YOUR_GITLAB_DOMAIN%` can be `gitlab.com` if you're using the hosted version of Gitlab.
-
-   #. https://%YOUR_GITLAB_DOMAIN%/%YOUR_ACCOUNT%/%REPO_YOUR_BRANCH_RESIDES%/settings/ci_cd
-   #. https://gitlab.com/130s/sample_gitlab_private/settings/ci_cd  (concrete example)
-
+#. Navigate to "Settings > CI/CD" in your repo.
 #. Expand "`Secret variables`" section.
 #. In "Add a variable" section, fill in the following text field/area.
 
@@ -280,7 +276,7 @@ If your development involves private Gitlab repos, additional setting is needed 
       gitlab.com ecdsa-sha2-nistp256 RandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequence
       # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
 
-#. Add a public key (`refrence <https://docs.gitlab.com/ce/ssh/README.html#deploy-keys>`_) to the private repos your repo accesses. You may need to ask the admin of that repo.
+#. Add a public key (reference for `Gitlab <https://docs.gitlab.com/ce/ssh/README.html#deploy-keys>`_ and for `GitHub <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`_) to the private repos your CI jobs accesses. You may need to ask the admin of that repo.
 
 References:
 
