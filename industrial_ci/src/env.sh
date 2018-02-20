@@ -86,6 +86,9 @@ if [ -z "$OS_CODE_NAME" ]; then
     "kinetic"|"lunar")
         OS_CODE_NAME="xenial"
         ;;
+    "melodic")
+        OS_CODE_NAME="bionic"
+        ;;
     *)
         error "ROS distro '$ROS_DISTRO' is not supported"
         ;;
