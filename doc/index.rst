@@ -22,10 +22,12 @@ Supported ROS distributions
 
 Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
 
+* `Hydro <http://wiki.ros.org/hydro>`_ *(legacy)*
 * `Indigo <http://wiki.ros.org/indigo>`_
-* `Jade <http://wiki.ros.org/jade>`_
+* `Jade <http://wiki.ros.org/jade>`_ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`_
 * `Lunar <http://wiki.ros.org/lunar>`_
+* `Melodic <http://wiki.ros.org/melodic>`_
 
 Terminology
 ----------------
