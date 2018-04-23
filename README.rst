@@ -37,28 +37,28 @@ For Travis CI
 
 1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`_). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
 
-2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci`, like below:
 
 ::
 
   install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
-    - .ci_config/travis.sh
+    - .industrial_ci/travis.sh
 
-* Note: The name `.ci_config` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name as long as the folder is hidden (by being prepended by ".").
+* Note: The name `.industrial_ci` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name (recommended practice to keep the folder hidden (by prepending ".").
 
 For Gitlab CI
 -------------
 
-1. In `.gitlab-ci.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+1. In `.gitlab-ci.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci`, like below:
 
 ::
 
   install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
-    - .ci_config/gitlab.sh
+    - .industrial_ci/gitlab.sh
 
 Concrete examples of config files
 -------------------------------------

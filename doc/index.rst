@@ -25,7 +25,7 @@ Supported ROS Distributions
 
 Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
 
-* `Hydro <http://wiki.ros.org/hydro>`_ *(legacy)*
+* `Hydro <http://wiki.ros.org/hydro>`_ *(EOL)*
 * `Indigo <http://wiki.ros.org/indigo>`_
 * `Jade <http://wiki.ros.org/jade>`_ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`_
@@ -120,21 +120,21 @@ Here are some operations in your client repositories.
 To start using CI config stored in this repo
 --------------------------------------------------
 
-With the following few short steps, you can start in your client repository using CI configurations stored in here (`industrial_ci` repository).
+With the following few short steps, you can start in your client repository using `industrial_ci` scripts.
 
 1. Don't forget to activate CI for your repository.
 
 - For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
 
-2. In `CI config <#terminology>`_ file in your client repo, add a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `CI config <#terminology>`_ file in your client repo, add a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .inductrial_ci`, like below:
 ::
 
   install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
-    - .ci_config/travis.sh
+    - .industrial_ci/travis.sh
 
-* Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
+* Note: The name `.industrial_ci` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name (recommended practice to keep the folder hidden (by prepending ".").
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
 * A Gitlab CI config can be found in `.gitlab-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/.gitlab-ci.yml>`_.
 
@@ -185,7 +185,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **CATKIN_PARALLEL_JOBS** (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * **CATKIN_PARALLEL_TEST_JOBS** (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * **CCACHE_DIR** (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#cache-build-artifacts-to-speed-up-the-subsequent-builds-if-any>`_
-* **CI_PARENT_DIR** (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
+* **CI_PARENT_DIR** (default: .industrial_ci): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
 * **DEBUG_BASH** (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
 * **DOCKER_BASE_IMAGE** (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
 * **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
@@ -453,11 +453,11 @@ First time you define the dependency to this repo
 
 ::
 
-  CLIENTREPO_LOCAL$ git submodule add https://github.com/ros-industrial/industrial_ci .ci_config
+  CLIENTREPO_LOCAL$ git submodule add https://github.com/ros-industrial/industrial_ci .industrial_ci
 
 This standard `git submodule` command:
 
-* hooks up your client repository to this repo by the name "`.ci_config`" (this name is hardcoded and mandatory).
+* hooks up your client repository to this repo by the name "`.industrial_ci`" (this name is hardcoded and mandatory).
 * stores the configuration in a file called `.gitmodules`.
 
 2. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_USER).
@@ -467,7 +467,7 @@ This standard `git submodule` command:
 ::
 
   script:
-    - .ci_config/ci.sh
+    - .industrial_ci/ci.sh
     #- ./your_non-docker_after.sh  # Optional. Explained later
 
 Also, the example of entire file `CI config <#terminology>`_ can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
@@ -506,7 +506,7 @@ If what you want to customize is within the `CI process <#what-are-checked>`_, y
       - BEFORE_SCRIPT='./your_custom_PREprocess.sh'
       - AFTER_SCRIPT='./your_custom_POSTprocess.sh'
   script:
-    - .ci_config/ci.sh
+    - .industrial_ci/ci.sh
 
 Multiple commands can be passed, as in a general `bash` manner.::
 
@@ -529,7 +529,7 @@ You can add your own commands before/after the main processes as follows.
 
   script:
     - ./your_non-docker_before.sh  <-- Runs on CI server natively.
-    - .ci_config/ci.sh             <-- Runs on Docker on CI server.
+    - .industrial_ci/ci.sh             <-- Runs on Docker on CI server.
     - ./your_non-docker_after.sh   <-- Runs on CI server natively.
 
 NOTE. CI native env vars can be sent to Docker (see `this section <#pass-custom-variables-to-docker>`_). The example above is useful e.g. when you have many variables to deal with. Anyways, both ways are valid.

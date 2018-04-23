@@ -6,6 +6,6 @@ language: generic
 env:
   - ROS_DISTRO="indigo"
 install:
-  - git clone --depth 1 https://github.com/ros-industrial/industrial_ci.git .ci_config  
+  - git clone --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci  
 script: 
-  - .ci_config/ci.sh
+  - .industrial_ci/ci.sh
