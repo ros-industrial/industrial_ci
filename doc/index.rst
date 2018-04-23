@@ -107,10 +107,10 @@ Your client repository does NOT need to pass all of above steps; in fact you can
 Prerequisite
 ============
 
-In order for your repository to get checked with configurations in `industrial_ci`, it needs:
+To run `industrial_ci`, each package in your repository needs to be:
 
-* To be a `Catkin package <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
-* Docker image for the targeted operating system is available on a Docker registry (e.g. http://hub.docker.com, Gitlab registry) either publicly or privately.
+* compatible on the `Supported Platform <#supported-platform>`_.
+* `"Catkin package" <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
 
 Basic Usage
 ===========
