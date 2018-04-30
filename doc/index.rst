@@ -185,7 +185,6 @@ Note that some of these currently tied only to a single option, but we still lea
 * **CATKIN_PARALLEL_JOBS** (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
 * **CATKIN_PARALLEL_TEST_JOBS** (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
 * **CCACHE_DIR** (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#cache-build-artifacts-to-speed-up-the-subsequent-builds-if-any>`_
-* **CI_PARENT_DIR** (default: .industrial_ci): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
 * **DEBUG_BASH** (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
 * **DOCKER_BASE_IMAGE** (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
 * **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
@@ -282,14 +281,6 @@ References:
 
 - https://docs.gitlab.com/ce/ssh/README.html
 - https://docs.gitlab.com/ee/ci/ssh_keys/README.html
-
-Pass custom variables to Docker
--------------------------------
-
-On CI platform usually some variables are available for the convenience. Since all checks using `industrial_ci` are NOT running directly on the operating system running on CI, but instead running on `Docker` where those variables are not defined, dozens of them are already passed for you (you can see `the list of those variables <https://github.com/ros-industrial/industrial_ci/blob/master/industrial_ci/src/docker.env>`_).
-
-Still, you may want to pass some other vars. `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE'` should do the trick.
-You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=42'` (format varies per CI platform. These are Gitlab CI example).
 
 (Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
@@ -516,7 +507,7 @@ Multiple commands are easier to be handled if they are put into a dedicated scri
 
     - BEFORE_SCRIPT='./my_before_script.sh'
 
-NOTE: In general the scripts are run as root in a Docker container. If you configures a different (base) Docker image, the user could be changed to non-root. But since we need to install packages the (base) image should set-up `sudo` for this user.
+NOTE: In general the scripts are run as root in a Docker container. If you configure a different (base) Docker image, the user could be changed to non-root. But since we need to install packages the (base) image should set-up `sudo` for this user.
 
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
