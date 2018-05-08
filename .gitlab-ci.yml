@@ -15,21 +15,21 @@ services:
 
 before_script:
   - apk add --update bash coreutils tar # install industrial_ci dependencies
-  # for regular users: - git clone https://github.com/ros-industrial/industrial_ci .ci_config
-  - mkdir .ci_config && cp -a * .ci_config # this is only needed for branch testing of industrial_ci itself
+  # for regular users: - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+  - mkdir .industrial_ci && cp -a * .industrial_ci # this is only needed for branch testing of industrial_ci itself
 
 # setup the actual tests
 
 indigo:
-  script: .ci_config/gitlab.sh
+  script: .industrial_ci/gitlab.sh
   variables:
     ROS_DISTRO: "indigo"
 
 jade:
-  script: .ci_config/gitlab.sh ROS_DISTRO=jade  # alternate syntax
+  script: .industrial_ci/gitlab.sh ROS_DISTRO=jade  # alternate syntax
 
 kinetic:
-  script: .ci_config/gitlab.sh
+  script: .industrial_ci/gitlab.sh
   variables:
     ROS_DISTRO: "kinetic"
     PRERELEASE: "true"

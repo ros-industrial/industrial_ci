@@ -11,27 +11,44 @@ Introduction
 
 This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`_ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`_ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-As of December 2015, this repo provides configuration for `Travis CI`. The CI config in this repository is intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of November 2017, this repo provides configuration for `Travis CI` and `Gitlab CI`. The CI scripts in this repository are intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
 For a brief introduction, you could also check a presentation:
 
 * `ROS-Industrial community meeting <http://rosindustrial.org/news/2016/6/14/ros-i-community-web-meeting-june-2016>`_
 
-Supported ROS distributions
-----------------------------------
+Supported Platform
+------------------
+
+Supported ROS Distributions
++++++++++++++++++++++++++++
 
 Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`_ are supported.
 
-* `Hydro <http://wiki.ros.org/hydro>`_ *(legacy)*
+* `Hydro <http://wiki.ros.org/hydro>`_ *(EOL)*
 * `Indigo <http://wiki.ros.org/indigo>`_
 * `Jade <http://wiki.ros.org/jade>`_ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`_
 * `Lunar <http://wiki.ros.org/lunar>`_
 * `Melodic <http://wiki.ros.org/melodic>`_
 
+Supported CIs
++++++++++++++
+
+* Gitlab CI
+* Travis CI
+
+As of January 2018, this document uses the format of `Travis CI` by default, unless specified.
+
+Variety of operating system by utilizing Docker
+-----------------------------------------------
+
+After `version 0.3.3 <http://docs.ros.org/kinetic/changelogs/industrial_ci/changelog.html>`_, all checks run on `Docker` so that you can have the variety of the operating system to check your software against, freed from the limitation of your CI platform (e.g. as of 2017 on `Travis CI`, Ubuntu 16.04 isn't available yet).
+
 Terminology
 ----------------
 
+* **CI config**: `.travis.yml` for Travis CI. `.gitlab-ci.yml` for `Gitlab CI`.
 * **client repository**: The repositories that use the configuration stored in this repo to run CI jobs.
 * **downstream packages**: The software packages that depend on the package that's targetted to be tested using industrial_ci.
 * **merge parent**: The branch that your pull/merge request is opened against.
@@ -90,10 +107,10 @@ Your client repository does NOT need to pass all of above steps; in fact you can
 Prerequisite
 ============
 
-In order for your repository to get checked with configurations in `industrial_ci`, it needs:
+To run `industrial_ci`, each package in your repository needs to be:
 
-* To be a `Catkin package <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
-* Build-able on Linux (as of Dec 2015, Ubuntu 14.04/Trusty is used). Although your repository is not necessarilly intended for Linux, checks are run on Linux.
+* compatible on the `Supported Platform <#supported-platform>`_.
+* `"Catkin package" <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`_ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
 
 Basic Usage
 ===========
@@ -103,20 +120,21 @@ Here are some operations in your client repositories.
 To start using CI config stored in this repo
 --------------------------------------------------
 
-With the following few short steps, you can start in your client repository using CI confiurations stored in here (`industrial_ci` repository).
+With the following few short steps, you can start in your client repository using `industrial_ci` scripts.
 
-1. Don't forget to activate Travis CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER).
+1. Don't forget to activate CI for your repository.
 
-2. In `.travis.yml` file in your client repo, add in `before_config` section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+- For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
 
+2. In `CI config <#terminology>`_ file in your client repo, add a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .inductrial_ci`, like below:
 ::
 
-  before_config:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+  install:
+    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
-    - .ci_config/travis.sh
+    - .industrial_ci/travis.sh
 
-* Note that `.ci_config` is the required name of the cloned folder; it is hardcoded so you need to use this name.
+* Note: The name `.industrial_ci` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name (recommended practice to keep the folder hidden (by prepending ".").
 * Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
 * A Gitlab CI config can be found in `.gitlab-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/.gitlab-ci.yml>`_.
 
@@ -140,7 +158,7 @@ Advanced Usage
 Variables you can configure
 ------------------------------------
 
-You can configure the behavior in `.travis.yml` in your client repository.
+You can configure the behavior in `CI config <#terminology>`_ in your client repository.
 
 * OS to use. Defined at `dist` tag.
 
@@ -153,50 +171,49 @@ Optional environment variables
 
 Note that some of these currently tied only to a single option, but we still leave them for the future when more options become available (e.g. ament with BUILDER).
 
-* `ABICHECK_MERGE` (default: not set): Used only when `ABICHECK_URL` is set. For travis it can be set to 'auto' to auto-detect pull requests. If set to 'true' the merge parent (see `Terminology section <#terminology>`_) will be checked against.
-* `ABICHECK_URL` (default: not set): Run binary compatibility check with `ABICC <https://github.com/lvc/abi-compliance-checker>`_. The URL should point to a baseline archive (\*.tar.\*,\*.zip, \*.tgz or \*.tbz2). See more in `the ABI checks section <#abi-checks>`_)
-* `ABICHECK_VERSION` (default: not set): Used only when `ABICHECK_URL` is set. Version name (for display only) of the set of code, which the location is specified in `ABICHECK_URL` of. The version will be automatically read from the URL passed in `ABICHECK_URL` if possible, but for a URL that doesn't point to a version-based file name (e.g. the link for a tagged version on Gitlab doesn't).
-* `ADDITIONAL_DEBS` (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
-* `AFTER_SCRIPT`: (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`_ where `after_script` doesn't affect the build result, the result in the commands specified with this DOES affect the build result.
-* `BEFORE_SCRIPT`: (default: not set): Used to specify shell commands that run before building packages.
-* `BUILD_PKGS_WHITELIST` (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
-* `BUILDER` (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
-* `CATKIN_CONFIG` (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`_.
-* `CATKIN_LINT` (default: not set. Value range: [true|pedantic]): If `true`, run `catkin_lint <http://fkie.github.io/catkin_lint/>`_ with `--explain` option. If `pedantic`, `catkin_lint` command runs with `--strict -W2` option, i.e. more verbose output will print, and the CI job fails if there's any error and/or warning occurs.
-* `CATKIN_LINT_ARGS` (default: not set): If true, you can pass whatever argument(s) `catkin_lint` takes, except `--explain` that is set by default. Options can be delimit by space if passing multiple.
-* `CATKIN_PARALLEL_JOBS` (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
-* `CATKIN_PARALLEL_TEST_JOBS` (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
-* `CCACHE_DIR` (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#cache-build-artifacts-to-speed-up-the-subsequent-builds-if-any>`_
-* `CI_PARENT_DIR` (default: .ci_config): (NOT recommended to specify) This is the folder name that is used in downstream repositories in order to point to this repo.
-* `DEBUG_BASH` (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
-* `DOCKER_BASE_IMAGE` (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
-* `DOCKER_IMAGE` (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
-* `DOCKER_FILE` (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
-* `DOCKER_BUILD_OPTS` (default: not set): Used do specify additional build options for Docker.
-* `DOCKER_RUN_OPTS` (default: not set): Used do specify additional run options for Docker.
-* `EXPECT_EXIT_CODE` (default: 0): exit code must match this value for test to succeed
-* `INJECT_QEMU` (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
-* `NOT_TEST_BUILD` (default: not set): If true, tests in `build` space won't be run.
-* `NOT_TEST_INSTALL` (default: not set): If true, tests in `install` space won't be run.
-* `OS_CODE_NAME` (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
-* `OS_NAME` (default: ubuntu): Possible options: {`ubuntu`, `debian`}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
-* `PRERELEASE` (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-ros-prerelease-test>`_.
-* `PRERELEASE_DOWNSTREAM_DEPTH` (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
-* `PRERELEASE_REPONAME` (default: TARGET_REPO_NAME): The  name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`_). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`_ for more usage.
-* `PKGS_DOWNSTREAM` (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
-* `ROS_PARALLEL_JOBS` (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
-* `ROS_PARALLEL_TEST_JOBS` (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
-* `ROS_REPO` (default: ros-shadow-fixed): `ROS_REPO` can be used to set `ROS_REPOSITORY_PATH` based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
-* `ROS_REPOSITORY_PATH`: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (`http://packages.ros.org/ros/ubuntu`) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_ (`http://packages.ros.org/ros-shadow-fixed/ubuntu`)). Since version 0.3.4, `ROS_REPO` is recommended, and `ROS_REPOSITORY_PATH` is for more intermediate usage only (e.g. to specify your own binary repository (non-standard / in house)). Backward compatibility is preserved.
-* `ROSDEP_SKIP_KEYS` (default: not set): space-separated list of keys that should get skipped by `rosdep install`.
-* `ROSINSTALL_FILENAME` (default: .travis.rosinstall): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
-* `ROSWS` (default: wstool): Currently only `wstool` is available.
-* `TARGET_PKGS` (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
-* `UPSTREAM_WORKSPACE` (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
-* `USE_DEB` (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
-* `USE_MOCKUP` (default: not set): reletive path to mockup packages to be used for the tests
-* `VERBOSE_OUTPUT` (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode (except `run_tests` - see also `VERBOSE_TESTS`)
-* `VERBOSE_TESTS` (default: true): If `true`, build tool (e.g. Catkin) output prints in verbose mode during `run_tests` step.
+* **ABICHECK_MERGE** (default: not set): Used only when `ABICHECK_URL` is set. For travis it can be set to 'auto' to auto-detect pull requests. If set to 'true' the merge parent (see `Terminology section <#terminology>`_) will be checked against.
+* **ABICHECK_URL** (default: not set): Run binary compatibility check with `ABICC <https://github.com/lvc/abi-compliance-checker>`_. The URL should point to a baseline archive (\*.tar.\*,\*.zip, \*.tgz or \*.tbz2). See more in `the ABI checks section <#abi-checks>`_)
+* **ABICHECK_VERSION** (default: not set): Used only when `ABICHECK_URL` is set. Version name (for display only) of the set of code, which the location is specified in `ABICHECK_URL` of. The version will be automatically read from the URL passed in `ABICHECK_URL` if possible, but for a URL that doesn't point to a version-based file name (e.g. the link for a tagged version on Gitlab doesn't).
+* **ADDITIONAL_DEBS** (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
+* **AFTER_SCRIPT**: (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`_ where `after_script` doesn't affect the build result, the result in the commands specified with this DOES affect the build result. See more `here <./index.rst#run-pre-post-process-custom-commands>`_.
+* **BEFORE_SCRIPT**: (default: not set): Used to specify shell commands that run before building packages (more precisely, it gets called after the workspace to be built is prepared, but before the dependency of packages in that workspace is resolved). See more `here <./index.rst#run-pre-post-process-custom-commands>`_.
+* **BUILD_PKGS_WHITELIST** (default: not set): Packages to be built can be explicitly specified with this, in ROS package name format (i.e. using underscore. No hyphen). This is useful when your repo contains some packages that you don't want to be used upon testing. Downstream packages, if necessary, should be also specified using this. Also these packages are to be built when `NOT_TEST_INSTALL` is set. Finally, packages specified with this will be built together with those speicified using unimplmented `USE_DEB`.
+* **BUILDER** (default: catkin): Currently only `catkin` is implemented (and with that `catkin_tools` is used instead of `catkin_make`. See `this discussion <https://github.com/ros-industrial/industrial_ci/issues/3>`_).
+* **CATKIN_CONFIG** (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`_.
+* **CATKIN_LINT** (default: not set. Value range: [true|pedantic]): If `true`, run `catkin_lint <http://fkie.github.io/catkin_lint/>`_ with `--explain` option. If `pedantic`, `catkin_lint` command runs with `--strict -W2` option, i.e. more verbose output will print, and the CI job fails if there's any error and/or warning occurs.
+* **CATKIN_LINT_ARGS** (default: not set): If true, you can pass whatever argument(s) `catkin_lint` takes, except `--explain` that is set by default. Options can be delimit by space if passing multiple.
+* **CATKIN_PARALLEL_JOBS** (default: -p4): Maximum number of packages to be built in parallel that is passed to underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools`. See for more detail about `number of build jobs <http://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#controlling-the-number-of-build-jobs>`_ and `documentation of catkin_tools <https://catkin-tools.readthedocs.org/en/latest/verbs/catkin_build.html#full-command-line-interface>`_ that this env variable is passed to internally in `catkin-tools`.
+* **CATKIN_PARALLEL_TEST_JOBS** (default: -p4): Maximum number of packages which could be examined in parallel during the test run. If not set it's filled by `ROS_PARALLEL_JOBS`.
+* **CCACHE_DIR** (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#cache-build-artifacts-to-speed-up-the-subsequent-builds-if-any>`_
+* **DEBUG_BASH** (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
+* **DOCKER_BASE_IMAGE** (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
+* **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
+* **DOCKER_FILE** (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
+* **DOCKER_BUILD_OPTS** (default: not set): Used do specify additional build options for Docker.
+* **DOCKER_RUN_OPTS** (default: not set): Used to specify additional run options for Docker.
+* **EXPECT_EXIT_CODE** (default: 0): exit code must match this value for test to succeed
+* **INJECT_QEMU** (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
+* **NOT_TEST_BUILD** (default: not set): If true, tests in `build` space won't be run.
+* **NOT_TEST_INSTALL** (default: not set): If true, tests in `install` space won't be run.
+* **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
+* **OS_NAME** (default: ubuntu): Possible options: {`ubuntu`, `debian`}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
+* **PRERELEASE** (default: false): If `true`, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-ros-prerelease-test>`_.
+* **PRERELEASE_DOWNSTREAM_DEPTH** (0 to 4, default: 0): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`_). NOTE: a job can run exponentially longer for the values greater than `0` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
+* **PRERELEASE_REPONAME** (default: TARGET_REPO_NAME): The  name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`_). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`_ for more usage.
+* **PKGS_DOWNSTREAM** (default: explained): Packages in downstream to be tested. By default, `TARGET_PKGS` is used if set, if not then `BUILD_PKGS` is used.
+* **ROS_PARALLEL_JOBS** (default: -j8): Maximum number of packages to be built in parallel by the underlining build tool. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
+* **ROS_PARALLEL_TEST_JOBS** (default: -j8): Maximum number of packages which could be examined in parallel during the test run by the underlining build tool. If not set it's filled by `ROS_PARALLEL_JOBS`. As of Jan 2016, this is only enabled with `catkin_tools` (with `make` as an underlining builder).
+* **ROS_REPO** (default: ros-shadow-fixed): `ROS_REPO` can be used to set `ROS_REPOSITORY_PATH` based on known aliases: 'ros`/`main`, 'ros-shadow-fixed`/`testing` or `building`.
+* **ROS_REPOSITORY_PATH**: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (`http://packages.ros.org/ros/ubuntu`) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`_ (`http://packages.ros.org/ros-shadow-fixed/ubuntu`)). Since version 0.3.4, `ROS_REPO` is recommended, and `ROS_REPOSITORY_PATH` is for more intermediate usage only (e.g. to specify your own binary repository (non-standard / in house)). Backward compatibility is preserved.
+* **ROSDEP_SKIP_KEYS** (default: not set): space-separated list of keys that should get skipped by `rosdep install`.
+* **ROSINSTALL_FILENAME** (default: .travis.rosinstall): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
+* **ROSWS** (default: wstool): Currently only `wstool` is available.
+* **TARGET_PKGS** (default: not set): Used to fill `PKGS_DOWNSTREAM` if it is not set. If not set packages are set using the output of `catkin_topological_order` for the source space.
+* **UPSTREAM_WORKSPACE** (default: debian): When set as `file`, the dependended packages that need to be built from source are downloaded based on a `.rosinstall` file in your repository. Use `$ROSINSTALL_FILENAME` to specify the file name. When set to a URL, downloads the rosinstall configuration from an ``http`` location. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#optional-build-depended-packages-from-source>`_.
+* **USE_DEB** (*DEPRECATED*: use `UPSTREAM_WORKSPACE` instead. default: true): if `true`, `UPSTREAM_WORKSPACE` will be set as `debian`. if `false`, `file` will be set. See `UPSTREAM_WORKSPACE` section for more info.
+* **USE_MOCKUP** (default: not set): reletive path to mockup packages to be used for the tests
+* **VERBOSE_OUTPUT** (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode.
+* **VERBOSE_TESTS** (default: true): If `true`, build tool (e.g. Catkin) output prints in verbose mode during `run_tests` step.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
@@ -210,16 +227,62 @@ Pulling Docker image from an online hub
 
 You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as long as the following requirement is met:
 
-* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`
 * sources.list set up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`_).
+* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`. If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
 
-If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`_).
+Some more notes:
 
-Note-1. This disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
+* Setting `DOCKER_IMAGE` is a bit tricky:
+   * disables the set-up of ROS based on `ROS_REPO` (or non-recommended `ROS_REPOSITORY_PATH`), and ROS_DISTRO.
+   * but `ROS_DISTRO` still needs to be set.  
+* Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
 
-Note-2. For some images, `ROS_DISTRO` variable still needs to be set. This holds for `ROS official Docker images <https://hub.docker.com/_/ros/>`_ as of Sept. 2017.
+Pass custom variables to Docker
+-------------------------------
 
-(Optional but recommended) Subscribe to the change in this repo (industrial_ci)
+On CI platform usually some variables are available for the convenience. Since all checks using `industrial_ci` are NOT running directly on the operating system running on CI, but instead running on `Docker` where those variables are not defined, dozens of them are already passed for you (you can see `the list of those variables <https://github.com/ros-industrial/industrial_ci/blob/master/industrial_ci/src/docker.env>`_).
+
+Still, you may want to pass some other vars. `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE'` should do the trick.
+You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=42'` (format varies per CI platform. These are Gitlab CI example).
+
+(Gitlab CI) Access to private repositories
+------------------------------------------
+
+If your Gitlab CI jobs require access to private repos, additional settings are needed both on:
+
+- Your repo: Add ssh private keys in the CI settings.
+- The private repos the CI jobs access: Matching public keys must be set as `Deploy Key`.
+
+#. If you haven't done so, create SSH key pair (`reference on gitlab.com <https://docs.gitlab.com/ce/ssh/README.html#generating-a-new-ssh-key-pair>`_).
+#. Navigate to "Settings > CI/CD" in your repo.
+#. Expand "`Secret variables`" section.
+#. In "Add a variable" section, fill in the following text field/area.
+
+   #. **Key**: `SSH_PRIVATE_KEY`
+   #. **Value**: Copy paste the entire content of your private key file.
+
+     #. Include the header and footer, i.e.  `-----BEGIN/END RSA PRIVATE KEY-----`.
+#. In "Add a variable" section again, fill in the following text field/area.
+
+   #. **Key**: `SSH_SERVER_HOSTKEYS`
+   #. **Value**: Copy paste the entire line of the following: On your Linux computer, run `ssh-keyscan gitlab.com`. You should get a hash key entry/ies. Copy the entire line that is NOT commented out. For example, the author gets the following, and copied the 2nd line (, which may render as separate lines on your web browser, but it's a long single line):
+
+     ::
+
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+      gitlab.com ssh-rsa RandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequence
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+      gitlab.com ecdsa-sha2-nistp256 RandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequenceRandomKeySequence
+      # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
+
+#. Add a public key (reference for `Gitlab <https://docs.gitlab.com/ce/ssh/README.html#deploy-keys>`_ and for `GitHub <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`_) to the private repos your CI jobs accesses. You may need to ask the admin of that repo.
+
+References:
+
+- https://docs.gitlab.com/ce/ssh/README.html
+- https://docs.gitlab.com/ee/ci/ssh_keys/README.html
+
+(Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
 Because of the aforementioned responsibility for the maintainers to watch the changes in `industrial_ci`, `you're encouraged to subscribe to the updates in this repository <https://github.com/ros-industrial/industrial_ci/subscription>`_.
@@ -227,9 +290,9 @@ Because of the aforementioned responsibility for the maintainers to watch the ch
 Run ROS Prerelease Test
 -------------------------------------------------------------------------------------
 
-Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your `Travis CI` test.
+Running `docker-based ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`_ is strongly recommended when you make a release. There are, however, some inconvenience (requires host computer setup, runs on your local host, etc. Detail discussed in `a ticket <https://github.com/ros-industrial/industrial_ci/pull/35#issue-150581346>`_). `industrial_ci` provides a way to run it on your CI.
 
-To do so, add a single line to your Travis config (eg. `.travis.yml`):
+To do so, add a single line to your `CI config <#terminology>`_:
 
 ::
 
@@ -241,16 +304,16 @@ Or with more configuration:
 
   ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
 
-NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in Travis config.
+NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_. To run both, use `matrix` in `CI config <#terminology>`_.
 
 See the usage sample in `.travis in indusrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`_.
 
-The following is some tips to be shared for running Prerelease Test on Travis CI using `industrial_ci`.
+The following is some tips to be shared for running Prerelease Test on CI using `industrial_ci`.
 
 (Workaround) Don't want to always run Prerelease Test
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire Travis jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the Travis result that eagerly (besides that, Travis CI limits the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `.travis.yml` only defines a check entry with `PRERELEASE` turned on. E.g.:
+The jobs that run Prerelease Test may usually take longer than the tests defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`_, which can result in longer time for the entire CI jobs to finish. This is usually okay, as developers who are concerned with PRs might not wait for the CI result that eagerly (besides that, most CI servers limit the maximum run time as 50 minutes so there can't be very long run). If you're concerned, however, then you may want to separately run the Prerelease Test. An example way to do this is to create a branch specifically for Prerelease Test where `CI config <#terminology>`_ only defines a check entry with `PRERELEASE` turned on. E.g.:
 
 ::
 
@@ -260,7 +323,7 @@ The jobs that run Prerelease Test may usually take longer than the tests defined
       - ROS_DISTRO=indigo PRERELEASE=true
   :
 
-Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the Travis result is. This branch is solely for Prerelease Test purpose.
+Then open a pull request using this branch against the branch that the change is subject to be merged. You do not want to actually merge this branch no matter what the CI result is. This branch is solely for Prerelease Test purpose.
 
 ABI checks
 ----------
@@ -312,7 +375,7 @@ It is up to each repository's maintainer for which baseline code you check ABI a
     - ABI check runs per every change/push into your branch, which is superfluous.
     - Reasonable for pull requests.
 
-(Optional) Customize `catkin config`
+Customize `catkin config`
 ------------------------------------
 
 By default, `industrial_ci` builds packages with `catkin config --install`, which requires `install` rules to pass CI jobs. This might not be suitable in some cases, e.g. with your experimental packages where you have no plan to make them deployable so that `install` rules are nothing but extra burden. Also, you may want to add addtional configuration for `catkin config`. In these cases define "`CATKIN_CONFIG`" variable.
@@ -355,32 +418,17 @@ https://docs.travis-ci.com/user/caching/#Arbitrary-directories
 
  * Define `CCACHE_DIR` variable. You can apply to all of your jobs by something like below::
 
-  env:
-    global:
-      - CCACHE_DIR=$HOME/.ccache
-    matrix:
-      :
+    env:
+      global:
+        - CCACHE_DIR=$HOME/.ccache
+      matrix:
+       :
 
 Or define `CCACHE_DIR` per job.
 
 NOTE:
   * Beware, if you use `run_ci <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#id39>`_, the files will be owned by root!
   * Caching may not work for packages with "smaller" number of files (see also `this discussion <https://github.com/ros-industrial/industrial_ci/pull/182>`_).
-
-Add repository-specific CI config in addition
-----------------------------------------------------------------
-
-Sometimes CI config stored in `industrial_ci` repo may not be sufficient for your purpose. In that case you can add your own config, while you still take advantage of `industrial_ci` repository.
-
-1. In `.travis.yml` file in your client repo, add the portion below:
-
-::
-
-  script:
-    - .ci_config/travis.sh
-    - ./travis.sh
-
-2. Create `travis.sh` file and define the checks you wish to add. NOTE: this `.sh` file you add here is a normal shell script, so this shouldn't be written in `travis CI` grammar.
 
 To use specific version of industrial_ci in your client repo
 -------------------------------------------------------------------------------------
@@ -396,24 +444,24 @@ First time you define the dependency to this repo
 
 ::
 
-  CLIENTREPO_LOCAL$ git submodule add https://github.com/ros-industrial/industrial_ci .ci_config
+  CLIENTREPO_LOCAL$ git submodule add https://github.com/ros-industrial/industrial_ci .industrial_ci
 
 This standard `git submodule` command:
 
-* hooks up your client repository to this repo by the name "`.ci_config`" (this name is hardcoded and mandatory).
+* hooks up your client repository to this repo by the name "`.industrial_ci`" (this name is hardcoded and mandatory).
 * stores the configuration in a file called `.gitmodules`.
 
 2. Don't forget to activate CI on your github repository (you may do so on https://travis-ci.org/profile/YOUR_GITHUB_USER).
 
-3. In `.travis.yml` file in your client repo, add the portion below:
+3. In `CI config <#terminology>`_ file in your client repo, add the portion below:
 
 ::
 
   script:
-    - .ci_config/travis.sh
-    #- ./travis.sh  # Optional. Explained later
+    - .industrial_ci/ci.sh
+    #- ./your_non-docker_after.sh  # Optional. Explained later
 
-Also, the example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
+Also, the example of entire file `CI config <#terminology>`_ can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/.travis.yml>`_.
 
 That's it.
 
@@ -433,29 +481,51 @@ Maintainers of client repos are responsible for applying the changes that happen
 Run pre/post-process custom commands
 -----------------------------------------
 
-You may want to add custom steps prior to the setup defined in `./travis.sh <./travis.sh>`_. Example usecases:
+You may want to add custom steps prior/subsequent to the setup defined in `industrial_ci`. Example usecases:
 
 * A device driver package X in your repository or in your repository's dependency requires a prorietary library installed. This library is publicly available, but not via apt or any package management system and thus the only way you can install it is in a classic way (unzip, run installer etc.) (`More discussion <https://github.com/ros-industrial/industrial_ci/issues/14>`_).
 
 * You want to run `ros_lint` (`thi discussion <https://github.com/ros-industrial/industrial_ci/issues/58#issuecomment-223601916>`_ may be of your interest).
 
-In such cases, you can specify the script(s) in `BEFORE_SCRIPT` and/or `AFTER_SCRIPT` variables. For example::
+Customize within the CI process
+++++++++++++++++++++++++++++++++
+
+If what you want to customize is within the `CI process <#what-are-checked>`_, you can specify the script(s) in `BEFORE_SCRIPT` and/or `AFTER_SCRIPT` variables. For example::
 
   env:
     global:
       - BEFORE_SCRIPT='./your_custom_PREprocess.sh'
       - AFTER_SCRIPT='./your_custom_POSTprocess.sh'
   script:
-    - .ci_config/travis.sh
+    - .industrial_ci/ci.sh
 
-NOTE: If you specify scripts in `script` section without using aforementioned variables, those will be run directly on CI, not on the `Docker` where `.ci_config/travis.sh` runs on.::
+Multiple commands can be passed, as in a general `bash` manner.::
+
+    - BEFORE_SCRIPT='ls /tmp/1 && ls /tmp/2 || ls /tmp/3'
+
+Multiple commands are easier to be handled if they are put into a dedicated script::
+
+    - BEFORE_SCRIPT='./my_before_script.sh'
+
+NOTE: In general the scripts are run as root in a Docker container. If you configure a different (base) Docker image, the user could be changed to non-root. But since we need to install packages the (base) image should set-up `sudo` for this user.
+
+Customize outside of the CI process
++++++++++++++++++++++++++++++++++++
+
+As `explained in Docker's usage <#use-custom-docker-images>`_ section, `main CI processes of industrial_ci <#what-are-checked>`_ run on `Docker`. There may be situations where you want to run additional processes before or after the main pipeline. This could be particularly the case when you'd like to take advantage of CI's native resources (e.g. environment variables your CI platform defines) more easily.
+
+You can add your own commands before/after the main processes as follows.
+
+::
 
   script:
-    - ./your_custom_PREprocess.sh  <-- Runs on CI server natively.
-    - .ci_config/travis.sh         <-- Runs on Docker on CI server.
-    - ./your_custom_POSTprocess.sh <-- Runs on CI server natively.
+    - ./your_non-docker_before.sh  <-- Runs on CI server natively.
+    - .industrial_ci/ci.sh             <-- Runs on Docker on CI server.
+    - ./your_non-docker_after.sh   <-- Runs on CI server natively.
 
-(Optional) Build depended packages from source
+NOTE. CI native env vars can be sent to Docker (see `this section <#pass-custom-variables-to-docker>`_). The example above is useful e.g. when you have many variables to deal with. Anyways, both ways are valid.
+
+Build depended packages from source
 ----------------------------------------------
 
 By default the packages your package depend upon are installed via binaries. However, you may want to build them via source in some cases (e.g. when depended binaries are not available). There are a few ways to do so in `industrial_ci`; By utilizing `rosinstall <http://docs.ros.org/independent/api/rosinstall/html/>`_, you can specify the packages that you want to be built from source.
@@ -514,7 +584,7 @@ Use .rosinstall from external location
 
 You can utilize `.rosinstall` file stored anywhere as long as its location is URL specifyable. To do so, set its complete path URL directly to `UPSTREAM_WORKSPACE`.
 
-(Optional) Type of OS and distribution
+Type of OS and distribution
 --------------------------------------
 
 Ubuntu and its distro are guessed by default from ROS_DISTRO
@@ -573,7 +643,7 @@ NOTE that this way the CI config (e.g. `.travis.yml`, `.gitlab-ci.yml`) are not 
 To do so,
 
 0. `Install Docker <https://docs.docker.com/engine/installation/linux/>`_
-1. Build and install industrial_ci (which is a `catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
+1. Build and install industrial_ci (which is `a catkin package <http://wiki.ros.org/ROS/Tutorials/CreatingPackage#ROS.2BAC8-Tutorials.2BAC8-catkin.2BAC8-CreatingPackage.What_makes_up_a_catkin_Package.3F>`_). Source setting.
 2. Change directory to the package you like to test.
 3. Run `run_ci` script with your settings.
 

@@ -32,41 +32,52 @@ Quick Start
 
 With a few steps, you can start in your client repository using CI confiurations stored in `industrial_ci`.
 
-1. Activate CI on your github repository.
+For Travis CI
+--------------
 
-- For `Travis CI <https://travis-ci.org/>`_), you may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
+1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`_). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
 
-2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .ci_config`, like below:
+2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci`, like below:
 
 ::
 
   install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
-    - .ci_config/travis.sh
+    - .industrial_ci/travis.sh
 
-* Note: The name `.ci_config` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name as long as the folder is hidden (by being prepended by ".").
+* Note: The name `.industrial_ci` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name (recommended practice to keep the folder hidden (by prepending ".").
+
+For Gitlab CI
+-------------
+
+1. Enable CI for your repo. Please refer to `official doc <https://docs.gitlab.com/ee/ci/quick_start/>`_ for the steps to do so. Note for Gitlab CI, necessary steps might be different between hosted version (i.e. the one on gitlab.com) v.s. the one on your own server, which Gitlab doesn't always clarify in its documentation.
+  1. For your server version, enable a runner for your Gitlab project which uses the Docker executor. See instructions on how to `install <https://docs.gitlab.com/runner/install/index.html>`_ and `register <https://docs.gitlab.com/runner/register/index.html>`_ such a runner with your Gitlab instance if you haven't done so yet.
+1. In `.gitlab-ci.yml` file in your client repo, add the following minimal configuration (this snippet can be the entire content of the file), replacing indigo for your chosen distro:
+
+::
+
+   image: docker:git
+   services:
+     - docker:dind
+   before_script:
+     - apk add --update bash coreutils tar
+     - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+   indigo:
+     script: .industrial_ci/gitlab.sh ROS_DISTRO=indigo
+
 
 Concrete examples of config files
 -------------------------------------
 
-For most of the cases, 
-For development branch intended for ROS Indigo:
-
-- `ros_canopen/.travis.yml <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
-
-For development branch intended for ROS Indigo and newer distros:
-
-- `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_: Indigo and Jade compatible.
-- `leap_motion/.travis.yml <https://github.com/ros-drivers/leap_motion/blob/954924befd2a6755f9d310f4a8b57aa526056a80/.travis.yml>`_: Indigo, Jade, Kinetic compatible. Also runs `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`_.
-
-For development branch intended for ROS Kinetic:
-
-- `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/a07f9089b0f6c8a931bab80b7fca959dd6bba05b/.travis.yml>`_
-
-For more complexed example:
-
-- `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/d09b8dd40d7f1fa1ad5b62323a1d6b2ca836e558/.travis.yml>`_ from the same repo. You can see how options are used.
+- A `template for Travis CI <doc/sample.travis.yml>`_.
+- For development branch intended for ROS Indigo: `ros_canopen <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
+- For development branch intended for ROS Indigo onward:
+   - `example 1 <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_ (Indigo and Jade compatible).
+   - `example 2 <https://github.com/ros-drivers/leap_motion/blob/954924befd2a6755f9d310f4a8b57aa526056a80/.travis.yml>`_ (Indigo, Jade, Kinetic compatible. Also runs `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`_).
+- For development branch intended for ROS Kinetic: `industrial_core <https://github.com/ros-industrial/industrial_core/blob/a07f9089b0f6c8a931bab80b7fca959dd6bba05b/.travis.yml>`_
+- For more complexed example: `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/d09b8dd40d7f1fa1ad5b62323a1d6b2ca836e558/.travis.yml>`_ from the same repo. You can see how options are used.
+- For Gitlab CI, a small `sample config <./.gitlab-ci.yml>`_.
 
 Metrics
 ========
