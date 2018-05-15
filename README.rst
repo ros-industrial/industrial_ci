@@ -86,17 +86,22 @@ There might not an easy way to precisely count how many repositories out there a
 
 - `Searching Github repos that contain string industrial_ci <https://github.com/search?p=1&q=industrial_ci+-repo%3Aros-industrial%2Findustrial_ci&ref=searchresults&type=Code&utf8=%E2%9C%93>`_) (with some duplicates. Excluding industrial_ci repo):
 
+  - 675 (May 15, 2018)
   - 457 (Dec 12, 2017)
   - 142 (Jan 20, 2017)
 
 - Github--> `Graphs` --> `Traffic` view (visible only to admins).
 
+  - May 15, 2018
+
+  .. figure:: http://ros-industrial.github.io/industrial_ci/images/industrial_ci_20180515_traffic.png
+
   - Dec 12, 2017
 
-  .. figure:: doc/industrial_ci_traffic_20171212.png
+  .. figure:: http://ros-industrial.github.io/industrial_ci/images/industrial_ci_traffic_20171212.png
 
   - Jan 20, 2017
 
-  .. figure:: doc/industrial_ci_traffic_20170120.png
+  .. figure:: http://ros-industrial.github.io/industrial_ci/images/industrial_ci_traffic_20170120.png
 
 EoF
