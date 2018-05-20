@@ -122,13 +122,13 @@ if [ -e $CATKIN_WORKSPACE/src/.rosinstall ]; then
     $ROSWS update -t $CATKIN_WORKSPACE/src
 fi
 # TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
-ln -s $TARGET_REPO_PATH $CATKIN_WORKSPACE/src
+ln -sf $TARGET_REPO_PATH $CATKIN_WORKSPACE/src
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
         error "mockup directory '$USE_MOCKUP' does not exist"
     fi
-    ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" $CATKIN_WORKSPACE/src
+    ln -sf "$TARGET_REPO_PATH/$USE_MOCKUP" $CATKIN_WORKSPACE/src
 fi
 
 catkin config --install
