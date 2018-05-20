@@ -187,9 +187,10 @@ Note that some of these currently tied only to a single option, but we still lea
 * **CCACHE_DIR** (default: not set): If set, `ccache <https://en.wikipedia.org/wiki/Ccache>`_ gets enabled for your build to speed up the subsequent builds in the same job if anything. See `detail. <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#cache-build-artifacts-to-speed-up-the-subsequent-builds-if-any>`_
 * **DEBUG_BASH** (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
 * **DOCKER_BASE_IMAGE** (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
-* **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
-* **DOCKER_FILE** (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
 * **DOCKER_BUILD_OPTS** (default: not set): Used do specify additional build options for Docker.
+* **DOCKER_FILE** (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
+* **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
+* **DOCKER_PULL** (default: true): set to false if custom docker image should not be pulled, e.g. if it was created locally
 * **DOCKER_RUN_OPTS** (default: not set): Used to specify additional run options for Docker.
 * **EXPECT_EXIT_CODE** (default: 0): exit code must match this value for test to succeed
 * **INJECT_QEMU** (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
