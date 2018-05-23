@@ -692,6 +692,12 @@ This will run the tests and commit the result to a Docker image `industrial-ci/r
 The hash is unique for each argument list, so `rerun_ci . ROS_DISTRO=melodic` and `rerun_ci . ROS_DISTRO=kinetic` do not mix  up.
 However, it will keep consuming disk space with each new combination.
 
+The cached images can be listed with
+::
+
+  $ rosrun industrial_ci rerun_ci --list
+
+
 For maintainers of industrial_ci repository
 ================================================
 

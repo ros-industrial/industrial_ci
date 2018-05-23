@@ -17,8 +17,35 @@
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+function show_help {
+  cat - <<'EOF'
+Usage:
+  rerun_ci --list
+  rerun_ci [--clean] TARGET_PATH [PARAM=VALUE>]...
+  rerun_ci --rm TARGET_PATH [PARAM=VALUE>]...
+EOF
+}
+
+case "$1" in
+"--list")
+  exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' $(docker images -q industrial-ci/rerun_ci/*)
+    ;;
+"--rm")
+  remove=true
+  shift
+    ;;
+"--clean")
+  clean=true
+  shift
+    ;;
+"-h" | "--help" | "")
+  show_help
+  exit 0
+    ;;
+esac
+
 if [ ! -d "$1" ]; then
-  echo "First argument need to be the target directory"
+  show_help
   exit 1
 fi
 
@@ -28,6 +55,13 @@ shift
 _COMMIT_IMAGE_MSG="$repo_dir $*"
 env_hash=($(sha256sum <<< "$_COMMIT_IMAGE_MSG"))
 _COMMIT_IMAGE="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
+
+if [ "$remove" ]; then
+  exec docker rmi $_COMMIT_IMAGE
+elif [ "$clean" ]; then
+  docker rmi $_COMMIT_IMAGE
+fi
+
 
 force_env=(_COMMIT_IMAGE=$_COMMIT_IMAGE _COMMIT_IMAGE_MSG=$_COMMIT_IMAGE_MSG)
 keep_env=(DOCKER_PORT=$DOCKER_PORT SSH_AUTH_SOCK=$SSH_AUTH_SOCK TERM=$TERM)
