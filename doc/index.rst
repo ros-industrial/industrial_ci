@@ -156,7 +156,7 @@ You can configure the behavior in `CI config <#terminology>`_ in your client rep
 
 Required environment variables:
 
-* `ROS_DISTRO`: Version of ROS in all lower case. E.g.: `indigo` / `jade`
+* `ROS_DISTRO`: Version of ROS in all lower case. E.g.: `indigo` / `jade`. If is is set in the custom Docker (base) image, it might be omitted in the script call.
 
 Optional environment variables
 ++++++++++++++++++++++++++++++++
@@ -228,7 +228,7 @@ Some more notes:
 
 * Setting `DOCKER_IMAGE` is a bit tricky:
    * disables the set-up of ROS based on `ROS_REPO` (or non-recommended `ROS_REPOSITORY_PATH`), and ROS_DISTRO.
-   * but `ROS_DISTRO` still needs to be set.
+   * but `ROS_DISTRO` needs to be set if it was not set in the image.
 * Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
 
 Pass custom variables to Docker
