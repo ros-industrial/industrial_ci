@@ -234,6 +234,7 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
         python-wstool \
         ros-$ROS_DISTRO-catkin \
         ssh-client \
+    && pip install --upgrade pip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 EOF
