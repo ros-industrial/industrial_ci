@@ -32,7 +32,7 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   fi
 
   # start SSH agent
-  eval $(ssh-agent -s)
+  eval "$(ssh-agent -s)"
   # add key to agent
   ssh-add <(echo "$SSH_PRIVATE_KEY") || { res=$?; echo "could not add ssh key"; exit $res; }
 
@@ -43,4 +43,4 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   fi
 fi
 
-env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash "$DIR_THIS/industrial_ci/src/ci_main.sh"

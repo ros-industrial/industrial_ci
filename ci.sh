@@ -25,4 +25,4 @@ export TARGET_REPO_PATH=${TARGET_REPO_PATH:-$(pwd)}
 export TARGET_REPO_NAME=${TARGET_REPO_NAME:-${TARGET_REPO_PATH##*/}}
 export _DO_NOT_FOLD=${_DO_NOT_FOLD:-true}
 
-env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash "$DIR_THIS/industrial_ci/src/ci_main.sh"

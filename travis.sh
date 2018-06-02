@@ -30,4 +30,4 @@ if [ "$ABICHECK_MERGE" = "auto" ]; then
   [ "$TRAVIS_PULL_REQUEST" = "false" ] || ABICHECK_MERGE=true
 fi
 
-env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash "$DIR_THIS/industrial_ci/src/ci_main.sh"
