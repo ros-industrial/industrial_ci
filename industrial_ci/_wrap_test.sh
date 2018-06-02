@@ -19,6 +19,11 @@
 
 set -e # exit script on errors
 
+# run shellcheck for all files
+files=($(find . -name '*.sh'))
+echo "shellcheck ${files[*]}"
+shellcheck -sbash "${files[@]}"
+
 if [ -n "$_EXTERNAL_REPO" ]; then
 
     export TRAVIS_BUILD_DIR=$(mktemp -d)
