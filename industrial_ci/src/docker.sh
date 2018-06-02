@@ -176,8 +176,8 @@ function ici_prepare_docker_image() {
     fi
   elif [ -z "$DOCKER_IMAGE" ]; then # image was not provided, use default
      ici_build_default_docker_image
-  else
-     docker pull "$DOCKER_IMAGE"
+  else # pull docker image if it hasn't been cached
+     if [ -z "$(docker images -q $DOCKER_IMAGE)" ]; then docker pull "$DOCKER_IMAGE"; fi
   fi
   ici_time_end # prepare_docker_image
 }
