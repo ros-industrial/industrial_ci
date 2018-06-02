@@ -33,3 +33,27 @@ kinetic:
   variables:
     ROS_DISTRO: "kinetic"
     PRERELEASE: "true"
+
+docker_pull_base:
+  script:
+    - docker pull ubuntu:xenial
+    - docker tag ubuntu:xenial industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_BASE_IMAGE="industrial-ci/ubuntu:xenial" EXPECT_EXIT_CODE=1
+
+docker_no_pull_base:
+  script:
+    - docker pull ubuntu:xenial
+    - docker tag ubuntu:xenial industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_BASE_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
+
+docker_pull:
+  script:
+    - docker pull rosindustrial/ci:kinetic-xenial-shadow-fixed
+    - docker tag rosindustrial/ci:kinetic-xenial-shadow-fixed industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" EXPECT_EXIT_CODE=1
+
+docker_no_pull:
+  script:
+    - docker pull rosindustrial/ci:kinetic-xenial-shadow-fixed
+    - docker tag rosindustrial/ci:kinetic-xenial-shadow-fixed industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
