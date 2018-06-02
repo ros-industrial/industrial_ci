@@ -24,23 +24,30 @@ set -e # exit script on errors
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
 # Define some env vars that need to come earlier than util.sh
-export ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
+export ICI_SRC_PATH
+ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
 
-source ${ICI_SRC_PATH}/util.sh
-source ${ICI_SRC_PATH}/env.sh
-source ${ICI_SRC_PATH}/docker.sh
+# shellcheck source=industrial_ci/src/util.sh
+source "${ICI_SRC_PATH}/util.sh"
+# shellcheck source=industrial_ci/src/env.sh
+source "${ICI_SRC_PATH}/env.sh"
+# shellcheck source=industrial_ci/src/docker.sh
+source "${ICI_SRC_PATH}/docker.sh"
 
 trap ici_exit EXIT # install industrial_ci exit handler
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
-  source ${ICI_SRC_PATH}/tests/ros_prerelease.sh
+  # shellcheck source=industrial_ci/src/tests/ros_prerelease.sh
+  source "${ICI_SRC_PATH}/tests/ros_prerelease.sh"
   run_ros_prerelease
 elif [ -n "$ABICHECK_URL" ]; then
-  source ${ICI_SRC_PATH}/tests/abi_check.sh
+  # shellcheck source=industrial_ci/src/tests/abi_check.sh
+  source "${ICI_SRC_PATH}/tests/abi_check.sh"
   run_abi_check
 else
-  source ${ICI_SRC_PATH}/tests/source_tests.sh
+  # shellcheck source=industrial_ci/src/tests/source_tests.sh
+  source "${ICI_SRC_PATH}/tests/source_tests.sh"
 fi
 
 if [ "${AFTER_SCRIPT// }" != "" ]; then
