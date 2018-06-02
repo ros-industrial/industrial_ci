@@ -166,7 +166,7 @@ function ici_prepare_docker_image() {
   ici_time_start prepare_docker_image
 
   if [ -n "$DOCKER_FILE" ]; then # docker file was provided
-    DOCKER_IMAGE=${DOCKER_IMAGE:"industrial-ci/custom"}
+    DOCKER_IMAGE=${DOCKER_IMAGE:-"industrial-ci/custom"}
     if [ -f "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if single file, run without context
        ici_docker_build - < "$TARGET_REPO_PATH/$DOCKER_FILE" > /dev/null
     elif [ -d "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if path, run with context
