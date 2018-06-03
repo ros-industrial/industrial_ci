@@ -20,6 +20,17 @@
 ## util.sh
 ## This is a script where the functions commonly used within the industrial_ci repo are defined.
 
+ANSI_RED=31
+ANSI_GREEN=32
+ANSI_YELLOW=33
+ANSI_BLUE=34
+
+function ici_color_output {
+  local c=$1
+  shift
+  echo -e "\e[${c}m$*\e[0m"
+}
+
 #######################################
 # Starts a timer section on Travis CI
 #
@@ -44,7 +55,7 @@ function ici_time_start {
         echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
         echo -en "\e[0Kici_time:start:$ICI_TIME_ID"
     fi
-    echo -e "\e[34m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
+    ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
@@ -64,7 +75,7 @@ function ici_time_start {
 #######################################
 function ici_time_end {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    local color_wrap=${1:-32}
+    local color_wrap=${1:-${ANSI_GREEN}}
     local exit_code=${2:-$?}
 
     if [ -z $ICI_START_TIME ]; then echo '[ici_time_end] var ICI_START_TIME is not set. You need to call `ici_time_start` in advance. Rerutning.'; return; fi
@@ -74,7 +85,7 @@ function ici_time_end {
         echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$(($end_time - $ICI_START_TIME))\e[0K"
         echo -en "ici_fold:end:$ICI_FOLD_NAME"
     fi
-        echo -e "\e[${color_wrap}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
+    ici_color_output "$color_wrap" "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     echo -e "\e[0K\e[${color_wrap}mFunction $ICI_FOLD_NAME returned with code '${exit_code}' after $(( $elapsed_seconds / 60 )) min $(( $elapsed_seconds % 60 )) sec \e[0m"
 
     unset ICI_FOLD_NAME
@@ -98,7 +109,7 @@ function ici_exit {
 
     # end fold if needed
     if [ -n "$ICI_FOLD_NAME" ]; then
-        if [ $exit_code -ne "0" ]; then color_wrap=31; fi  # Red color for errors
+        if [ $exit_code -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
         ici_time_end "$color_wrap" "$exit_code"
     fi
 
@@ -111,10 +122,24 @@ function ici_exit {
     exit $exit_code
 }
 
+function ici_warn {
+    ici_color_output ${ANSI_YELLOW} "$*"
+}
+
+function ici_mark_deprecated {
+  if ! [ "$IN_DOCKER" ]; then
+    local e=$1
+    shift
+    if [ "${!e}" ]; then
+      ici_warn "'$e' is deprecated. $*"
+    fi
+  fi
+}
+
 #######################################
 # Print an error message and calls "exit"
 #
-# * Wraps the section that is started by ici_time_start function with the echo color red (31).
+# * Wraps the section that is started by ici_time_start function with the echo color red (${ANSI_RED}).
 # * exit_code is taken from second argument or from the previous comman.
 # * If the final exit_code is 0, this function will exit 1 instead to enforce a test failure
 #
@@ -129,12 +154,20 @@ function ici_exit {
 function error {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
-        echo -e "\e[31m$1\e[0m" # print error in red
+        ici_color_output ${ANSI_RED} "$1"
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
         ici_exit 1
     fi
     ici_exit $exit_code
+}
+
+function ici_enforce_deprecated {
+    local e=$1
+    shift
+    if [ "${!e}" ]; then
+      error "'$e' is not used anymore. $*"
+    fi
 }
 
 if ! which sudo > /dev/null; then
