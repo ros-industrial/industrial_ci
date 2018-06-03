@@ -85,7 +85,7 @@ def read_env(env):
     if isinstance(env, dict):
         m = env['matrix']
         if 'global' in env:
-            g = ' '.join(env['global']),
+            g = ' '.join(env['global'])
     return g, m
 
 def parse_extra_args(args):
