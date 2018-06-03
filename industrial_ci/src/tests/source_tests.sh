@@ -59,9 +59,11 @@ sudo apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
-    sudo apt-get install -qq -y $ADDITIONAL_DEBS || error "One or more additional deb installation is failed. Exiting."
+    add_debs=($ADDITIONAL_DEBS)
+    sudo apt-get install -qq -y "${add_debs[@]}" || error "One or more additional deb installation is failed. Exiting."
 fi
-source /opt/ros/$ROS_DISTRO/setup.bash
+# shellcheck source=/dev/null
+source "/opt/ros/$ROS_DISTRO/setup.bash"
 
 ici_time_end  # setup_apt
 
@@ -80,7 +82,7 @@ if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
     sudo rosdep init
 fi
 ret_rosdep=1
-rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
+rosdep update || while [ "$ret_rosdep" != "0" ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
 
 ici_time_end  # setup_rosdep
 
@@ -89,9 +91,9 @@ ici_time_start setup_rosws
 ## BEGIN: travis' install: # Use this to install any prerequisites or dependencies necessary to run your build ##
 # Create workspace
 export CATKIN_WORKSPACE=~/catkin_ws
-mkdir -p $CATKIN_WORKSPACE/src
-if [ ! -f $CATKIN_WORKSPACE/src/.rosinstall ]; then
-  $ROSWS init $CATKIN_WORKSPACE/src
+mkdir -p "$CATKIN_WORKSPACE/src"
+if [ ! -f "$CATKIN_WORKSPACE/src/.rosinstall" ]; then
+  "$ROSWS" init "$CATKIN_WORKSPACE/src"
 fi
 case "$UPSTREAM_WORKSPACE" in
 debian)
@@ -99,40 +101,43 @@ debian)
     ;;
 file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to be built from source are downloaded based on $ROSINSTALL_FILENAME file.
     # Prioritize $ROSINSTALL_FILENAME.$ROS_DISTRO if it exists over $ROSINSTALL_FILENAME.
-    if [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO ]; then
+    if [ -e "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO" ]; then
         # install (maybe unreleased version) dependencies from source for specific ros version
-        $ROSWS merge -t $CATKIN_WORKSPACE/src file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO
-    elif [ -e $TARGET_REPO_PATH/$ROSINSTALL_FILENAME ]; then
+        "$ROSWS" merge -t "$CATKIN_WORKSPACE/src" "file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO"
+    elif [ -e "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME" ]; then
         # install (maybe unreleased version) dependencies from source
-        $ROSWS merge -t $CATKIN_WORKSPACE/src file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME
+        "$ROSWS" merge -t "$CATKIN_WORKSPACE/src" "file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME"
     else
         error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/$ROSINSTALL_FILENAME[.$ROS_DISTRO]' does not exist"
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
-    $ROSWS merge -t $CATKIN_WORKSPACE/src $UPSTREAM_WORKSPACE
+    "$ROSWS" merge -t "$CATKIN_WORKSPACE/src" "$UPSTREAM_WORKSPACE"
     ;;
 esac
 
 # download upstream packages into workspace
-if [ -e $CATKIN_WORKSPACE/src/.rosinstall ]; then
+if [ -e "$CATKIN_WORKSPACE/src/.rosinstall" ]; then
+    env
     # ensure that the target is not in .rosinstall
-    (cd $CATKIN_WORKSPACE/src; $ROSWS rm $TARGET_REPO_NAME 2> /dev/null \
-     && echo "$ROSWS ignored $TARGET_REPO_NAME found in $CATKIN_WORKSPACE/src/.rosinstall file. Its source fetched from your repository is used instead." || true) # TODO: add warn function
-    $ROSWS update -t $CATKIN_WORKSPACE/src
+    if (cd "$CATKIN_WORKSPACE/src"; "$ROSWS" rm "$TARGET_REPO_NAME" 2> /dev/null); then
+      echo "$ROSWS ignored $TARGET_REPO_NAME found in $CATKIN_WORKSPACE/src/.rosinstall file. Its source fetched from your repository is used instead." # TODO: add warn function
+    fi
+    "$ROSWS" update -t "$CATKIN_WORKSPACE/src"
 fi
 # TARGET_REPO_PATH is the path of the downstream repository that we are testing. Link it to the catkin workspace
-ln -s $TARGET_REPO_PATH $CATKIN_WORKSPACE/src
+ln -s "$TARGET_REPO_PATH" "$CATKIN_WORKSPACE/src"
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
         error "mockup directory '$USE_MOCKUP' does not exist"
     fi
-    ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" $CATKIN_WORKSPACE/src
+    ln -s "$TARGET_REPO_PATH/$USE_MOCKUP" "$CATKIN_WORKSPACE/src"
 fi
 
 catkin config --install
-if [ -n "$CATKIN_CONFIG" ]; then eval catkin config $CATKIN_CONFIG; fi
+catkin_config=($CATKIN_CONFIG)
+if [ ${#catkin_config[@]} -ne 0 ]; then eval catkin config "${catkin_config[@]}"; fi
 
 ici_time_end  # setup_rosws
 
@@ -161,50 +166,68 @@ ici_time_end  # rosdep_install
 if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_start catkin_lint
     sudo pip install catkin-lint
+
+    lint_args=($CATKIN_LINT_ARGS)
     if [ "$CATKIN_LINT" == "pedantic" ]; then
-    	CATKIN_LINT_ARGS="$CATKIN_LINT_ARGS --strict -W2"
+    	lint_args+=(--strict -W2)
     fi
-    catkin_lint --explain $CATKIN_LINT_ARGS $TARGET_REPO_PATH && echo "catkin_lint passed." || error "catkin_lint failed by either/both errors and/or warnings"
+    if catkin_lint --explain "${lint_args[@]}" "$TARGET_REPO_PATH"; then
+      echo "catkin_lint passed."
+    else
+      error "catkin_lint failed by either/both errors and/or warnings"
+    fi
     ici_time_end  # catkin_lint
 fi
 
 ici_time_start catkin_build
 
 # for catkin
-if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
-# fall-back to all workspace packages if target repo does not contain any packages (#232) 
-if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order $CATKIN_WORKSPACE/src --only-names`; fi
-if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
-if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
+export TARGET_PKGS
+export PKGS_DOWNSTREAM
+
+if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "${TARGET_REPO_PATH}" --only-names); fi
+# fall-back to all workspace packages if target repo does not contain any packages (#232)
+if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "$CATKIN_WORKSPACE/src" --only-names); fi
+if [ "${PKGS_DOWNSTREAM// }" == "" ]; then PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
+
+pkgs_downstream=($PKGS_DOWNSTREAM)
+pkgs_whitelist=($BUILD_PKGS_WHITELIST)
+
+catkin_parallel_jobs=($CATKIN_PARALLEL_JOBS)
+ros_parallel_jobs=($ROS_PARALLEL_JOBS)
+catkin_parallel_test_jobs=($CATKIN_PARALLEL_TEST_JOBS)
+ros_parallel_test_jobs=($ROS_PARALLEL_TEST_JOBS)
+
+if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status "${pkgs_whitelist[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" ; fi
 
 ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
     ici_time_start catkin_build_downstream_pkgs
     if [ "$BUILDER" == catkin ]; then
-        catkin build $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+        catkin build $OPT_VI --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}"
     fi
     ici_time_end  # catkin_build_downstream_pkgs
 
     ici_time_start catkin_build_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin build --no-deps --catkin-make-args tests -- $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS --
+        catkin build --no-deps --catkin-make-args tests -- $OPT_VI --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" --
     fi
     ici_time_end  # catkin_build_tests
 
     ici_time_start catkin_run_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin build --no-deps --catkin-make-args run_tests -- $OPT_RUN_V --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_TEST_JOBS --make-args $ROS_PARALLEL_TEST_JOBS --
+        catkin build --no-deps --catkin-make-args run_tests -- $OPT_RUN_V --no-status "${pkgs_downstream[@]}" "${catkin_parallel_test_jobs[@]}" --make-args "${ros_parallel_test_jobs[@]}" --
         if [ "${ROS_DISTRO}" == "hydro" ]; then
             PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
             PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 
             if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
-            if [ "$BUILDER" == catkin -a -e $ROS_LOG_DIR ]; then catkin_test_results --all $ROS_LOG_DIR || error; fi
-            if [ "$BUILDER" == catkin -a -e $CATKIN_WORKSPACE/build/ ]; then catkin_test_results --all $CATKIN_WORKSPACE/build/ || error; fi
-            if [ "$BUILDER" == catkin -a -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || error; fi
+            if [ "$BUILDER" == catkin ] && [ -e "$ROS_LOG_DIR" ]; then catkin_test_results --all "$ROS_LOG_DIR" || error; fi
+            if [ "$BUILDER" == catkin ] && [ -e "$CATKIN_WORKSPACE/build/" ]; then catkin_test_results --all "$CATKIN_WORKSPACE/build/" || error; fi
+            if [ "$BUILDER" == catkin ] && [ -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || error; fi
         else
-            catkin_test_results --verbose $CATKIN_WORKSPACE || error
+            catkin_test_results --verbose "$CATKIN_WORKSPACE" || error
         fi
     fi
     ici_time_end  # catkin_run_tests
@@ -222,13 +245,13 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
 
         echo "[$pkg] Started testing..."
         rostest_files=$(find "$CATKIN_WORKSPACE/install/share/$pkg" -iname '*.test')
-        echo "[$pkg] Found $(echo $rostest_files | wc -w) tests."
+        echo "[$pkg] Found $(echo "$rostest_files" | wc -w) tests."
         for test_file in $rostest_files; do
           echo "[$pkg] Testing $test_file"
-          $CATKIN_WORKSPACE/install/env.sh rostest $test_file || EXIT_STATUS=$?
+          "$CATKIN_WORKSPACE/install/env.sh" rostest "$test_file" || EXIT_STATUS=$?
           if [ $EXIT_STATUS != 0 ]; then
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
-            $CATKIN_WORKSPACE/install/env.sh rostest --text $test_file
+            "$CATKIN_WORKSPACE/install/env.sh" rostest --text "$test_file"
             echo -e "[$pkg] Testing again the failed test: $test_file.\e[31m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
           fi
         done
