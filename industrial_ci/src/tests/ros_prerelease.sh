@@ -26,10 +26,10 @@ function setup_environment() {
     echo "WORKSPACE: $WORKSPACE"
 
     if [ -n "$DOCKER_PORT" ]; then
-        DIND_OPTS="-e DOCKER_HOST=$DOCKER_PORT"
+        DIND_OPTS=(-e "DOCKER_HOST=$DOCKER_PORT")
         user_cmd="useradd ci"
     elif [ -e /var/run/docker.sock ]; then
-        DIND_OPTS=-"v /var/run/docker.sock:/var/run/docker.sock"
+        DIND_OPTS=(-v /var/run/docker.sock:/var/run/docker.sock)
         user_cmd="groupadd -o -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
     else
         error "Could not detect docker settings"
@@ -64,7 +64,7 @@ EOF
 }
 
 function run_in_prerelease_docker() {
-    ici_run_cmd_in_docker $DIND_OPTS \
+    ici_run_cmd_in_docker "${DIND_OPTS[@]}" \
                           -v "$WORKSPACE:$WORKSPACE:rw" \
                           -e TRAVIS \
                           "industrial-ci/prerelease" \
@@ -85,7 +85,7 @@ function run_ros_prerelease() {
     cp -a "$TARGET_REPO_PATH" "$WORKSPACE/catkin_workspace/src/$reponame"
 
     # ensure access rights
-    ici_run_cmd_in_docker $DIND_OPTS -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci $WORKSPACE
+    ici_run_cmd_in_docker "${DIND_OPTS[@]}" -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci "$WORKSPACE"
 
 
     if [ "${USE_MOCKUP// }" != "" ]; then

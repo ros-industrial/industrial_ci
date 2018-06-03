@@ -147,7 +147,7 @@ function run_abi_check() {
 
     local broken=()
     for n in /abicheck/new/abi_dumps/*.dump; do
-        local l=$(basename "$n" ".dump")
+        local l; l=$(basename "$n" ".dump")
         local o="/abicheck/old/$ABICHECK_VERSION/abi_dumps/$l.dump"
         if [ -f "$o" ]; then
             ici_time_start "abi_check_$l"
