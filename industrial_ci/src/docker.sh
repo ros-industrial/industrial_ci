@@ -229,12 +229,11 @@ RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && apt-get -qq install --no-install-recommends -y \
         build-essential \
         python-catkin-tools \
-        python-dev \
-        python-pip \
         python-rosdep \
         python-wstool \
         ros-$ROS_DISTRO-catkin \
         ssh-client \
+    && apt-get -qq install python-pip -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 EOF
