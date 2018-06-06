@@ -108,6 +108,16 @@ function ici_run_cmd_in_docker() {
   local ret=0
   wait %% || ret=$?
   trap - INT
+
+  # keep docker image as KEEP_IMAGE_AFTER_RUN (possibly for caching)
+  if [ "${KEEP_IMAGE_AFTER_RUN// }" != "" ]; then
+    ici_time_start keep_image_after_run
+
+    docker commit "$cid" "$KEEP_IMAGE_AFTER_RUN"
+
+    ici_time_end  # keep_image_after_run
+  fi
+
   docker rm "$cid" > /dev/null
   return $ret
 }

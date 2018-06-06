@@ -193,6 +193,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **DOCKER_RUN_OPTS** (default: not set): Used to specify additional run options for Docker.
 * **EXPECT_EXIT_CODE** (default: 0): exit code must match this value for test to succeed
 * **INJECT_QEMU** (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
+* **KEEP_IMAGE_AFTER_RUN** (default: not set): If set, the docker container will be committed into a new docker image named `KEEP_IMAGE_AFTER_RUN` at the end of the CI routine. This can e.g. be used to cache the docker image for subsequent CI pipelines.
 * **NOT_TEST_BUILD** (default: not set): If true, tests in `build` space won't be run.
 * **NOT_TEST_INSTALL** (default: not set): If true, tests in `install` space won't be run.
 * **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`_.
