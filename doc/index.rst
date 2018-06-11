@@ -676,7 +676,9 @@ Please note that `run_ci` and `run_travis` will download all dependencies every 
 For recurring runs, e.g. in a debugging session, this might not be desired.
 
 As an alternative `rerun_ci` could be used. It take the same argument as `run_ci`, but will run the build incrementally and only download or compile after changes.
+
 This results in much faster execution for recurring runs, but has some disadvantages as well:
+
 * The user needs to clean-up manually, an instruction to do so is printed at the end of all runs.
 * All parameters incl. the repository path have to be passed explicitly to allow for proper caching.
 * The apt dependencies won't get updated in recurring runs.
@@ -688,8 +690,8 @@ Example:
 
   $ rosrun industrial_ci rerun_ci . ROS_DISTRO=melodic ROS_REPO=ros-shadow-fixed
 
-This will run the tests and commit the result to a Docker image `industrial-ci/rerun_ci/ros_canopen:$HASH`.
-The hash is unique for each argument list, so `rerun_ci . ROS_DISTRO=melodic` and `rerun_ci . ROS_DISTRO=kinetic` do not mix  up.
+This will run the tests and commit the result to a Docker image ``industrial-ci/rerun_ci/ros_canopen:$HASH``.
+The hash is unique for each argument list, so ``rerun_ci . ROS_DISTRO=melodic`` and ``rerun_ci . ROS_DISTRO=kinetic`` do not mix  up.
 However, it will keep consuming disk space with each new combination.
 
 The cached images can be listed with
