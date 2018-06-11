@@ -36,7 +36,10 @@ def find_config_file(args, names):
         return None
 
     if len(args) >  0: # test first argument if available
-        p = test_file(args[0])
+        arg0=args[0]
+        if os.path.isfile(arg0):
+            return os.path.abspath(arg0),args[1:]
+        p = test_file(arg0)
         if p is not None:
             return p, args[1:]
     return test_file(os.getcwd()), args
