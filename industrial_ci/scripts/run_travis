@@ -140,6 +140,8 @@ def main(scripts_dir, argv):
     global_env, job_envs = read_env(read_yaml(path)['env'])
 
     if len(args) == 0:
+        if(len(global_env) > 0):
+            print('Globals: %s' % str(global_env))
         jobs = len(job_envs)
         digits = len(str(jobs))
         for i in range(jobs):
