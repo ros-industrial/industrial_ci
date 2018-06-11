@@ -104,7 +104,7 @@ def gen_env(e):
 
 def print_help(cmd):
     print("""
-Usage: %s [PATH] [RANGE*] [-- [ENV*]]
+Usage: %s [PATH] [RANGE*] [-- [ENV[=VALUE]*]]
 
 Parses the travis config in the given path or in the current working directory and runs all specified tests sequentially
 If no range is given, the list of jobs will get printed.
@@ -134,7 +134,7 @@ def main(scripts_dir, argv):
         print_help(argv[0])
         sys.exit(0)
 
-    args, keep_env = parse_extra_args(argv[1:])
+    args, extra_env = parse_extra_args(argv[1:])
 
     path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
     global_env, job_envs = read_env(read_yaml(path)['env'])
@@ -153,13 +153,12 @@ def main(scripts_dir, argv):
 
     run_ci = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), global_env]
 
-    extra_env = map(gen_env, keep_env + ['DOCKER_PORT', 'SSH_AUTH_SOCK', 'TERM'])
-    bash = ['env', '-i'] + extra_env + ['bash','-e']
+    bash = ['env', '-i'] +map(gen_env, ['DOCKER_PORT', 'SSH_AUTH_SOCK', 'TERM']) + ['bash','-e']
 
     selection = set(apply_ranges(ranges, len(job_envs)))
 
     for i in selection:
-        cmd = ' '.join(run_ci + [job_envs[i]])
+        cmd = ' '.join(run_ci + [job_envs[i]] + map(gen_env, extra_env))
         print('\033[1;44mRunning job %d: %s\033[1;m' %(i+1, cmd))
 
         proc = subprocess.Popen(bash, stdin=subprocess.PIPE)
