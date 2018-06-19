@@ -28,7 +28,7 @@ EOF
 
 case "$1" in
 "--list")
-  exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' $(docker images -q industrial-ci/rerun_ci/*)
+  exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' $(docker images -q industrial-ci/rerun_ci/*) 2> /dev/null
     ;;
 "--rm")
   remove=true
