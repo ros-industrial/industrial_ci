@@ -36,7 +36,10 @@ def find_config_file(args, names):
         return None
 
     if len(args) >  0: # test first argument if available
-        p = test_file(args[0])
+        arg0=args[0]
+        if os.path.isfile(arg0):
+            return os.path.abspath(arg0),args[1:]
+        p = test_file(arg0)
         if p is not None:
             return p, args[1:]
     return test_file(os.getcwd()), args
@@ -84,8 +87,8 @@ def read_env(env):
     g = ''
     if isinstance(env, dict):
         m = env['matrix']
-        if 'globals' in env:
-            g = ' '.join(env['globals']),
+        if 'global' in env:
+            g = ' '.join(env['global'])
     return g, m
 
 def parse_extra_args(args):
@@ -104,7 +107,7 @@ def gen_env(e):
 
 def print_help(cmd):
     print("""
-Usage: %s [PATH] [RANGE*] [-- [ENV*]]
+Usage: %s [PATH] [RANGE*] [-- [ENV[=VALUE]*]]
 
 Parses the travis config in the given path or in the current working directory and runs all specified tests sequentially
 If no range is given, the list of jobs will get printed.
@@ -134,12 +137,14 @@ def main(scripts_dir, argv):
         print_help(argv[0])
         sys.exit(0)
 
-    args, keep_env = parse_extra_args(argv[1:])
+    args, extra_env = parse_extra_args(argv[1:])
 
     path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
     global_env, job_envs = read_env(read_yaml(path)['env'])
 
     if len(args) == 0:
+        if(len(global_env) > 0):
+            print('Globals: %s' % str(global_env))
         jobs = len(job_envs)
         digits = len(str(jobs))
         for i in range(jobs):
@@ -151,20 +156,19 @@ def main(scripts_dir, argv):
 
     run_ci = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), global_env]
 
-    extra_env = map(gen_env, keep_env + ['DOCKER_PORT', 'SSH_AUTH_SOCK', 'TERM'])
-    bash = ['env', '-i'] + extra_env + ['bash','-e']
+    bash = ['env', '-i'] +map(gen_env, ['DOCKER_PORT', 'SSH_AUTH_SOCK', 'TERM']) + ['bash','-e']
 
     selection = set(apply_ranges(ranges, len(job_envs)))
 
     for i in selection:
-        cmd = ' '.join(run_ci + [job_envs[i]])
+        cmd = ' '.join(run_ci + [job_envs[i]] + map(gen_env, extra_env))
         print('\033[1;44mRunning job %d: %s\033[1;m' %(i+1, cmd))
 
         proc = subprocess.Popen(bash, stdin=subprocess.PIPE)
         proc.communicate(cmd)
         if proc.returncode:
             print('\033[1;41mFailed job %d: %s\033[1;m' %(i+1, cmd))
-            sys.exit(bash.proc)
+            sys.exit(proc.returncode)
 
 if __name__ == "__main__":
     main(os.path.abspath(os.path.dirname(__file__)), sys.argv)
