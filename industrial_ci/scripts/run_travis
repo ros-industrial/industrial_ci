@@ -133,7 +133,7 @@ Additional variable names can be passed at the end.
 """ % cmd)
 
 def main(scripts_dir, argv):
-    if '--help' in argv:
+    if ('--help' in argv or '-h' in argv):
         print_help(argv[0])
         sys.exit(0)
 
