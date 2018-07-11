@@ -158,7 +158,7 @@ function run_abi_check() {
             elif [ "$ret" -eq "1" ]; then
                 links -dump "$reports_dir/$l.html"
                 broken+=("$l")
-                ici_time_end 33 "$ret" # abi_check_*, yellow
+                ici_time_end ${ANSI_YELLOW} "$ret" # abi_check_*, yellow
             else
                 ici_exit "$ret"
             fi
