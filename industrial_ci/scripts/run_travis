@@ -18,6 +18,7 @@
 
 from __future__ import print_function
 
+import argparse
 import os
 import os.path
 import re
@@ -105,9 +106,8 @@ def gen_env(e):
     return '%s=%s' % (e, os.getenv(e, ''))
 
 
-def print_help(cmd):
-    print("""
-Usage: %s [PATH] [RANGE*] [-- [ENV[=VALUE]*]]
+_help_message = """
+%(prog)s [PATH] [RANGE*] [-- [ENV[=VALUE]*]]
 
 Parses the travis config in the given path or in the current working directory and runs all specified tests sequentially
 If no range is given, the list of jobs will get printed.
@@ -130,19 +130,17 @@ The jobs will be run in clean environments.
 Only DOCKER_PORT, SSH_AUTH_SOCK, and TERM will be kept.
 Additional variable names can be passed at the end.
 
-""" % cmd)
+"""
 
 def main(scripts_dir, argv):
-    if ('--help' in argv or '-h' in argv):
-        print_help(argv[0])
-        sys.exit(0)
-
-    args, extra_env = parse_extra_args(argv[1:])
+    parser = argparse.ArgumentParser(usage=_help_message)
+    args, unknown = parser.parse_known_args(argv)
+    args, extra_env = parse_extra_args(unknown)
 
     path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
     if path is None:
         print("Could not find Travis config")
-        print_help(argv[0])
+        parser.print_usage()
         sys.exit(1)
 
     global_env, job_envs = read_env(read_yaml(path)['env'])
