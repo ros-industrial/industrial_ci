@@ -67,6 +67,32 @@ For Gitlab CI
      script: .industrial_ci/gitlab.sh ROS_DISTRO=indigo
 
 
+For Bitbucket Pipelines
+-----------------------
+
+1. Enable CI for your repo. Please refer to `official doc <https://confluence.atlassian.com/bitbucket/get-started-with-bitbucket-pipelines-792298921.html>`_ for the steps to do so.
+2. In the `bitbucket-pipelines.yml` file in your client repo, add the following minimal configuration (this snippet can be the entire content of the file), replacing indigo for your chosen distro:
+
+::
+
+   image: docker:git
+
+   pipelines:
+     default:
+        - step:
+            services:
+              - docker
+            script:
+              - apk add --update bash coreutils tar
+              - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+              - .industrial_ci/bitbucket.sh ROS_DISTRO=indigo
+
+   definitions:
+     services:
+       docker:
+         memory: 2048
+
+
 Concrete examples of config files
 -------------------------------------
 
