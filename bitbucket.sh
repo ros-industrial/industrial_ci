@@ -2,6 +2,7 @@
 
 # Copyright (c) 2016, Isaac I. Y. Saito
 # Copyright (c) 2017, Mathias Lüdtke
+# Copyright (c) 2018, Alexander Rössler
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
