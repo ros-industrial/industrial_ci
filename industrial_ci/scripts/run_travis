@@ -133,13 +133,18 @@ Additional variable names can be passed at the end.
 """ % cmd)
 
 def main(scripts_dir, argv):
-    if '--help' in argv:
+    if ('--help' in argv or '-h' in argv):
         print_help(argv[0])
         sys.exit(0)
 
     args, extra_env = parse_extra_args(argv[1:])
 
     path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
+    if path is None:
+        print("Could not find Travis config")
+        print_help(argv[0])
+        sys.exit(1)
+
     global_env, job_envs = read_env(read_yaml(path)['env'])
 
     if len(args) == 0:
