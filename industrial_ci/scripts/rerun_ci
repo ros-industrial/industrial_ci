@@ -1,0 +1,77 @@
+#!/bin/bash -e
+
+# Copyright (c) 2018, Mathias Lüdtke
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing@, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+function show_help {
+  cat - <<'EOF'
+Usage:
+  rerun_ci --list
+  rerun_ci [--clean] TARGET_PATH [PARAM=VALUE>]...
+  rerun_ci --rm TARGET_PATH [PARAM=VALUE>]...
+EOF
+}
+
+case "$1" in
+"--list")
+  exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' $(docker images -q industrial-ci/rerun_ci/*) 2> /dev/null
+    ;;
+"--rm")
+  remove=true
+  shift
+    ;;
+"--clean")
+  clean=true
+  shift
+    ;;
+"-h" | "--help" | "")
+  show_help
+  exit 0
+    ;;
+esac
+
+if [ ! -d "$1" ]; then
+  show_help
+  exit 1
+fi
+
+repo_dir=$(cd "$1" && pwd)
+shift
+
+_COMMIT_IMAGE_MSG="$repo_dir $*"
+env_hash=($(sha256sum <<< "$_COMMIT_IMAGE_MSG"))
+_COMMIT_IMAGE="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
+
+if [ "$remove" ]; then
+  exec docker rmi $_COMMIT_IMAGE
+elif [ "$clean" ]; then
+  docker rmi $_COMMIT_IMAGE
+fi
+
+
+force_env=(_COMMIT_IMAGE=$_COMMIT_IMAGE _COMMIT_IMAGE_MSG=$_COMMIT_IMAGE_MSG)
+keep_env=(DOCKER_PORT=$DOCKER_PORT SSH_AUTH_SOCK=$SSH_AUTH_SOCK TERM=$TERM)
+
+if docker image inspect $_COMMIT_IMAGE &> /dev/null; then
+  force_env+=(DOCKER_IMAGE=$_COMMIT_IMAGE  DOCKER_PULL=false)
+fi
+
+env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" "$@" "${force_env[@]}" || ret=$?
+
+echo "Please do not forget to clean-up: docker rmi $_COMMIT_IMAGE"
+
+exit $ret

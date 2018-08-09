@@ -234,7 +234,7 @@ Some more notes:
 
 * Setting `DOCKER_IMAGE` is a bit tricky:
    * disables the set-up of ROS based on `ROS_REPO` (or non-recommended `ROS_REPOSITORY_PATH`), and ROS_DISTRO.
-   * but `ROS_DISTRO` still needs to be set.  
+   * but `ROS_DISTRO` still needs to be set.
 * Some common credentials such as `.docker`, `.ssh`, `.subversion` are passed from CI native platform to Docker container.
 
 Pass custom variables to Docker
@@ -348,10 +348,10 @@ If pull requests should be checked against the merge parent instead of the stabl
 
 URL can be specified in shortcut form `provider:organization/repository#version`, which is supported for bitbucket, github and gitlab. "`version`" can be either one of the name of the branch, the tagged version, or even a commit. Some (more) concrete examples:
 
-- github:ros-industrial-release/ros_canopen-release#upstream           
+- github:ros-industrial-release/ros_canopen-release#upstream
 - gitlab:ipa-mdl/ci-example#master
 - github:ros-planning/moveit#0.9.9
-  
+
 Alternatively you can use the following forms as URL.:
 
 - https://github.com/ros-industrial/ros_canopen/archive/kinetic.zip
@@ -668,6 +668,36 @@ Since v0.6.0, you can run locally using `.travis.yml` you already defined for yo
 ::
 
    rosrun industrial_ci run_travis --help
+
+Recurring runs for debugging
+++++++++++++++++++++++++++++
+Please note that `run_ci` and `run_travis` will download all dependencies every time, just as CI services would do.
+For recurring runs, e.g. in a debugging session, this might not be desired.
+
+As an alternative `rerun_ci` could be used. It take the same argument as `run_ci`, but will run the build incrementally and only download or compile after changes.
+
+This results in much faster execution for recurring runs, but has some disadvantages as well:
+
+* The user needs to clean-up manually, an instruction to do so is printed at the end of all runs.
+* All parameters incl. the repository path have to be passed explicitly to allow for proper caching.
+* The apt dependencies won't get updated in recurring runs.
+* Incremental builds might not work properly for all cases. Especially, it does not help with prerelease tests.
+
+Example:
+
+::
+
+  $ rosrun industrial_ci rerun_ci . ROS_DISTRO=melodic ROS_REPO=ros-shadow-fixed
+
+This will run the tests and commit the result to a Docker image ``industrial-ci/rerun_ci/ros_canopen:$HASH``.
+The hash is unique for each argument list, so ``rerun_ci . ROS_DISTRO=melodic`` and ``rerun_ci . ROS_DISTRO=kinetic`` do not mix  up.
+However, it will keep consuming disk space with each new combination.
+
+The cached images can be listed with
+::
+
+  $ rosrun industrial_ci rerun_ci --list
+
 
 For maintainers of industrial_ci repository
 ================================================
