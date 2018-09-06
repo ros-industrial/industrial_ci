@@ -170,6 +170,25 @@ function ici_enforce_deprecated {
     fi
 }
 
+#######################################
+# Install and run yamllint.
+#
+# Globals:
+#   (None)
+# Arguments:
+#   config to pass to yamllint (optional)
+# Returns:
+#   Pass/Fail (bool)
+#######################################
+function run_yamllint {
+    YAMLLINT_CONF=${1:-"${ICI_SRC_PATH}"/yamllint_config_v1.5.0.yaml}
+    sudo apt-get install -qq -y python3-pkg-resources yamllint || (echo "WARN: Required package 'yaml_lint' isn't available. Skipping to check yaml files." && return);
+    # Run it against the entire repo, incl. whatever pkgs available in the workspace.
+    # You may change .yamllint_config_v1.5.0 to v1.2.1 when running manually on your host, as yamllint version might be different from CI.
+    yamllint -c $YAMLLINT_CONF .;
+    return $?
+}
+
 if ! which sudo > /dev/null; then
   function sudo {
     "$@"

@@ -168,6 +168,12 @@ if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_end  # catkin_lint
 fi
 
+if [ "$YAML_LINT" == "true" ]; then
+    ici_time_start yaml_lint
+    run_yamllint $YAML_LINT_CONFPATH && echo "yamllint passes without errors." || error "yamllint returned errors.";
+    ici_time_end  # yaml_lint
+fi
+
 ici_time_start catkin_build
 
 # for catkin

@@ -214,6 +214,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * **USE_MOCKUP** (default: not set): reletive path to mockup packages to be used for the tests
 * **VERBOSE_OUTPUT** (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode.
 * **VERBOSE_TESTS** (default: true): If `true`, build tool (e.g. Catkin) output prints in verbose mode during `run_tests` step.
+* **YAML_LINT** (default: false): If `true`, run linter for yaml files. Error output from yaml linter program makes the CI job fail. You can pass your own config file to yaml_lint by defining ``YAML_LINT_CONFPATH`` with the file's path. See `yaml check section <#run-linter-for-yaml-files>`_ for more detail.
+* **YAML_LINT_TARGETPATHS** (default: not set): By default, 1) all files with file extension ``.yaml`` and ``.yml``, 2) files on the top directory that contain the ``.rosinstall`` in their names are set. Use space as a delimitter for passing multiple paths.
 
 Note: You see some `*PKGS*` variables. These make things very flexible but in normal usecases you don't need to be bothered with them - just keep them blank.
 
@@ -698,6 +700,18 @@ The cached images can be listed with
 
   $ rosrun industrial_ci rerun_ci --list
 
+Run linter for yaml files
+-------------------------
+
+As of Sep 2018, this feature is only available on Ubuntu where the binary package of `yaml_lint <http://manpages.ubuntu.com/manpages/artful/man1/yamllint.1.html>`_ is available (i.e. it is NOT available on older Ubuntu than 16.04).
+
+Define ``YAML_LINT_TARGETPATHS`` variable to change the paths of the files/directories to run linter against (if you define it, the default gets overwritten). Path can be absolute (on the platform industrial_ci runs on, e.g. CI) or relative from the top directory of the repository. E.g. ::
+
+  YAML_LINT_TARGETPATHS="conf test"
+
+You can use any shell expression, e.g. ::
+
+  YAML_LINT_TARGETPATHS="conf/*.config"
 
 For maintainers of industrial_ci repository
 ================================================
