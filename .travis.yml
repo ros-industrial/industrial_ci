@@ -60,7 +60,8 @@ env:
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
 
     # external repositories
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel'
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/abb_experimental#kinetic-devel' YAML_LINT=true EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel' YAML_LINT=true
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE'
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ipa320/cob_calibration_data#indigo_dev' ROS_REPO=ros UPSTREAM_WORKSPACE=file AFTER_SCRIPT='./.travis.xacro_test.sh'
