@@ -182,31 +182,31 @@ function ici_enforce_deprecated {
 #   Pass/Fail (bool)
 #######################################
 function run_yamllint {
-	target_path_default='.'
-	# See if there are '*rosinstall*' files in the repo.
-	find . -path ./.git -prune -o -iname "*rosinstall*" -print | egrep
-	if [ $? == 0 ]; then target_path_default="*rosinstall* $target_path_default"; fi
+    target_path_default='.'
+    # See if there are '*rosinstall*' files in the repo.
+    find . -path ./.git -prune -o -iname "*rosinstall*" -print | egrep
+    if [ $? == 0 ]; then target_path_default="*rosinstall* $target_path_default"; fi
 
     yamllint_conf=$1
     target_paths=${2:-"$target_path_default"}  # multiple elements delimitted by space.
     sudo apt-get install -qq -y python3-pkg-resources yamllint || (echo "WARN: Required package 'yaml_lint' isn't available. Skipping to check yaml files." && return);
 
     if [ -z "$yamllint_conf" ]; then
-    	# Get the yamllint version and assign an appropriate version of config file.
-    	yamllint_v_output=$(yamllint --version)
-    	for yamllint_version in $yamllint_v_output; do     echo "yamllint version: ${yamllint_version}"; done
+        # Get the yamllint version and assign an appropriate version of config file.
+        yamllint_v_output=$(yamllint --version)
+        for yamllint_version in $yamllint_v_output; do     echo "yamllint version: ${yamllint_version}"; done
 
-	  	case $yamllint_version in
-	  		1.2.1)  # Ubuntu Xenial https://packages.ubuntu.com/xenial/yamllint
-	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.2.1.yaml
-	  		    ;;
-	  		1.5.0)
-	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.5.0.yaml
-	  		    ;;
-	  		*)
-	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.8.2.yaml
-	  		    ;;
-	  	esac
+        case $yamllint_version in
+            1.2.1)  # Ubuntu Xenial https://packages.ubuntu.com/xenial/yamllint
+                yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.2.1.yaml
+                ;;
+            1.5.0)
+                yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.5.0.yaml
+                ;;
+            *)
+                yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.8.2.yaml
+                ;;
+        esac
     fi
 
     # Need to remove quotes from target_paths https://stackoverflow.com/a/10943857/577001
