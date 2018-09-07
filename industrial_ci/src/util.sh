@@ -176,12 +176,15 @@ function ici_enforce_deprecated {
 # Globals:
 #   (None)
 # Arguments:
-#   config to pass to yamllint (optional)
+#    yamllint_conf: config to pass to yamllint (optional)
+#    target_paths: paths to pass yamllint (optional)
 # Returns:
 #   Pass/Fail (bool)
 #######################################
 function run_yamllint {
+	TARGET_PATH_DEFAULT="*.rosinstall* ."
     yamllint_conf=$1
+    target_paths=${2:-"$TARGET_PATH_DEFAULT"}  # multiple elements delimitted by space.
     sudo apt-get install -qq -y python3-pkg-resources yamllint || (echo "WARN: Required package 'yaml_lint' isn't available. Skipping to check yaml files." && return);
 
     if [ -z "$yamllint_conf" ]; then
@@ -201,9 +204,9 @@ function run_yamllint {
 	  		    ;;
 	  	esac
     fi
-    # Run it against the entire repo, incl. whatever pkgs available in the workspace.
-    # You may change .yamllint_config_v1.5.0 to v1.2.1 when running manually on your host, as yamllint version might be different from CI.
-    yamllint -c "${yamllint_conf}" .;
+
+    # Need to remove quotes from target_paths https://stackoverflow.com/a/10943857/577001
+    yamllint -c "${yamllint_conf}" "$target_paths";
     return $?
 }
 

@@ -170,7 +170,7 @@ fi
 
 if [ "$YAML_LINT" == "true" ]; then
     ici_time_start yaml_lint
-    run_yamllint $YAML_LINT_CONFPATH && echo "yamllint passes without errors." || error "yamllint returned errors.";
+    run_yamllint $YAML_LINT_CONFPATH "${YAML_LINT_TARGETPATHS}" && echo "yamllint passes without errors." || error "yamllint returned errors.";
     ici_time_end  # yaml_lint
 fi
 
