@@ -181,11 +181,29 @@ function ici_enforce_deprecated {
 #   Pass/Fail (bool)
 #######################################
 function run_yamllint {
-    YAMLLINT_CONF=${1:-"${ICI_SRC_PATH}"/yamllint_config_v1.5.0.yaml}
+    yamllint_conf=$1
     sudo apt-get install -qq -y python3-pkg-resources yamllint || (echo "WARN: Required package 'yaml_lint' isn't available. Skipping to check yaml files." && return);
+
+    if [ -z "$yamllint_conf" ]; then
+    	# Get the yamllint version and assign an appropriate version of config file.
+    	yamllint_v_output=$(yamllint --version)
+    	for yamllint_version in $yamllint_v_output; do     echo "yamllint version: ${yamllint_version}"; done
+
+	  	case $yamllint_version in
+	  		1.2.1)  # Ubuntu Xenial https://packages.ubuntu.com/xenial/yamllint
+	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.2.1.yaml
+	  		    ;;
+	  		1.5.0)
+	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.5.0.yaml
+	  		    ;;
+	  		*)
+	  		    yamllint_conf="${ICI_SRC_PATH}"/yamllint_config_v1.8.2.yaml
+	  		    ;;
+	  	esac
+    fi
     # Run it against the entire repo, incl. whatever pkgs available in the workspace.
     # You may change .yamllint_config_v1.5.0 to v1.2.1 when running manually on your host, as yamllint version might be different from CI.
-    yamllint -c $YAMLLINT_CONF .;
+    yamllint -c "${yamllint_conf}" .;
     return $?
 }
 
