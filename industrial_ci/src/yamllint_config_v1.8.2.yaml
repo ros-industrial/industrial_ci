@@ -22,12 +22,12 @@ rules:
     level: warning
     require-starting-space: true
     min-spaces-from-content: 2
-  comments-indentation:
-    level: warning
+#  comments-indentation:
+#    level: warning
   document-end: disable
-  document-start:
-    level: warning
-    present: true
+#  document-start:
+#    level: warning
+#    present: true
   empty-lines:
     max: 2
     max-start: 0
@@ -35,14 +35,16 @@ rules:
   hyphens:
     max-spaces-after: 1
   indentation:
+    level: warning
     spaces: consistent
     indent-sequences: true
     check-multi-line-strings: false
   key-duplicates: enable
-  line-length:
-    max: 128  # 80
-    allow-non-breakable-words: true
-    allow-non-breakable-inline-mappings: false
+#  line-length:
+#    level: warning
+#    max: 80
+#    allow-non-breakable-words: true
+#    allow-non-breakable-inline-mappings: false
   new-line-at-end-of-file: disable  # enable
   new-lines:
     type: unix

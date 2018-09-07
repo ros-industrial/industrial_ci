@@ -1,22 +1,26 @@
+---
 # The following block is needed for the shared Docker-based runner
 # For local runners you might want to enable the overlay driver:
 # https://docs.gitlab.com/ce/ci/docker/using_docker_build.html#using-the-overlayfs-driver
 
-image: docker:git # docker and git clients
+image: docker:git  # docker and git clients
 
 # The docker runner does not expose /tmp to the docker-in-docker service
-# This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
+# This config ensures that the temp folder is located inside the project
+# directory (e.g. for prerelease tests or SSH agent forwarding)
 variables:
-  TMPDIR: "${CI_PROJECT_DIR}.tmp" #
+  TMPDIR: "${CI_PROJECT_DIR}.tmp"
 
 # enable docker-in-docker
 services:
   - docker:dind
 
 before_script:
-  - apk add --update bash coreutils tar # install industrial_ci dependencies
-  # for regular users: - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
-  - mkdir .industrial_ci && cp -a * .industrial_ci # this is only needed for branch testing of industrial_ci itself
+  - apk add --update bash coreutils tar  # install industrial_ci dependencies
+  # The next line is only needed for branch testing of industrial_ci itself
+  - mkdir .industrial_ci && cp -a * .industrial_ci
+  # for regular users, the next line should work.
+  # - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
 
 # setup the actual tests
 
