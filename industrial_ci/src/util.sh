@@ -183,9 +183,9 @@ function ici_enforce_deprecated {
 #######################################
 function run_yamllint {
     target_path_default='.'
-    # See if there are '*rosinstall*' files in the repo.
-    find . -path ./.git -prune -o -iname "*rosinstall*" -print | egrep
-    if [ $? == 0 ]; then target_path_default="*rosinstall* $target_path_default"; fi
+    # If there are '*rosinstall*' files in the repo, add to the search criteria.
+    files_rosinstall=$(find . -path ./.git -prune -o -iname "*rosinstall*" -print)
+    if [ $? == 0 ]; then target_path_default="$files_rosinstall $target_path_default"; fi
 
     yamllint_conf=$1
     target_paths=${2:-"$target_path_default"}  # multiple elements delimitted by space.
