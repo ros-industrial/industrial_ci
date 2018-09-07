@@ -182,7 +182,7 @@ function ici_enforce_deprecated {
 #   Pass/Fail (bool)
 #######################################
 function run_yamllint {
-    target_path_default='.'
+    target_path_default="$TARGET_REPO_PATH"
     # If there are '*rosinstall*' files in the repo, add to the search criteria.
     files_rosinstall=$(find . -path ./.git -prune -o -iname "*rosinstall*" -print)
     if [ $? == 0 ]; then target_path_default="$files_rosinstall $target_path_default"; fi
