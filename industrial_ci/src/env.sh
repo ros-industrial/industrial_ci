@@ -20,6 +20,7 @@ ici_mark_deprecated USE_DEB "Please migrate to UPSTREAM_WORKSPACE."
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
+if [ "$COMMIT_IMAGE" ]; then export COMMIT_IMAGE; else export COMMIT_IMAGE="false"; fi
 if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
 # .rosintall file name
@@ -64,6 +65,7 @@ fi
 export OS_CODE_NAME
 export OS_NAME
 export DOCKER_BASE_IMAGE
+export COMMIT_IMAGE_NAME
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
