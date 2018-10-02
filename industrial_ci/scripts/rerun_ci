@@ -54,24 +54,24 @@ shift
 
 DOCKER_COMMIT_IMAGE_MSG="$repo_dir $*"
 env_hash=($(sha256sum <<< "$DOCKER_COMMIT_IMAGE_MSG"))
-DOCKER_COMMIT_IMAGE="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
+DOCKER_COMMIT_IMAGE_NAME="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
 
 if [ "$remove" ]; then
-  exec docker rmi $DOCKER_COMMIT_IMAGE
+  exec docker rmi $DOCKER_COMMIT_IMAGE_NAME
 elif [ "$clean" ]; then
-  docker rmi $DOCKER_COMMIT_IMAGE
+  docker rmi $DOCKER_COMMIT_IMAGE_NAME
 fi
 
 
-force_env=(DOCKER_COMMIT_IMAGE=$DOCKER_COMMIT_IMAGE DOCKER_COMMIT_IMAGE_MSG=$DOCKER_COMMIT_IMAGE_MSG)
+force_env=(DOCKER_COMMIT_IMAGE_NAME=$DOCKER_COMMIT_IMAGE_NAME DOCKER_COMMIT_IMAGE_MSG=$DOCKER_COMMIT_IMAGE_MSG)
 keep_env=(DOCKER_PORT=$DOCKER_PORT SSH_AUTH_SOCK=$SSH_AUTH_SOCK TERM=$TERM)
 
-if docker image inspect $DOCKER_COMMIT_IMAGE &> /dev/null; then
-  force_env+=(DOCKER_IMAGE=$DOCKER_COMMIT_IMAGE  DOCKER_PULL=false)
+if docker image inspect $DOCKER_COMMIT_IMAGE_NAME &> /dev/null; then
+  force_env+=(DOCKER_IMAGE=$DOCKER_COMMIT_IMAGE_NAME  DOCKER_PULL=false)
 fi
 
 env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" "$@" "${force_env[@]}" || ret=$?
 
-echo "Please do not forget to clean-up: docker rmi $DOCKER_COMMIT_IMAGE"
+echo "Please do not forget to clean-up: docker rmi $DOCKER_COMMIT_IMAGE_NAME"
 
 exit $ret
