@@ -20,7 +20,6 @@ ici_mark_deprecated USE_DEB "Please migrate to UPSTREAM_WORKSPACE."
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
-if [ "$DOCKER_COMMIT_IMAGE" ]; then export DOCKER_COMMIT_IMAGE; else export DOCKER_COMMIT_IMAGE="false"; fi
 if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
 if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
 # .rosintall file name
