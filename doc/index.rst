@@ -248,6 +248,24 @@ On CI platform usually some variables are available for the convenience. Since a
 Still, you may want to pass some other vars. `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE'` should do the trick.
 You can even set it to a specific value: `DOCKER_RUN_OPTS='-e MY_VARIABLE_VALUE=42'` (format varies per CI platform. These are Gitlab CI example).
 
+Re-use the container image
+--------------------------
+
+``industrial_ci`` builds a ``Docker`` image using the associated repository on the specified operating system per every job. While the built Docker image is thrown away once the job finishes by default, there's a way to access the built image post job so that you can re-use it.
+
+To do so, simply set ``DOCKER_COMMIT_IMAGE_NAME`` the name of the image of your choice. Then you'll be able to access that image. For example in your CI config (e.g. ``.travis.yml``), add something like ::
+
+  variables:
+      DOCKER_COMMIT_IMAGE_NAME=registry.gitlab.com/your-org/your-repo:your_img
+  :
+  script:
+      - docker push $DOCKER_COMMIT_IMAGE_NAME
+
+Note for the built Docker image:
+
+- ``apt`` repositories (i.e. Result of ``apt-get update``) are removed.
+- Some utility packages are pre-installed. As of Sept 2018, those are: ``build-essential, python-catkin-tools, python-pip, python-rosdep, python-wstool, ros-$ROS_DISTRO-catkin, ssh-client``.
+
 (Gitlab CI) Access to private repositories
 ------------------------------------------
 
@@ -700,7 +718,6 @@ The cached images can be listed with
 ::
 
   $ rosrun industrial_ci rerun_ci --list
-
 
 For maintainers of industrial_ci repository
 ================================================
