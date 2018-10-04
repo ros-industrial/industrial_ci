@@ -188,9 +188,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * **DEBUG_BASH** (default: not set): If set with any value (e.g. `true`), all executed commands that are not printed by default to reduce print space will be printed.
 * **DOCKER_BASE_IMAGE** (default: $OS_NAME:$OS_CODE_NAME): Base image used for building the CI image. Could be used to pre-bundle dependecies or to run tests for different architectures. See `this PR <https://github.com/ros-industrial/industrial_ci/pull/174>`_ for more info.
 * **DOCKER_BUILD_OPTS** (default: not set): Used do specify additional build options for Docker.
-* **DOCKER_COMMIT_IMAGE_MSG** (default: not set): used to specify a commit during the docker commit command which is triggered by setting DOCKER_COMMIT_IMAGE=true. If unset and if DOCKER_COMMIT_IMAGE=true then the commit message will be empty. See more ``DOCKER_COMMIT_IMAGE_NAME``.
-* **DOCKER_COMMIT_IMAGE_NAME** (default: not set): 
-If set, the docker images which contains the build and test will be saved in the outer-layer docker which runs the script.  The commited image is then be available to be pushed to a docker registry.  This behavior enables a building Docker images with CI/CD approach. If unset the container will not be commited and is removed. The value set is used to specify an image name during the docker commit command which is triggered by setting ``DOCKER_COMMIT_IMAGE=true``. If special value "use_containerid" is set, then container id will be used as the image name.
+* **DOCKER_COMMIT** (default: not set): If set, the docker images which contains the build and test will be saved in the outer-layer docker which runs the script.  The commited image is then be available to be pushed to a docker registry.  This behavior enables a building Docker images with CI/CD approach. If unset the container will not be commited and is removed. The value set is used to specify an image name during the docker commit command which is triggered by setting ``DOCKER_COMMIT_IMAGE=true``. If special value "use_containerid" is set, then container id will be used as the image name.
+* **DOCKER_COMMIT_MSG** (default: not set): used to specify a commit during the docker commit command which is triggered by setting DOCKER_COMMIT_IMAGE=true. If unset and if DOCKER_COMMIT_IMAGE=true then the commit message will be empty. See more ``DOCKER_COMMIT``.
 * **DOCKER_FILE** (default: not set): Instead of pulling an images from the Docker hub, build it from the given path or URL. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO`, they have to be set in the build file instead.
 * **DOCKER_IMAGE** (default: not set): Selects a Docker images different from default one. Please note, this disables the handling of `ROS_REPOSITORY_PATH` and `ROS_DISTRO` as ROS needs already to be installed in the image.
 * **DOCKER_PULL** (default: true): set to false if custom docker image should not be pulled, e.g. if it was created locally
@@ -253,13 +252,13 @@ Re-use the container image
 
 ``industrial_ci`` builds a ``Docker`` image using the associated repository on the specified operating system per every job. While the built Docker image is thrown away once the job finishes by default, there's a way to access the built image post job so that you can re-use it.
 
-To do so, simply set ``DOCKER_COMMIT_IMAGE_NAME`` the name of the image of your choice. Then you'll be able to access that image. For example in your CI config (e.g. ``.travis.yml``), add something like ::
+To do so, simply set ``DOCKER_COMMIT`` the name of the image of your choice. Then you'll be able to access that image. For example in your CI config (e.g. ``.travis.yml``), add something like ::
 
   variables:
-      DOCKER_COMMIT_IMAGE_NAME=registry.gitlab.com/your-org/your-repo:your_img
+      DOCKER_COMMIT=registry.gitlab.com/your-org/your-repo:your_img
   :
   script:
-      - docker push $DOCKER_COMMIT_IMAGE_NAME
+      - docker push $DOCKER_COMMIT
 
 Note for the built Docker image:
 
