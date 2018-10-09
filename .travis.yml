@@ -58,6 +58,7 @@ env:
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=stretch AFTER_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release'
     - ROS_DISTRO=melodic OS_NAME=debian EXPECT_EXIT_CODE=1
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=melodic DOCKER_COMMIT="img_temp"
 
     # external repositories
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel'
@@ -77,3 +78,4 @@ install:
 script:
   - industrial_ci/_wrap_test.sh # this script is only for internal use
   - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
+  - if ! [ -z "$DOCKER_COMMIT" ]; then  echo "Test if the Docker image is committed or not. See the size of the Docker image is non-zero or not."; if docker image inspect $DOCKER_COMMIT --format='{{.Size}}'; then exit 0; else exit 1; fi fi

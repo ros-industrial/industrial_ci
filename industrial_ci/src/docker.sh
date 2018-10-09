@@ -65,8 +65,8 @@ function ici_require_run_in_docker() {
 #######################################
 function ici_run_cmd_in_docker() {
   local run_opts=($DOCKER_RUN_OPTS)
-  local commit_image=$COMMIT_IMAGE
-  unset COMMIT_IMAGE
+  local commit_image=$DOCKER_COMMIT
+  unset DOCKER_COMMIT
 
   #forward ssh agent into docker container
  local ssh_docker_opts=()
@@ -111,7 +111,10 @@ function ici_run_cmd_in_docker() {
   wait %% || ret=$?
   trap - INT
   if [ -n "$commit_image" ]; then
-    docker commit -m "$COMMIT_IMAGE_MSG" "$cid" "$COMMIT_IMAGE_NAME"
+    if [ "use_containerid" != "$commit_image" ]; then
+        commit_image_name="$commit_image"
+    fi  # commit_image_name will be empty if 'use_containerid' is passed.
+    docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image_name"
   fi
   docker rm "$cid" > /dev/null
   return $ret
