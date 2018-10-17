@@ -11,7 +11,7 @@ Introduction
 
 This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`__ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`__ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
 
-As of November 2017, this repo provides scripts for `Travis CI` and `Gitlab CI`. The CI scripts in this repository are intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
+As of November 2019, this repo provides scripts for `Bitbucket CI`, `Gitlab CI`, `GitHub Actions` and `Travis CI`. The CI scripts in this repository are intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
 For a brief introduction, you could also check a presentation:
 
