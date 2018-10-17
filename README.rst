@@ -4,6 +4,9 @@ Industrial CI
 .. image:: https://travis-ci.com/ros-industrial/industrial_ci.svg?branch=master
     :target: https://travis-ci.com/ros-industrial/industrial_ci
     :alt: Travis CI status
+.. image:: https://github.com/ros-industrial/industrial_ci/workflows/CI/badge.svg?branch=master
+    :target: https://github.com/ros-industrial/industrial_ci/actions
+    :alt: GitHub Actions status
 .. image:: https://gitlab.com/ipa-mdl/industrial_ci/badges/master/pipeline.svg
     :target: https://gitlab.com/ipa-mdl/industrial_ci/commits/master
     :alt: Gitlab CI status
@@ -33,7 +36,7 @@ Some notable feature:
 * Proven to cover the general requirements of the ROS-based robotics repositories. Easily configurable.
 * Users can add custom pre/post processes.
 * Covers ROS1 Indigo, Jade, Kinetic, Lunar, Melodic and ROS2 distributions.
-* This repo provides scripts for `Bitbucket CI`, `Gitlab CI`, and `Travis CI` only, but it can be easily adapted for other CI services.
+* This repo provides scripts for `Bitbucket CI`, `Gitlab CI`, `GitHub Actions` and `Travis CI` only, but it can be easily adapted for other CI services.
 
 For a brief overall introduction, you could also check a presentation:
 
@@ -112,6 +115,30 @@ For Bitbucket Pipelines
        docker:
          memory: 2048
 
+
+For GitHub Actions
+-----------------------
+
+1. Create `.github/workflows/main.yml` (main.yml is arbitrary)  with the following configuration, (this snippet can be the entire content of the file), replacing melodic for your chosen distro:
+
+::
+
+   name: CI
+
+   on: [push, pull_request]
+
+   jobs:
+     industrial_ci:
+       strategy:
+         matrix:
+           env:
+             - {ROS_DISTRO: melodic, ROS_REPO: testing}
+             - {ROS_DISTRO: melodic, ROS_REPO: main}
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v1
+         - uses: 'ros-industrial/industrial_ci@master'
+           env: ${{matrix.env}}
 
 Concrete examples of config files
 -------------------------------------

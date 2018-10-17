@@ -1,0 +1,4 @@
+name: 'ROS industrial_ci'
+runs:
+  using: 'node12'
+  main: '.github/action.js'
