@@ -21,17 +21,7 @@ function clang_install() {
   sudo apt-get install -y -qq clang-format"$version"
 }
 
-function define_clang_format() {
-  if [ -f "$TARGET_REPO_PATH/.clang-format" ]; then
-    echo "Found '.clang-format' file."
-    CLANG_FORMAT="file"
-  else    
-    CLANG_FORMAT="$CLANGCHECK" # If not valid Clang uses default
-  fi
-}
-
 function run_clang_format_check() {
-  local version="${1:--3.8}" # default = -3.8
   local ERR=0
 
   ici_require_run_in_docker # this script must be run in docker
@@ -39,14 +29,10 @@ function run_clang_format_check() {
   ici_time_start clang_install
     clang_install "$version"
   ici_time_end # clang_install
-
-  ici_time_start define_clang_format
-    define_clang_format
-  ici_time_end # define_clang_format
   
   ici_time_start run_clang_format_check
-  while read f; do
-    if ! clang-format"$version" -style="$CLANG_FORMAT" "$f" | git diff --exit-code "$f" - ; then
+  while read file; do
+    if ! clang-format -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       ERR=$[$ERR +1]
     fi
   done < <(find "$TARGET_REPO_PATH" -name '*.h' -or -name '*.hpp' -or -name '*.cpp') 

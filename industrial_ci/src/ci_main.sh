@@ -39,7 +39,7 @@ if [ "$PRERELEASE" == true ]; then
 elif [ -n "$ABICHECK_URL" ]; then
   source ${ICI_SRC_PATH}/tests/abi_check.sh
   run_abi_check
-elif [ -f "$TARGET_REPO_PATH/.clang-format" -o -n "$CLANGCHECK" ] && [ "$CLANGCHECK" != "false" ]; then
+elif [ -n "$CLANG_FORMAT_CHECK" ]; then
   source ${ICI_SRC_PATH}/tests/clang_format_check.sh
   run_clang_format_check
 else
