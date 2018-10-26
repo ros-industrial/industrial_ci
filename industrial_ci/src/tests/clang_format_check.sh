@@ -15,20 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function clang_install() {
-  local version="$1"
-  sudo apt-get update -qq
-  sudo apt-get install -y -qq clang-format"$version"
-}
-
 function run_clang_format_check() {
   local ERR=0
 
   ici_require_run_in_docker # this script must be run in docker
   
-  ici_time_start clang_install
-    clang_install "$version"
-  ici_time_end # clang_install
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq git clang-format
   
   ici_time_start run_clang_format_check
   while read file; do
