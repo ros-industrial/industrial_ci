@@ -16,7 +16,7 @@
 # limitations under the License.
 
 function run_clang_format_check() {
-  local ERR=0
+  local err=0
 
   ici_require_run_in_docker # this script must be run in docker
   
@@ -26,12 +26,12 @@ function run_clang_format_check() {
   ici_time_start run_clang_format_check
   while read file; do
     if ! clang-format -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
-      ERR=$[$ERR +1]
+      err=$[$err +1]
     fi
   done < <(find "$TARGET_REPO_PATH" -name '*.h' -or -name '*.hpp' -or -name '*.cpp') 
   
-  if [ "$ERR" -ne "0" ]; then
-      echo "Clang format check failed for $ERR file(s)."
+  if [ "$err" -ne "0" ]; then
+      error "Clang format check failed for $err file(s)."
       echo "Changes required to comply to formatting rules. See diff above."
       exit 1
   fi
