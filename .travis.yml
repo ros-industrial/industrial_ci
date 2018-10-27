@@ -27,7 +27,7 @@ env:
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  CATKIN_CONFIG='--no-install -DCMAKE_CXX_FLAGS="-Werror=uninitialized -Werror=return-type"'
     - ROS_DISTRO=indigo DOCKER_IMAGE='mluedtke/ci-test:indigo'
     - ROS_DISTRO=indigo DOCKER_IMAGE='arm32v7/ros:indigo-ros-core' ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip" INJECT_QEMU=arm BEFORE_SCRIPT='[[ $(uname -p) == armv7l ]]'
-    - ROS_DISTRO=melodic NOT_TEST_BUILD='true'
+    - ROS_DISTRO=melodic NOT_TEST_BUILD='true' _GUARD_INTERVAL=10
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_SCRIPT='test -z "${CXX+x}"' # test that CXX is not set
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' CXX=/usr/bin/gcc BEFORE_SCRIPT='test -z "${CXX+x}"' EXPECT_EXIT_CODE=1 # test the CXX test
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
