@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Copyright (c) 2016, Isaac I. Y. Saito
-# Copyright (c) 2017, Mathias Lüdtke
+# Copyright (c) 2018, Mathias Lüdtke
 # All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,4 +30,13 @@ if [ "$ABICHECK_MERGE" = "auto" ]; then
   [ "$TRAVIS_PULL_REQUEST" = "false" ] || ABICHECK_MERGE=true
 fi
 
-env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
+function watch_output() {
+  while read -r -t "${_GUARD_INTERVAL:-540}" ||
+        { [[ $? -gt 128 ]] &&
+          echo -en "${ANSI_YELLOW}...industrial_ci is still running...${ANSI_RESET}"; }
+  do
+    echo "$REPLY"
+  done
+}
+
+{ env "$@" stdbuf -oL -eL bash "$DIR_THIS"/industrial_ci/src/ci_main.sh; exit $?; } |& watch_output
