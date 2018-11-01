@@ -58,6 +58,7 @@ env:
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=stretch AFTER_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release'
     - ROS_DISTRO=melodic OS_NAME=debian EXPECT_EXIT_CODE=1
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=melodic ROSDEP_OPTIONS="--reinstall"  # Disabling '-q' option for 'rosdep install'.
 
     # external repositories
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel'
