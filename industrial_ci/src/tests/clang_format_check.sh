@@ -19,8 +19,8 @@ function run_clang_format_check() {
   local err=0
   local path=$TARGET_REPO_PATH
 
-  ici_require_run_in_docker # this script must be run in docker
-  
+  DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_require_run_in_docker # this script must be run in docker
+
   sudo apt-get update -qq
   sudo apt-get install -y -qq git clang-format
 
