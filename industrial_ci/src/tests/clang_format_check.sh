@@ -32,14 +32,14 @@ function run_clang_format_check() {
     fi
     path="$TARGET_REPO_PATH/$USE_MOCKUP"
   fi
-  
+
   ici_time_start run_clang_format_check
   while read file; do
     if ! clang-format -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       err=$[$err +1]
     fi
   done < <(find "$path" -name '*.h' -or -name '*.hpp' -or -name '*.cpp')
-  
+
   if [ "$err" -ne "0" ]; then
       error "Clang format check failed for $err file(s)."
       echo "Changes required to comply to formatting rules. See diff above."
