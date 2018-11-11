@@ -152,9 +152,7 @@ rosdep_opts=(-q --from-paths $CATKIN_WORKSPACE/src --ignore-src --rosdistro $ROS
 if [ -n "$ROSDEP_SKIP_KEYS" ]; then
   rosdep_opts+=(--skip-keys "$ROSDEP_SKIP_KEYS")
 fi
-set -o pipefail # fail if rosdep install fails
-rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
-set +o pipefail
+rosdep install "${rosdep_opts[@]}"
 
 ici_time_end  # rosdep_install
 
