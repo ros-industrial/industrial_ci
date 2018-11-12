@@ -1,4 +1,7 @@
 #include <iostream>
 using namespace std;
 
-void main() { cout << "Check my format!"; }
+int main() {
+  cout << "Check my format!";
+  return 0;
+}
