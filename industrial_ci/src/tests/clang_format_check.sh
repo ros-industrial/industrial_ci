@@ -23,7 +23,7 @@ function run_clang_format_check() {
 
   ici_time_start install_clang_format
   sudo apt-get update -qq
-  sudo apt-get install -qq -y git-core clang-format
+  sudo apt-get install -qq -y git-core clang-format > /dev/null
   ici_time_end # install_clang_format
 
   if [ -n "$USE_MOCKUP" ]; then
