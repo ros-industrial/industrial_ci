@@ -38,7 +38,7 @@ function run_clang_format_check() {
     if ! clang-format -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       err=$[$err +1]
     fi
-  done < <(find "$path" -name '*.h' -or -name '*.hpp' -or -name '*.cpp')
+  done < <(find "$path"/* -name '*.h' -or -name '*.hpp' -or -name '*.cpp')
 
   if [ "$err" -ne "0" ]; then
       error "Clang format check failed for $err file(s)."
