@@ -111,10 +111,7 @@ function ici_run_cmd_in_docker() {
   wait %% || ret=$?
   trap - INT
   if [ -n "$commit_image" ]; then
-    if [ "use_containerid" != "$commit_image" ]; then
-        commit_image_name="$commit_image"
-    fi  # commit_image_name will be empty if 'use_containerid' is passed.
-    docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image_name"
+    docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image"
   fi
   docker rm "$cid" > /dev/null
   return $ret
