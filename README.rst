@@ -37,12 +37,20 @@ For Travis CI
 
 1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`_). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
 
-2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci`, like below:
+2. Add `.travis.yml` file to your repository root (`complete template <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`_):
 
 ::
+  
+  language: generic
+  services:
+    - docker
+
+  env:
+    matrix:
+      - ROS_DISTRO="indigo"
 
   install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+    - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
   script:
     - .industrial_ci/travis.sh
 
@@ -62,7 +70,7 @@ For Gitlab CI
      - docker:dind
    before_script:
      - apk add --update bash coreutils tar
-     - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+     - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci
    indigo:
      script: .industrial_ci/gitlab.sh ROS_DISTRO=indigo
 
@@ -84,7 +92,7 @@ For Bitbucket Pipelines
               - docker
             script:
               - apk add --update bash coreutils tar
-              - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+              - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci
               - .industrial_ci/bitbucket.sh ROS_DISTRO=indigo
 
    definitions:
@@ -96,7 +104,7 @@ For Bitbucket Pipelines
 Concrete examples of config files
 -------------------------------------
 
-- A `template for Travis CI <doc/sample.travis.yml>`_.
+- A `template for Travis CI <doc/.travis.yml>`_.
 - For development branch intended for ROS Indigo: `ros_canopen <https://github.com/ros-industrial/ros_canopen/blob/0a42bf181804167834b8dc3b80bfca971f24546f/.travis.yml>`_
 - For development branch intended for ROS Indigo onward:
    - `example 1 <https://github.com/ros-industrial/industrial_core/blob/eeb6a470e05233d0efaaf8c32a9e4133cdcbb80b/.travis.yml>`_ (Indigo and Jade compatible).

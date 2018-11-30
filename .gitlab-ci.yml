@@ -15,7 +15,7 @@ services:
 
 before_script:
   - apk add --update bash coreutils tar # install industrial_ci dependencies
-  # for regular users: - git clone https://github.com/ros-industrial/industrial_ci .industrial_ci
+  # for regular users: - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci
   - mkdir .industrial_ci && cp -a * .industrial_ci # this is only needed for branch testing of industrial_ci itself
 
 # setup the actual tests
@@ -33,6 +33,8 @@ kinetic:
   variables:
     ROS_DISTRO: "kinetic"
     PRERELEASE: "true"
+
+# some internal tests
 
 docker_pull_base:
   script:

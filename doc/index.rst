@@ -124,19 +124,11 @@ With the following few short steps, you can start in your client repository usin
 
 1. Don't forget to activate CI for your repository.
 
-- For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
+   * For Travis CI and GitHub, you may do so on https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or https://travis-ci.org/profile/YOUR_GITHUB_USER (replace capital with your value).
+2. In `CI config <#terminology>`_ file in your client repo include and run industrial_ci.
 
-2. In `CI config <#terminology>`_ file in your client repo, add a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .inductrial_ci`, like below:
-::
-
-  install:
-    - git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci
-  script:
-    - .industrial_ci/travis.sh
-
-* Note: The name `.industrial_ci` is NO longer REQUIRED for the cloned folder starting version 0.3.2; you can pick any name (recommended practice to keep the folder hidden (by prepending ".").
-* Example of entire file `.travis.yml` can be found in `industrial_core/.travis.yml <https://github.com/ros-industrial/industrial_core/blob/indigo-devel/.travis.yml>`_.
-* A Gitlab CI config can be found in `.gitlab-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/.gitlab-ci.yml>`_.
+   * For Travis create the file `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`_.
+   * A Gitlab CI config can be found in `.gitlab-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/.gitlab-ci.yml>`_.
 
 That's it.
 
@@ -624,7 +616,6 @@ For the older ROS distributions than `those that are supported <https://github.c
 
 For `Travis CI`, you need at least the following changes in `.travis.yml`:
 
-* Use `dist: precise` (instead of e.g. "`dist: trusty`").
 * Define `ROS_DISTRO` with  `hydro` (so have `ROS_DISTRO="hydro"`).
 
 A successful example from `swri-robotics/mapviz <https://github.com/swri-robotics/mapviz/blob/49b0c5748950a956804e1976cfd7a224fa3f3f7d/.travis.yml>`_.
