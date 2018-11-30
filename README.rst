@@ -40,10 +40,10 @@ For Travis CI
 2. In `.travis.yml` file in your client repo, add in "`install`" section a sentence `git clone https://github.com/ros-industrial/industrial_ci.git .industrial_ci`, like below:
 
 ::
-  dist: trusty # do not change this!
+  
+  language: generic
   services:
     - docker
-  language: generic
 
   env:
     matrix:

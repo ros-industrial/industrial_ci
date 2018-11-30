@@ -624,7 +624,6 @@ For the older ROS distributions than `those that are supported <https://github.c
 
 For `Travis CI`, you need at least the following changes in `.travis.yml`:
 
-* Use `dist: precise` (instead of e.g. "`dist: trusty`").
 * Define `ROS_DISTRO` with  `hydro` (so have `ROS_DISTRO="hydro"`).
 
 A successful example from `swri-robotics/mapviz <https://github.com/swri-robotics/mapviz/blob/49b0c5748950a956804e1976cfd7a224fa3f3f7d/.travis.yml>`_.
