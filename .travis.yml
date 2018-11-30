@@ -13,6 +13,10 @@ notifications:
   email:
     recipients:
       - gm130s@gmail.com  # Change this to yours should you copy this file.
+
+git:
+  quiet: true
+
 env:
   global:
     - POST_PROCESS='echo "post processing reached"'
