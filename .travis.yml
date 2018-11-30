@@ -1,6 +1,7 @@
-#   This .travis.yml works to check "this" repository, namely `industrial_ci`. Do not get confused with the check of "client" repositories (repos that use travis configs in this repo).
+# This .travis.yml works to check "this" repository, namely `industrial_ci`.
+# A template for users can be found here: https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml
 
-#  Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
+# Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
 
 services:
   - docker
