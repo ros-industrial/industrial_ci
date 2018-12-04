@@ -27,10 +27,9 @@ ici_require_run_in_docker # this script must be run in docker
 #Define some verbose env vars
 #verbose build
 if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
-    OPT_VI="-vi"
-else
-    OPT_VI=""
+	CATKIN_BUILD_OPT +=" -vi"
 fi
+
 #verbose run tests
 if [ "$VERBOSE_TESTS" == false ]; then
     OPT_RUN_V=""
@@ -175,20 +174,20 @@ if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_or
 # fall-back to all workspace packages if target repo does not contain any packages (#232) 
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order $CATKIN_WORKSPACE/src --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
-if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
+if [ "$BUILDER" == catkin ]; then catkin build $CATKIN_BUILD_OPT --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
 
 ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
     ici_time_start catkin_build_downstream_pkgs
     if [ "$BUILDER" == catkin ]; then
-        catkin build $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
+        catkin build $CATKIN_BUILD_OPT --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS
     fi
     ici_time_end  # catkin_build_downstream_pkgs
 
     ici_time_start catkin_build_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin build --no-deps --catkin-make-args tests -- $OPT_VI --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS --
+        catkin build --no-deps --catkin-make-args tests -- $CATKIN_BUILD_OPT --summarize  --no-status $PKGS_DOWNSTREAM $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS --
     fi
     ici_time_end  # catkin_build_tests
 
