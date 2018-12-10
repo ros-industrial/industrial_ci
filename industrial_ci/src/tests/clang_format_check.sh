@@ -21,9 +21,12 @@ function run_clang_format_check() {
 
   DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_require_run_in_docker # this script must be run in docker
 
+  # Check whether a specific version of clang-format is desired
+  local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
+
   ici_time_start install_clang_format
   sudo apt-get update -qq
-  sudo apt-get install -qq -y git-core clang-format > /dev/null
+  sudo apt-get install -qq -y git-core $clang_format_executable > /dev/null
   ici_time_end # install_clang_format
 
   if [ -n "$USE_MOCKUP" ]; then
@@ -35,7 +38,7 @@ function run_clang_format_check() {
 
   ici_time_start run_clang_format_check
   while read file; do
-    if ! clang-format -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
+    if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       err=$[$err +1]
     fi
   done < <(find "$path"/* -iname '*.h' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.cc' -or -iname '*.cpp' -or -iname '*.cxx')
