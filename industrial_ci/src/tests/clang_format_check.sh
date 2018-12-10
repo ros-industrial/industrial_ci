@@ -22,7 +22,7 @@ function run_clang_format_check() {
   DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_require_run_in_docker # this script must be run in docker
 
   # Check whether a specific version of clang-format is desired
-  local clang_format_executable=${CLANG_FORMAT_EXECUTABLE:-clang-format}
+  local clang_format_executable="catkin-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
 
   ici_time_start install_clang_format
   sudo apt-get update -qq
