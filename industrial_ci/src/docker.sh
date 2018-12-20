@@ -223,6 +223,8 @@ function ici_generate_default_dockerfile() {
   cat <<EOF
 FROM $DOCKER_BASE_IMAGE
 
+ENV ROS_DISTRO $ROS_DISTRO
+
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN apt-get update -qq \

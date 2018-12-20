@@ -91,6 +91,18 @@ if [ -z "$OS_CODE_NAME" ]; then
     "melodic")
         OS_CODE_NAME="bionic"
         ;;
+    "")
+        if [ -n "$DOCKER_IMAGE" ] || [ -n "$DOCKER_BASE_IMAGE" ]; then
+          # try to reed ROS_DISTRO from imgae
+          if [ "$DOCKER_PULL" != false ]; then
+            docker pull "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}"
+          fi
+          export ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*")
+        fi
+        if [ -z "$ROS_DISTRO" ]; then
+            error "Please specify ROS_DISTRO"
+        fi
+        ;;
     *)
         error "ROS distro '$ROS_DISTRO' is not supported"
         ;;
