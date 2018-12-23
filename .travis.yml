@@ -53,7 +53,7 @@ env:
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
     - ROS_DISTRO=jade   APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  _DO_NOT_FOLD=true # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
-    - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS=`docker image inspect "$DOCKER_COMMIT" --format="$DOCKER_COMMIT: {{.Size}} bytes"`
+    - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS='eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT: \"{{.Size}}\" bytes"'
     - ROS_DISTRO=kinetic APTKEY_STORE_SKS=hkp://ha.pool.sks-keyservers.vet  # Passing wrong SKS URL as a break test. Should still pass.
     - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=melodic AFTER_SCRIPT='grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=bionic /etc/os-release'
