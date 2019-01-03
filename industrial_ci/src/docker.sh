@@ -176,7 +176,7 @@ function ici_prepare_docker_image() {
   elif [ -z ${DOCKER_IMAGE+x} ]; then # image was not provided, use default
      ici_build_default_docker_image
   elif [ -z "$DOCKER_IMAGE" ]; then
-     echo "Empty string passed to DOCKER_IMAGE." \
+     error "Empty string passed to DOCKER_IMAGE." \
      "Specify a valid docker image or unset the environment variable to use the default image." 1>&2
      exit 1
   elif [ "$DOCKER_PULL" != false ]; then
