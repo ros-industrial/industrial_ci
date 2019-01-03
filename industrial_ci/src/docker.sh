@@ -173,7 +173,7 @@ function ici_prepare_docker_image() {
     else # url, run directly
         ici_docker_build "$DOCKER_FILE" > /dev/null
     fi
-  elif [ -z ${DOCKER_IMAGE+x} ]; then # image was not provided, use default
+  elif [ -z "${DOCKER_IMAGE+x}" ]; then # image was not provided, use default
      ici_build_default_docker_image
   elif [ -z "$DOCKER_IMAGE" ]; then
      error "Empty string passed to DOCKER_IMAGE." \
