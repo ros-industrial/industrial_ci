@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2019-01-02)
+------------------
 * [capability] Add clang-format check (`#320 <https://github.com/ros-industrial/industrial_ci/issues/320>`_, `#340 <https://github.com/ros-industrial/industrial_ci/issues/340>`_)
 * [capability] Re-use previous local CI run `#279 <https://github.com/ros-industrial/industrial_ci/issues/279>`_
 * [capability] Allow reuse Docker image `#341 <https://github.com/ros-industrial/industrial_ci/issues/341>`_
