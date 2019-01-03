@@ -2,6 +2,20 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [capability] Add clang-format check (`#320 <https://github.com/ros-industrial/industrial_ci/issues/320>`_, `#340 <https://github.com/ros-industrial/industrial_ci/issues/340>`_)
+* [capability] Re-use previous local CI run `#279 <https://github.com/ros-industrial/industrial_ci/issues/279>`_
+* [capability] Allow reuse Docker image `#341 <https://github.com/ros-industrial/industrial_ci/issues/341>`_
+* [capability] Automatically set ROS_DISTRO from Docker image if not specified `#280 <https://github.com/ros-industrial/industrial_ci/issues/280>`_
+* [capability] ROS melodic support `#271 <https://github.com/ros-industrial/industrial_ci/issues/271>`_
+* [deprecation] USE_DEB, UBUNTU_OS_CODE_NAME
+* [fix] Run Travis CI locally `#331 <https://github.com/ros-industrial/industrial_ci/issues/331>`_, `#265 <https://github.com/ros-industrial/industrial_ci/issues/265>`_ 
+* [maintenance] remove rosdep hack `#287 <https://github.com/ros-industrial/industrial_ci/issues/287>`_
+* [improve] Better output text `#328 <https://github.com/ros-industrial/industrial_ci/issues/328>`_
+* [improve] Speed up CI by skipping Docker pull `#283 <https://github.com/ros-industrial/industrial_ci/issues/283>`_
+* Contributors: Felix Messmer, Isaac I.Y. Saito, Jonathan Hechtbauer, Mathias Lüdtke, Miguel Prada, Wolfgang Merkt
+
 0.6.0 (2018-01-13)
 ------------------
 * [capability] You can run industrial_ci locally on your computer using configuration in your .travis.yml `#230 <https://github.com/ros-industrial/industrial_ci/issues/230>`_
