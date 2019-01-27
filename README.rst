@@ -20,8 +20,8 @@ Some notable feature:
 * Checks if your package builds, installs without issues. If unit/system tests are defined run them. `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`_ can optionally be run.
 * Proven to cover the general requirements of the ROS-based robotics repositories. Easily configurable.
 * Users can add custom pre/post processes.
-* Covers ROS Indigo, Jade, Kinetic distribution.
-* As of January 2017, this repo provides configuration for `Travis CI` only, although it should be easily deployed from other CI services.
+* Covers ROS Hydro, Indigo, Jade, Kinetic, Lunar, Melodic distribution.
+* This repo provides scripts for `Bitbucket CI`, `Gitlab CI`, and `Travis CI` only, but it can be easily adapted for other CI services.
 
 For a brief overall introduction, you could also check a presentation:
 
@@ -40,7 +40,7 @@ For Travis CI
 2. Add `.travis.yml` file to your repository root (`complete template <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`_):
 
 ::
-  
+
   language: generic
   services:
     - docker
