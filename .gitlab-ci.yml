@@ -25,13 +25,13 @@ indigo:
   variables:
     ROS_DISTRO: "indigo"
 
-jade:
-  script: .industrial_ci/gitlab.sh ROS_DISTRO=jade  # alternate syntax
-
 kinetic:
+  script: .industrial_ci/gitlab.sh ROS_DISTRO=kinetic  # alternate syntax
+
+melodic:
   script: .industrial_ci/gitlab.sh
   variables:
-    ROS_DISTRO: "kinetic"
+    ROS_DISTRO: "melodic"
     PRERELEASE: "true"
 
 # some internal tests

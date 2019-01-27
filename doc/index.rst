@@ -156,7 +156,7 @@ You can configure the behavior in `CI config <#terminology>`_ in your client rep
 
 Required environment variables:
 
-* `ROS_DISTRO`: Version of ROS in all lower case. E.g.: `indigo` / `jade`. If is is set in the custom Docker (base) image, it might be omitted in the script call.
+* `ROS_DISTRO`: Version of ROS in all lower case. E.g.: `indigo`. If is is set in the custom Docker (base) image, it might be omitted in the script call.
 
 Optional environment variables
 ++++++++++++++++++++++++++++++++
@@ -576,7 +576,7 @@ Have multiple .rosinstall files per ROS-distro
 ++++++++++++++++++++++++++++++++++++++++++++++
 
 By adding `.$ROS_DISTRO` suffix to your `$ROSINSTALL_FILENAME` file, you can specify which file to use per your `$ROS_DISTRO`. So the syntax of the file name for this purpose is `$ROSINSTALL_FILENAME.$ROS_DISTRO`.
-For example, let's say you want to test multiple distros (indigo, jade) and you have `.travis.rosinstall` and `.travis.rosinstall.jade` files in your repo. You can define the Travis config as:
+For example, let's say you want to test multiple distros (indigo, kinetic) and you have `.travis.rosinstall` and `.travis.rosinstall.kinetic` files in your repo. You can define the Travis config as:
 
 ::
 
@@ -584,9 +584,9 @@ For example, let's say you want to test multiple distros (indigo, jade) and you 
       matrix:
 
         - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file
-        - ROS_DISTRO=jade   UPSTREAM_WORKSPACE=file
+        - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file
 
-With this config, for indigo default file name `.travis.rosinstall` will be seached and used if found. For jade, the file that consists of the default file name plus `.jade` suffix will be prioritized.
+With this config, for indigo default file name `.travis.rosinstall` will be seached and used if found. For kinetic, the file that consists of the default file name plus `.kinetic` suffix will be prioritized.
 
 When `$ROSINSTALL_FILENAME.$ROS_DISTRO` file isn't found, `$ROSINSTALL_FILENAME` will be used for all jobs that define `UPSTREAM_WORKSPACE`.
 
@@ -605,9 +605,9 @@ You can specify the OS and its distribution to run the CI job by setting `OS_NAM
 By default users don't need to set this and its value will be automatically guessed according to the value of `ROS_DISTRO`. e.g.::
 
   `ROS_DISTRO=indigo`  --> `OS_NAME=ubuntu` `OS_CODE_NAME=trusty`
-  `ROS_DISTRO=jade`    --> `OS_NAME=ubuntu` `OS_CODE_NAME=trusty`
   `ROS_DISTRO=kinetic` --> `OS_NAME=ubuntu` `OS_CODE_NAME=xenial`
   `ROS_DISTRO=lunar`   --> `OS_NAME=ubuntu` `OS_CODE_NAME=xenial`
+  `ROS_DISTRO=melodic` --> `OS_NAME=ubuntu` `OS_CODE_NAME=bionic`
 
 Use non-default Ubuntu distro
 +++++++++++++++++++++++++++++
