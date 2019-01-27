@@ -172,12 +172,16 @@ function ici_enforce_deprecated {
 
 function ici_retry {
   local tries=$1; shift
+  local ret=0
 
   for ((i=1;i<=tries;i++)); do
     "$@" && return 0
+    ret=$?
     sleep 1;
   done
-  error "'$*' failed $tries times"
+
+  ici_color_output ${ANSI_RED} "'$*' failed $tries times"
+  return $ret
 }
 
 if ! which sudo > /dev/null; then
