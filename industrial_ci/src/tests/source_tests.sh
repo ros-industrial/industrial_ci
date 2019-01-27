@@ -79,8 +79,17 @@ rosdep --version
 if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
     sudo rosdep init
 fi
-ret_rosdep=1
-rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
+
+update_opts=()
+case "$ROS_DISTRO" in
+"hydro"|"jade")
+    if rosdep update --help | grep -q -- --include-eol-distros; then
+      update_opts+=(--include-eol-distros)
+    fi
+    ;;
+esac
+
+ici_retry 2 rosdep update "${update_opts[@]}"
 
 ici_time_end  # setup_rosdep
 
@@ -172,7 +181,7 @@ ici_time_start catkin_build
 
 # for catkin
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order ${TARGET_REPO_PATH} --only-names`; fi
-# fall-back to all workspace packages if target repo does not contain any packages (#232) 
+# fall-back to all workspace packages if target repo does not contain any packages (#232)
 if [ "${TARGET_PKGS// }" == "" ]; then export TARGET_PKGS=`catkin_topological_order $CATKIN_WORKSPACE/src --only-names`; fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then export PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status $BUILD_PKGS_WHITELIST $CATKIN_PARALLEL_JOBS --make-args $ROS_PARALLEL_JOBS            ; fi
