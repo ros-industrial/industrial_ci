@@ -170,6 +170,16 @@ function ici_enforce_deprecated {
     fi
 }
 
+function ici_retry {
+  local tries=$1; shift
+
+  for ((i=1;i<=tries;i++)); do
+    "$@" && return 0
+    sleep 1;
+  done
+  error "'$*' failed $tries times"
+}
+
 if ! which sudo > /dev/null; then
   function sudo {
     "$@"
