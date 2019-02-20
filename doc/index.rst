@@ -25,7 +25,6 @@ Supported ROS Distributions
 
 Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`__ are supported.
 
-* `Hydro <http://wiki.ros.org/hydro>`__ *(EOL)*
 * `Indigo <http://wiki.ros.org/indigo>`__ *(EOL)*
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`__
@@ -626,17 +625,6 @@ All combinations available of OS and distros
 ++++++++++++++++++++++++++++++++++++++++++++++
 
 Possible combination of `OS_NAME` and `OS_CODE_NAME` depend on available Docker images. See `ros-industrial/docker/ci <https://github.com/ros-industrial/docker/tree/master/ci>`__.
-
-Checking older ROS distros with industrial_ci
---------------------------------------------------------
-
-For the older ROS distributions than `those that are supported <https://github.com/ros-industrial/industrial_ci#supported-ros-distributions>`__, you may still be able to use `industrial_ci`. Here's how to do so taking ROS `Hydro` as an example.
-
-For `Travis CI`, you need at least the following changes in `.travis.yml`:
-
-* Define `ROS_DISTRO` with  `hydro` (so have `ROS_DISTRO="hydro"`).
-
-A successful example from `swri-robotics/mapviz <https://github.com/swri-robotics/mapviz/blob/49b0c5748950a956804e1976cfd7a224fa3f3f7d/.travis.yml>`__.
 
 Run industrial_ci on local host
 ---------------------------------------

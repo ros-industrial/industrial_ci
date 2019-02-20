@@ -71,7 +71,7 @@ function abi_setup_rosdep() {
     fi
 
     update_opts=()
-    if [ "$ROS_VERSION_EOL" = true ] && rosdep update --help | grep -q -- --include-eol-distros; then
+    if [ "$ROS_VERSION_EOL" = true ]; then
       update_opts+=(--include-eol-distros)
     fi
 
