@@ -20,28 +20,15 @@
 set -e # exit script on errors
 
 if [ -n "$_EXTERNAL_REPO" ]; then
+    export TRAVIS_BUILD_DIR; TRAVIS_BUILD_DIR=$(mktemp -d)
+    source ./industrial_ci/src/workspace.sh
+    IFS=" " read -r -a parts <<< "$(ici_resolve_scheme "$_EXTERNAL_REPO")" # name, type, url, version
+    echo "Cloning '${parts[2]}'...'"
+    git clone -q "${parts[2]}" "$TRAVIS_BUILD_DIR"
+    git -C "$TRAVIS_BUILD_DIR" checkout "${parts[3]}"
 
-    export TRAVIS_BUILD_DIR
-    TRAVIS_BUILD_DIR=$(mktemp -d)
-
-    repo_name=${_EXTERNAL_REPO%%#*}
-    repo_branch=${_EXTERNAL_REPO##*#}
-
-    if [ "$repo_branch" = "$_EXTERNAL_REPO" ]; then # if branch name was not provided
-        repo_branch="HEAD"
-    fi
-
-    if [[ "$repo_name" =~ ^[:alpha:][[:alnum:].+-]+: ]]; then # stars with scheme (RFC 3986)
-        repo_url=$repo_name
-    else
-        repo_url="https://github.com/$repo_name.git" # treat as github repo
-    fi
-
-    git clone "$repo_url" "$TRAVIS_BUILD_DIR"
-    git -C "$TRAVIS_BUILD_DIR" checkout "$repo_branch"
-
-    urlbasename=${repo_url##*/}
-    urldirname=${repo_url%/$urlbasename}
+    urlbasename=${parts[2]##*/}
+    urldirname=${parts[2]%/$urlbasename}
     export TRAVIS_REPO_SLUG="${urldirname##*/}/${urlbasename%.git}"
 fi
 
