@@ -17,7 +17,6 @@ env:
     - "BEFORE_SCRIPT='echo current dir: $(pwd)'"
 
   matrix:
-    - ROS_DISTRO=hydro  USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true'
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1

@@ -70,10 +70,6 @@ fi
 
 if [ -z "$OS_CODE_NAME" ]; then
     case "$ROS_DISTRO" in
-    "hydro")
-        OS_CODE_NAME="precise"
-        ROS_VERSION_EOL=true
-        ;;
     "indigo"|"jade")
         OS_CODE_NAME="trusty"
         ROS_VERSION_EOL=true
