@@ -30,6 +30,8 @@ export ICI_SRC_PATH; ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && p
 source "${ICI_SRC_PATH}/util.sh"
 # shellcheck source=industrial_ci/src/docker.sh
 source "${ICI_SRC_PATH}/docker.sh"
+# shellcheck source=industrial_ci/src/workspace.sh
+source "${ICI_SRC_PATH}/workspace.sh"
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"
 
