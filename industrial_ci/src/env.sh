@@ -17,6 +17,14 @@
 # limitations under the License.
 
 ici_mark_deprecated USE_DEB "Please migrate to UPSTREAM_WORKSPACE."
+
+if [ -n "$NOT_TEST_INSTALL" ]; then
+    if [ "$NOT_TEST_INSTALL" != true ]; then
+        ici_enforce_deprecated NOT_TEST_INSTALL "testing installed test files has been removed."
+    else
+        ici_mark_deprecated NOT_TEST_INSTALL "testing installed test files has been removed, NOT_TEST_INSTALL=false is superfluous"
+    fi
+fi
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
 if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi

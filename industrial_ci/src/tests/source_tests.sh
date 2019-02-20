@@ -248,33 +248,3 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
     fi
     ici_time_end  # catkin_run_tests
 fi
-
-if [ "$NOT_TEST_INSTALL" != "true" ]; then
-
-    ici_time_start catkin_install_run_tests
-
-    EXIT_STATUS=0
-    # Test if the unit tests in the packages in the downstream repo pass.
-    if [ "$BUILDER" == catkin ]; then
-      for pkg in $PKGS_DOWNSTREAM; do
-        if [ ! -d "$CATKIN_WORKSPACE/install/share/$pkg" ]; then continue; fi # skip meta-packages
-
-        echo "[$pkg] Started testing..."
-        rostest_files=$(find "$CATKIN_WORKSPACE/install/share/$pkg" -iname '*.test')
-        echo "[$pkg] Found $(echo "$rostest_files" | wc -w) tests."
-        for test_file in $rostest_files; do
-          echo "[$pkg] Testing $test_file"
-          "$CATKIN_WORKSPACE/install/env.sh" rostest "$test_file" || EXIT_STATUS=$?
-          if [ $EXIT_STATUS != 0 ]; then
-            echo -e "[$pkg] Testing again the failed test: $test_file.\e[${ANSI_RED}m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\e[0m"
-            "$CATKIN_WORKSPACE/install/env.sh" rostest --text "$test_file"
-            echo -e "[$pkg] Testing again the failed test: $test_file.\e[${ANSI_RED}m<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\e[0m"
-          fi
-        done
-      done
-      [ $EXIT_STATUS -eq 0 ] || ici_error # unless all tests pass, raise error
-    fi
-
-    ici_time_end  # catkin_install_run_tests
-
-fi
