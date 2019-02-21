@@ -111,9 +111,9 @@ function ici_run_cmd_in_docker() {
   trap - INT
   if [ -n "$commit_image" ]; then
     echo "Committing container to tag: '$commit_image'"
-    docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image" > /dev/null
+    ici_quiet docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image"
   fi
-  docker rm "$cid" > /dev/null
+  ici_quiet docker rm "$cid"
   return $ret
 }
 
@@ -166,11 +166,11 @@ function ici_prepare_docker_image() {
   if [ -n "$DOCKER_FILE" ]; then # docker file was provided
     DOCKER_IMAGE=${DOCKER_IMAGE:"industrial-ci/custom"}
     if [ -f "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if single file, run without context
-       ici_docker_build - < "$TARGET_REPO_PATH/$DOCKER_FILE" > /dev/null
+       ici_quiet ici_docker_build - < "$TARGET_REPO_PATH/$DOCKER_FILE"
     elif [ -d "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if path, run with context
-        ici_docker_build "$TARGET_REPO_PATH/$DOCKER_FILE" > /dev/null
+        ici_quiet ici_docker_build "$TARGET_REPO_PATH/$DOCKER_FILE"
     else # url, run directly
-        ici_docker_build "$DOCKER_FILE" > /dev/null
+        ici_quiet ici_docker_build "$DOCKER_FILE"
     fi
   elif [ -z "$DOCKER_IMAGE" ]; then # image was not provided, use default
      ici_build_default_docker_image
@@ -208,7 +208,7 @@ EOF
     cp "$qemu_path" "$qemu_temp"
     unset INJECT_QEMU
     export DOCKER_BASE_IMAGE="$DOCKER_BASE_IMAGE-qemu"
-    DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_docker_build "$qemu_temp" > /dev/null
+    DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_quiet ici_docker_build "$qemu_temp"
     rm -rf "$qemu_temp"
   fi
   # choose a unique image name
@@ -216,7 +216,7 @@ EOF
   echo "Building image '$DOCKER_IMAGE':"
   local dockerfile; dockerfile=$(ici_generate_default_dockerfile)
   echo "$dockerfile"
-  ici_docker_build - <<< "$dockerfile" > /dev/null
+  ici_quiet ici_docker_build - <<< "$dockerfile"
 }
 
 function ici_generate_default_dockerfile() {

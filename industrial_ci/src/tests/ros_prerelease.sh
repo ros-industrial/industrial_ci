@@ -35,7 +35,7 @@ function setup_environment() {
         error "Could not detect docker settings"
     fi
 
-    docker build -t "industrial-ci/prerelease" - <<EOF > /dev/null
+    ici_quiet docker build -t "industrial-ci/prerelease" - <<EOF
 FROM ubuntu:xenial
 
 RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget apt-transport-https ca-certificates

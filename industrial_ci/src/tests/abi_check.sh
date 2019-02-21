@@ -71,7 +71,7 @@ function abi_setup_rosdep() {
     fi
     ret_rosdep=1
     rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
-    rosdep install -q --from-paths "$TARGET_REPO_PATH" --ignore-src -y > /dev/null
+    ici_quiet rosdep install -q --from-paths "$TARGET_REPO_PATH" --ignore-src -y
 }
 
 function run_abi_check() {
@@ -121,7 +121,7 @@ function run_abi_check() {
     ici_require_run_in_docker # this script must be run in docker
 
     ici_time_start install_abi_compliance_checker
-    abi_install > /dev/null
+    ici_quiet abi_install
     ici_time_end  # install_abi_compliance_checker
 
     ici_time_start abi_get_base

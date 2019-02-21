@@ -185,6 +185,17 @@ function ici_retry {
   return $ret
 }
 
+function ici_quiet {
+    local out; out=$(mktemp)
+    "$@" &> "$out" | true # '|| err=$?' disables errexit
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        cat "$out"
+    fi
+    rm -rf "$out"
+    return "$err"
+}
+
 if ! which sudo > /dev/null; then
   function sudo {
     "$@"
