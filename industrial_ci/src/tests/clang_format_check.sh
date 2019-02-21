@@ -26,7 +26,7 @@ function run_clang_format_check() {
 
   ici_time_start install_clang_format
   sudo apt-get update -qq
-  sudo apt-get install -qq -y git-core "$clang_format_executable" > /dev/null
+  ici_quiet sudo apt-get install -qq -y git-core "$clang_format_executable"
   ici_time_end # install_clang_format
 
   if [ -n "$USE_MOCKUP" ]; then
