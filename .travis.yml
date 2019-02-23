@@ -57,7 +57,7 @@ env:
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/industrial_core@kinetic-devel'
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='gh:ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE'
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ipa320/cob_calibration_data#indigo_dev' ROS_REPO=ros UPSTREAM_WORKSPACE=file AFTER_SCRIPT='./.travis.xacro_test.sh'
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ipa320/cob_calibration_data#indigo_dev' ROS_REPO=ros UPSTREAM_WORKSPACE=file AFTER_SCRIPT='rosenv ./.travis.xacro_test.sh'
     - ROS_DISTRO=indigo _EXTERNAL_REPO='github:ros/actionlib#38ce66e2ae2ec9c19cf12ab22d57a8134a9285be' ROS_REPO=ros ABICHECK_URL=url ABICHECK_MERGE=true # actual URL will not be used in the case
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.5' ROS_REPO=ros ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.1' ABICHECK_MERGE=false EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.6' ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.5' ABICHECK_MERGE=false

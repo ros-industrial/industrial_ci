@@ -31,6 +31,46 @@ function ici_color_output {
   echo -e "\e[${c}m$*\e[0m"
 }
 
+function rosenv() (
+  # if current_ws not set, use an invalid path to skip it
+  for e in ${current_ws:-/dev/null} ~/downstream_ws ~/target_ws ~/base_ws ~/upstream_ws "/opt/ros/$ROS_DISTRO"; do
+   if [ -f "$e/setup.bash" ]; then
+     set +u
+     # shellcheck disable=SC1090
+     source "$e/setup.bash"
+     set -u
+     if [ -n "$*" ]; then
+       exec "$@"
+     fi
+     return 0
+   fi
+  done
+  return 1
+)
+
+function ici_with_ws() {
+  # shellcheck disable=SC2034
+  current_ws=$1; shift
+  "$@"
+  unset current_ws
+}
+
+function _sub_shell() (
+  set -u
+  eval "$@"
+  set +u
+)
+
+function ici_hook() {
+  local name=${1^^}
+  name=${name//[^A-Z0-9_]/_}
+
+  local script=${!name}
+  if [ -n "$script" ]; then
+    ici_run "$1" _sub_shell "$script"
+  fi
+}
+
 #######################################
 # Starts a timer section on Travis CI
 # based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_start.bash
@@ -49,6 +89,7 @@ function ici_color_output {
 #######################################
 
 function ici_time_start {
+    ici_hook "before_${1}"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     ICI_START_TIME=$(date -u +%s%N)
     ICI_TIME_ID="$(printf %08x $((RANDOM * RANDOM)))"
@@ -99,6 +140,15 @@ function ici_time_end {
 
     unset ICI_FOLD_NAME
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
+    ici_hook "after_${name}"
+
+}
+
+function ici_run {
+    local name=$1; shift
+    ici_time_start "$name"
+    "$@"
+    ici_time_end
 }
 
 #######################################
