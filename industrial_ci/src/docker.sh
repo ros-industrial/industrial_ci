@@ -43,6 +43,7 @@ function ici_require_run_in_docker() {
                           -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
                           -t \
                           --entrypoint '' \
+                          -w "$docker_target_repo_path" \
                           "$DOCKER_IMAGE" \
                           /bin/bash $docker_ici_src_path/ci_main.sh
     exit
@@ -87,9 +88,14 @@ function ici_run_cmd_in_docker() {
     run_opts+=(-v "$qemu_path:$qemu_path:ro")
   fi
 
+  local hooks=()
+  for hook in $(env | grep -o '^\(BEFORE\|AFTER\)_[^=]*'); do
+      hooks+=(-e "$hook")
+  done
   local cid
   cid=$(docker create \
       --env-file "${ICI_SRC_PATH}"/docker.env \
+      "${hooks[@]}" \
       "${run_opts[@]}" \
       "$@")
 
