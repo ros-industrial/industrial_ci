@@ -65,11 +65,11 @@ env:
     - ROS_DISTRO=melodic NOT_TEST_DOWNSTREAM=true BUILDER=colcon _EXTERNAL_REPO='github:ros-controls/ros_control#melodic-devel' UPSTREAM_WORKSPACE="github:ros-controls/control_msgs#kinetic-devel github:ros-controls/realtime_tools#melodic-devel github:ros-controls/control_toolbox#melodic-devel" DOWNSTREAM_WORKSPACE="github:ros-controls/ros_controllers#melodic-devel"
 
     # Format tests
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM' CLANG_FORMAT_VERSION=3.8
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM'
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='LLVM' EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='file'
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='WebKit' EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM' CLANG_FORMAT_VERSION=3.8
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM'
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='LLVM' EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='file'
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='WebKit' EXPECT_EXIT_CODE=1
 matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
