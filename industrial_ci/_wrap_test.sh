@@ -21,7 +21,8 @@ set -e # exit script on errors
 
 if [ -n "$_EXTERNAL_REPO" ]; then
 
-    export TRAVIS_BUILD_DIR=$(mktemp -d)
+    export TRAVIS_BUILD_DIR
+    TRAVIS_BUILD_DIR=$(mktemp -d)
 
     repo_name=${_EXTERNAL_REPO%%#*}
     repo_branch=${_EXTERNAL_REPO##*#}
@@ -30,7 +31,7 @@ if [ -n "$_EXTERNAL_REPO" ]; then
         repo_branch="HEAD"
     fi
 
-    if [[ "$repo_name" =~ ^[a-zA-Z][\w+-\.]*: ]]; then # stars with scheme (RFC 3986)
+    if [[ "$repo_name" =~ ^[:alpha:][[:alnum:].+-]+: ]]; then # stars with scheme (RFC 3986)
         repo_url=$repo_name
     else
         repo_url="https://github.com/$repo_name.git" # treat as github repo

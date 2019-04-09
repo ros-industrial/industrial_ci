@@ -26,7 +26,7 @@ function run_clang_format_check() {
 
   ici_time_start install_clang_format
   sudo apt-get update -qq
-  sudo apt-get install -qq -y git-core $clang_format_executable > /dev/null
+  sudo apt-get install -qq -y git-core "$clang_format_executable" > /dev/null
   ici_time_end # install_clang_format
 
   if [ -n "$USE_MOCKUP" ]; then
@@ -37,9 +37,9 @@ function run_clang_format_check() {
   fi
 
   ici_time_start run_clang_format_check
-  while read file; do
+  while read -r file; do
     if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
-      err=$[$err +1]
+      err=$((err +1))
     fi
   done < <(find "$path"/* -iname '*.h' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.cc' -or -iname '*.cpp' -or -iname '*.cxx')
 
