@@ -27,4 +27,4 @@ export TARGET_REPO_NAME=${BITBUCKET_REPO_SLUG##*/}
 export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 export _DO_NOT_FOLD=true
 
-env "$@" bash $DIR_THIS/industrial_ci/src/ci_main.sh
+env "$@" bash "$DIR_THIS/industrial_ci/src/ci_main.sh"

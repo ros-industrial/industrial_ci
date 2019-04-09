@@ -69,7 +69,6 @@ function ici_run_cmd_in_docker() {
   unset DOCKER_COMMIT
 
   #forward ssh agent into docker container
- local ssh_docker_opts=()
   if [ "$SSH_AUTH_SOCK" ]; then
      local auth_dir
      auth_dir=$(dirname "$SSH_AUTH_SOCK")
@@ -77,7 +76,7 @@ function ici_run_cmd_in_docker() {
   fi
 
   if [ "$CCACHE_DIR" ]; then
-     run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e CCACHE_DIR=/root/.ccache)
+     run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
   fi
 
   if [ -n "$INJECT_QEMU" ]; then
@@ -122,7 +121,7 @@ function ici_run_cmd_in_docker() {
 # ensures that copied files are owned by the target user
 function docker_cp {
   set -o pipefail
-  tar --numeric-owner --owner=${docker_uid:-root} --group=${docker_gid:-root} -c -f - -C "$(dirname $1)" "$(basename $1)" | docker cp - $2
+  tar --numeric-owner --owner="${docker_uid:-root}" --group="${docker_gid:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
   set +o pipefail
 }
 #######################################
@@ -204,7 +203,7 @@ function ici_build_default_docker_image() {
     qemu_temp=$(mktemp -d)
     cat <<EOF > "$qemu_temp/Dockerfile"
     FROM $DOCKER_BASE_IMAGE
-    COPY '$(basename $qemu_path)' '$qemu_path'
+    COPY '$(basename "$qemu_path")' '$qemu_path'
 EOF
     cp "$qemu_path" "$qemu_temp"
     unset INJECT_QEMU
@@ -215,7 +214,7 @@ EOF
   # choose a unique image name
   export DOCKER_IMAGE="industrial-ci/$ROS_DISTRO/$DOCKER_BASE_IMAGE"
   echo "Building image '$DOCKER_IMAGE':"
-  local dockerfile=$(ici_generate_default_dockerfile)
+  local dockerfile; dockerfile=$(ici_generate_default_dockerfile)
   echo "$dockerfile"
   ici_docker_build - <<< "$dockerfile" > /dev/null
 }

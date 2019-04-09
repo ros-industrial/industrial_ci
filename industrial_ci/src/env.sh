@@ -64,6 +64,7 @@ fi
 export OS_CODE_NAME
 export OS_NAME
 export DOCKER_BASE_IMAGE
+export ROS_DISTRO
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
@@ -97,7 +98,7 @@ if [ -z "$OS_CODE_NAME" ]; then
           if [ "$DOCKER_PULL" != false ]; then
             docker pull "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}"
           fi
-          export ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*")
+          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
         fi
         if [ -z "$ROS_DISTRO" ]; then
             error "Please specify ROS_DISTRO"
