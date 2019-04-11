@@ -62,6 +62,9 @@ env:
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.6' ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.5' ABICHECK_MERGE=false
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE="ros_control.rosinstall -ros_control -ros_controllers"
     - ROS_DISTRO=melodic NOT_TEST_DOWNSTREAM=true BUILDER=colcon _EXTERNAL_REPO='github:ros-controls/ros_control#melodic-devel' UPSTREAM_WORKSPACE="github:ros-controls/control_msgs#kinetic-devel github:ros-controls/realtime_tools#melodic-devel github:ros-controls/control_toolbox#melodic-devel" DOWNSTREAM_WORKSPACE="github:ros-controls/ros_controllers#melodic-devel"
+    - ROS_DISTRO=bouncy _EXTERNAL_REPO='github:ros2/joystick_drivers#bouncy'
+    - ROS_DISTRO=crystal _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
+    - ROS_DISTRO=dashing _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
 
     # Format tests
     - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM' CLANG_FORMAT_VERSION=3.8

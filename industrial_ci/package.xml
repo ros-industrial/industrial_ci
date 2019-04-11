@@ -1,4 +1,4 @@
-<package>
+<package format="3">
   <name>industrial_ci</name>
   <version>0.8.0</version>
   <description>This package contains CI (Continuous Integration) configuration that any ROS-powered packages can commonly use. Some notable feature:
@@ -21,10 +21,14 @@
   <url type="repository">https://github.com/ros-industrial/industrial_ci</url>
   <url type="bugtracker">https://github.com/ros-industrial/industrial_ci/issues</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION != 2">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
-  <run_depend>python-rospkg</run_depend>
-  <run_depend>python-yaml</run_depend>
+  <exec_depend>coreutils</exec_depend>
+  <exec_depend>python-yaml</exec_depend>
 
-  <export/>
+  <export>
+      <build_type condition="$ROS_VERSION != 2">catkin</build_type>
+      <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
+  </export>
 </package>

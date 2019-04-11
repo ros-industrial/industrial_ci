@@ -35,6 +35,7 @@ for v in CATKIN_PARALLEL_JOBS CATKIN_PARALLEL_TEST_JOBS ROS_PARALLEL_JOBS ROS_PA
     ici_mark_deprecated "$v" "Job control is not available anymore"
 done
 
+ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPACE format"
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
@@ -58,59 +59,18 @@ fi
 
 TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
 
-export OS_CODE_NAME
-export OS_NAME
-export DOCKER_BASE_IMAGE
-export ROS_DISTRO
-export ROS_VERSION_EOL
-
-# exit with error if OS_NAME is set, but OS_CODE_NAME is not.
-# assume ubuntu as default
-if [ -z "$OS_NAME" ]; then
-    OS_NAME=ubuntu
-elif [ -z "$OS_CODE_NAME" ]; then
-    ici_error "please specify OS_CODE_NAME"
-fi
-
-if [ -n "$UBUNTU_OS_CODE_NAME" ]; then # for backward-compatibility
-    OS_CODE_NAME=$UBUNTU_OS_CODE_NAME
-fi
-
-if [ -z "$OS_CODE_NAME" ]; then
-    case "$ROS_DISTRO" in
-    "indigo"|"jade")
-        OS_CODE_NAME="trusty"
-        ROS_VERSION_EOL=true
-        ;;
-    "lunar")
-        OS_CODE_NAME="xenial"
-        ROS_VERSION_EOL=true
-        ;;
-    "kinetic")
-        OS_CODE_NAME="xenial"
-        ;;
-    "melodic")
-        OS_CODE_NAME="bionic"
-        ;;
-    "")
-        if [ -n "$DOCKER_IMAGE" ] || [ -n "$DOCKER_BASE_IMAGE" ]; then
-          # try to reed ROS_DISTRO from imgae
-          if [ "$DOCKER_PULL" != false ]; then
-            docker pull "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}"
-          fi
-          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
-        fi
-        if [ -z "$ROS_DISTRO" ]; then
-            ici_error "Please specify ROS_DISTRO"
-        fi
-        ;;
-    *)
-        ici_error "ROS distro '$ROS_DISTRO' is not supported"
-        ;;
-    esac
-fi
-
-
+function  ros1_defaults {
+    DEFAULT_OS_CODE_NAME=$1
+    ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
+    BUILDER=${BUILDER:-catkin_tools}
+    ROS_VERSION=1
+}
+function  ros2_defaults {
+    DEFAULT_OS_CODE_NAME=$1
+    ROS2_DISTRO=${ROS2_DISTRO:-$ROS_DISTRO}
+    BUILDER=${BUILDER:-colcon}
+    ROS_VERSION=2
+}
 function use_snapshot() {
     ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
     HASHKEY_SKS="AD19BAB3CBF125EA"
@@ -129,30 +89,130 @@ function use_repo_or_final_snapshot() {
         fi
     fi
 }
-
-# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
-if [ ! "$ROS_REPOSITORY_PATH" ]; then
-    case "${ROS_REPO:-testing}" in
-    "building")
-        use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
+function set_ros_variables {
+    case "$ROS_DISTRO" in
+    "indigo"|"jade")
+        ros1_defaults "trusty"
+        DEFAULT_DOCKER_IMAGE=""
+        ROS_VERSION_EOL=true
         ;;
-    "ros"|"main")
-        use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
+    "kinetic")
+        ros1_defaults "xenial"
         ;;
-    "ros-shadow-fixed"|"ros-testing"|"testing")
-        use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
+    "lunar")
+        ros1_defaults "xenial"
+        ROS_VERSION_EOL=true
         ;;
-    "final"|????-??-??)
-        use_snapshot "${ROS_REPO}"
+    "melodic")
+        ros1_defaults "bionic"
         ;;
-    *)
-        ici_error "ROS repo '$ROS_REPO' is not supported"
+    "ardent")
+        ros2_defaults "xenial"
+        DEFAULT_DOCKER_IMAGE=
+        ROS_VERSION_EOL=true
+        ;;
+    "bouncy")
+        ros2_defaults "bionic"
+        ROS_VERSION_EOL=true
+        ;;
+    "crystal"|"dashing")
+        ros2_defaults "bionic"
         ;;
     esac
+
+    local prefix=ros
+    if [ "$ROS_VERSION" -eq 2 ]; then
+      prefix=ros2
+    fi
+
+    if [ ! "$ROS_REPOSITORY_PATH" ]; then
+        case "${ROS_REPO:-testing}" in
+        "building")
+            use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        "main")
+            use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
+            ;;
+        "ros")
+            use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
+            ;;
+        "ros2")
+            use_repo_or_final_snapshot "http://packages.ros.org/ros2/ubuntu"
+            ;;
+        "testing")
+            use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        "ros-shadow-fixed"|"ros-testing")
+            use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        "ros2-testing")
+            use_repo_or_final_snapshot "http://packages.ros.org/ros2-testing/ubuntu"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        "final"|????-??-??)
+            use_snapshot "${ROS_REPO}"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        *)
+            ici_error "ROS repo '$ROS_REPO' is not supported"
+            ;;
+        esac
+    fi
+}
+
+# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
+export OS_CODE_NAME
+export OS_NAME
+export DOCKER_BASE_IMAGE
+export ROS_DISTRO
+export ROS_VERSION
+export ROS_VERSION_EOL
+
+# exit with error if OS_NAME is set, but OS_CODE_NAME is not.
+# assume ubuntu as default
+if [ -z "$OS_NAME" ]; then
+    OS_NAME=ubuntu
+elif [ -z "$OS_CODE_NAME" ]; then
+    ici_error "please specify OS_CODE_NAME"
+fi
+
+if [ -n "$UBUNTU_OS_CODE_NAME" ]; then # for backward-compatibility
+    OS_CODE_NAME=$UBUNTU_OS_CODE_NAME
+fi
+
+if [ -z "$OS_CODE_NAME" ]; then
+    case "$ROS_DISTRO" in
+    "")
+        if [ -n "$DOCKER_IMAGE" ] || [ -n "$DOCKER_BASE_IMAGE" ]; then
+          # try to reed ROS_DISTRO from (base) image
+          ici_docker_try_pull "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}"
+          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
+        fi
+        if [ -z "$ROS_DISTRO" ]; then
+            ici_error "Please specify ROS_DISTRO"
+        fi
+        set_ros_variables
+        ;;
+    *)
+        set_ros_variables
+        if [ -z "$DEFAULT_OS_CODE_NAME" ]; then
+            ici_error "ROS distro '$ROS_DISTRO' is not supported"
+        fi
+        OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
+        DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
+        ;;
+    esac
+else
+    set_ros_variables
 fi
 
 if [ -z "$DOCKER_BASE_IMAGE" ]; then
     DOCKER_BASE_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
+else
+    DEFAULT_DOCKER_IMAGE=""
 fi
 
 
@@ -166,7 +226,7 @@ fi
 
 if [ "$USE_DEB" = true ]; then
   if [ "${UPSTREAM_WORKSPACE:-debian}" != "debian" ]; then
-    error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
+    ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
   fi
   ici_warn "Setting 'USE_DEB=true' is superfluous"
 fi
@@ -179,7 +239,7 @@ if [ "$UPSTREAM_WORKSPACE" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
 
   if [ "${USE_DEB:-true}" != true ]; then # means UPSTREAM_WORKSPACE=file
       if [ "${UPSTREAM_WORKSPACE:-file}" != "file" ]; then
-        error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
+        ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
       fi
       ici_warn "Replacing 'USE_DEB=false' with 'UPSTREAM_WORKSPACE=$ROSINSTALL_FILENAME'"
   else
