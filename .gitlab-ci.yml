@@ -34,6 +34,9 @@ melodic:
     ROS_DISTRO: "melodic"
     PRERELEASE: "true"
 
+dashing:
+  script: .industrial_ci/gitlab.sh ROS_DISTRO=dashing
+
 # some internal tests
 
 docker_pull_base:

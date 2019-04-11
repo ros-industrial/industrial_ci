@@ -157,6 +157,14 @@ function ici_docker_build() {
   docker build -t "$DOCKER_IMAGE" "${build_opts[@]}" "$@"
 }
 
+function ici_docker_try_pull {
+    local image=$1
+    if [ "$DOCKER_PULL" != false ]; then
+        echo "Pulling Docker image '$image'..."
+        ici_quiet docker pull "$image"
+    fi
+}
+
 #######################################
 # set-ups the CI docker image
 #
@@ -184,10 +192,16 @@ function ici_prepare_docker_image() {
         ici_quiet ici_docker_build "$DOCKER_FILE"
     fi
   elif [ -z "$DOCKER_IMAGE" ]; then # image was not provided, use default
-     ici_build_default_docker_image
-  elif [ "$DOCKER_PULL" != false ]; then
-     docker pull "$DOCKER_IMAGE"
+    if [ -n "$DEFAULT_DOCKER_IMAGE" ]; then
+        DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE
+        ici_docker_try_pull "$DOCKER_IMAGE"
+    else
+        ici_build_default_docker_image
+    fi
+  else
+      ici_docker_try_pull "$DOCKER_IMAGE"
   fi
+
   ici_time_end # prepare_docker_image
 }
 
@@ -236,33 +250,23 @@ function ici_generate_default_dockerfile() {
   if [ -n "${APTKEY_STORE_HTTPS}" ]; then
     keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
   else
-    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS}'"
+    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
   fi
 
   cat <<EOF
 FROM $DOCKER_BASE_IMAGE
 
 ENV ROS_DISTRO $ROS_DISTRO
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates lsb-release dirmngr
+RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr python-pip python3-pip
 
-RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
 RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
+RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list
 
-RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
-    && apt-get update -qq \
-    && apt-get -qq install --no-install-recommends -y \
-        build-essential \
-        python-catkin-tools \
-        python-pip \
-        python-rosdep \
-        python-wstool \
-        ros-$ROS_DISTRO-catkin \
-        ssh-client \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list  && apt-get update -qq
 EOF
 }

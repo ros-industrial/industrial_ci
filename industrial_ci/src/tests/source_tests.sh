@@ -29,7 +29,7 @@ function install_catkin_lint {
 
 function run_source_tests {
     # shellcheck disable=SC1090
-    source "${ICI_SRC_PATH}/builders/${BUILDER:-catkin_tools}.sh" || ici_error "Builder '$BUILDER' not supported"
+    source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
 
     ici_require_run_in_docker # this script must be run in docker
     upstream_ws=~/upstream_ws
