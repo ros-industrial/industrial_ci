@@ -26,11 +26,7 @@ function builder_run_build {
     if [ "$VERBOSE_OUTPUT" != false ]; then
         opts+=("-vi")
     fi
-    if [ -n "$CATKIN_CONFIG" ]; then
-      local -a config
-      ici_parse_env_array config CATKIN_CONFIG
-      ici_exec_in_workspace "$extend" "$ws" catkin config "${config[@]}"
-    fi
+    ici_exec_in_workspace "$extend" "$ws" catkin config --install
     ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize  --no-status "$@"
 }
 

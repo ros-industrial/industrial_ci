@@ -168,7 +168,6 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ADDITIONAL_DEBS** (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: "ros-indigo-roslint ros-indigo-gazebo-ros" (without quotation).
 * **AFTER_SCRIPT** (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`__ where `after_script` doesn't affect the build result, the result in the commands specified with this DOES affect the build result. See more `here <./index.rst#run-pre-post-process-custom-commands>`__.
 * **BUILDER** (default: catkin_tools for ROS1, colcon for ROS2): Select the builder e.g. to build ROS1 packages with colcon
-* **CATKIN_CONFIG** (default: not set): `catkin config --install` is used by default and with this variable you can 1) pass additional config options, or 2) overwrite `--install` by `--no-install`. See more in `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-customize-catkin-config>`__.
 * **CATKIN_LINT** (default: not set. Value range: [true|pedantic]): If `true`, run `catkin_lint <http://fkie.github.io/catkin_lint/>`__ with `--explain` option. If `pedantic`, `catkin_lint` command runs with `--strict -W2` option, i.e. more verbose output will print, and the CI job fails if there's any error and/or warning occurs.
 * **CATKIN_LINT_ARGS** (default: not set): If true, you can pass whatever argument(s) `catkin_lint` takes, except `--explain` that is set by default. Options can be delimit by space if passing multiple.
 * **CMAKE_ARGS** (default: not set): CMake arguments that get passed to the builder for all workspaces.
@@ -476,30 +475,6 @@ It is up to each repository's maintainer for which baseline code you check ABI a
 
     - ABI check runs per every change/push into your branch, which is superfluous.
     - Reasonable for pull requests.
-
-Customize `catkin config`
-------------------------------------
-
-By default, `industrial_ci` builds packages with `catkin config --install`, which requires `install` rules to pass CI jobs. This might not be suitable in some cases, e.g. with your experimental packages where you have no plan to make them deployable so that `install` rules are nothing but extra burden. Also, you may want to add addtional configuration for `catkin config`. In these cases define "`CATKIN_CONFIG`" variable.
-
-Example-1::
-
-  CATKIN_CONFIG='--no-install'
-
-This allows you to use `devel` space for the job, instead of `install` space.
-
-Example-2::
-
-  CATKIN_CONFIG='-DMyCustomBuildFlag=true'
-
-This will end up defining the following CMake arg. `install` space is still used::
-
-  Additional CMake Args:       -DMyCustomBuildFlag=true
-
-Reference:
-
- * `Discussion about install space <https://github.com/ros-industrial/industrial_ci/issues/54>`__
- * `Detail for catkin config <http://catkin-tools.readthedocs.io/en/latest/verbs/catkin_config.html>`__ for more info about `catkin-tools`.
 
 Cache build artifacts to speed up the subsequent builds (if any)
 ----------------------------------------------------------------

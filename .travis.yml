@@ -22,7 +22,6 @@ env:
     - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/testpkg_broken_install'  EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  CATKIN_CONFIG='--no-install -DCMAKE_CXX_FLAGS="-Werror=uninitialized -Werror=return-type"'
     - DOCKER_IMAGE='arm32v7/ros:indigo-ros-core' ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip" INJECT_QEMU=arm BEFORE_INIT='[[ $(uname -p) == armv7l ]]'
     - ROS_DISTRO=melodic NOT_TEST_BUILD='true' _GUARD_INTERVAL=10
     - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_INIT='test -z "${CXX+x}"' # test that CXX is not set
