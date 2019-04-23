@@ -17,6 +17,7 @@
 # limitations under the License.
 
 ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
+ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not available anymore."
 
 if [ -n "$NOT_TEST_INSTALL" ]; then
     if [ "$NOT_TEST_INSTALL" != true ]; then
