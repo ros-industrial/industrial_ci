@@ -148,6 +148,11 @@ catkin config --install
 catkin_config=($CATKIN_CONFIG)
 if [ ${#catkin_config[@]} -ne 0 ]; then eval catkin config "${catkin_config[@]}"; fi
 
+cmake_args=(${CMAKE_ARGS})
+if [ ${#cmake_args[@]} -gt 0 ]; then
+  catkin config --cmake-args "${cmake_args[@]}"
+fi
+
 ici_time_end  # setup_rosws
 
 
