@@ -12,6 +12,8 @@ Industrial CI
     :alt: License
 
 CI (Continuous Integration) configuration for `ROS` (`Robot Operating System <http://ros.org>`__).
+This is the refactored version with ROS2 support, the old verson can be found in the `legacy branch <https://github.com/ros-industrial/industrial_ci/tree/legacy>`__.
+Please check the `migration guide <doc/migration_guide.md>`__ as well.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -30,7 +32,7 @@ Some notable feature:
 * Checks if your package builds, installs without issues. If unit/system tests are defined run them. `ROS Prerelease Test <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest>`__ can optionally be run.
 * Proven to cover the general requirements of the ROS-based robotics repositories. Easily configurable.
 * Users can add custom pre/post processes.
-* Covers ROS Hydro, Indigo, Jade, Kinetic, Lunar, Melodic distribution.
+* Covers ROS1 Indigo, Jade, Kinetic, Lunar, Melodic and ROS2 distributions.
 * This repo provides scripts for `Bitbucket CI`, `Gitlab CI`, and `Travis CI` only, but it can be easily adapted for other CI services.
 
 For a brief overall introduction, you could also check a presentation:
