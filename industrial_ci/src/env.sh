@@ -56,7 +56,7 @@ if [ ! "$ROS_REPOSITORY_PATH" ]; then
         ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"
         ;;
     *)
-        error "ROS repo '$ROS_REPO' is not supported"
+        ici_error "ROS repo '$ROS_REPO' is not supported"
         ;;
     esac
 fi
@@ -71,7 +71,7 @@ export ROS_DISTRO
 if [ -z "$OS_NAME" ]; then
     OS_NAME=ubuntu
 elif [ -z "$OS_CODE_NAME" ]; then
-    error "please specify OS_CODE_NAME"
+    ici_error "please specify OS_CODE_NAME"
 fi
 
 if [ -n "$UBUNTU_OS_CODE_NAME" ]; then # for backward-compatibility
@@ -101,11 +101,11 @@ if [ -z "$OS_CODE_NAME" ]; then
           ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
         fi
         if [ -z "$ROS_DISTRO" ]; then
-            error "Please specify ROS_DISTRO"
+            ici_error "Please specify ROS_DISTRO"
         fi
         ;;
     *)
-        error "ROS distro '$ROS_DISTRO' is not supported"
+        ici_error "ROS distro '$ROS_DISTRO' is not supported"
         ;;
     esac
 fi

@@ -32,7 +32,7 @@ function setup_environment() {
         DIND_OPTS=(-v /var/run/docker.sock:/var/run/docker.sock)
         user_cmd="groupadd -o -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
     else
-        error "Could not detect docker settings"
+        ici_error "Could not detect docker settings"
     fi
 
     ici_quiet docker build -t "industrial-ci/prerelease" - <<EOF
@@ -90,7 +90,7 @@ function run_ros_prerelease() {
 
     if [ "${USE_MOCKUP// }" != "" ]; then
         if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
-            error "mockup directory '$USE_MOCKUP' does not exist"
+            ici_error "mockup directory '$USE_MOCKUP' does not exist"
         fi
         cp -a "$TARGET_REPO_PATH/$USE_MOCKUP" "$WORKSPACE/catkin_workspace/src"
     fi

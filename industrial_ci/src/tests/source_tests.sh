@@ -47,7 +47,7 @@ ici_time_end  # init_ici_environment
 
 function catkin {
   local path
-  path=$(which catkin) || error "catkin not available. Make sure python-catkin-tools is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216"
+  path=$(which catkin) || ici_error "catkin not available. Make sure python-catkin-tools is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216"
   local cmd=$1
   shift
   "$path" "$cmd" -w "$CATKIN_WORKSPACE" "$@"
@@ -60,7 +60,7 @@ sudo apt-get update -qq
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
     add_debs=($ADDITIONAL_DEBS)
-    sudo apt-get install -qq -y "${add_debs[@]}" || error "One or more additional deb installation is failed. Exiting."
+    sudo apt-get install -qq -y "${add_debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
 fi
 # shellcheck source=/dev/null
 source "/opt/ros/$ROS_DISTRO/setup.bash"
@@ -69,7 +69,7 @@ ici_time_end  # setup_apt
 
 if [ "$CCACHE_DIR" ]; then
     ici_time_start setup_ccache
-    sudo apt-get install -qq -y ccache || error "Could not install ccache. Exiting."
+    sudo apt-get install -qq -y ccache || ici_error "Could not install ccache. Exiting."
     export PATH="/usr/lib/ccache:$PATH"
     ici_time_end  # setup_ccache
 fi
@@ -117,7 +117,7 @@ file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to b
         # install (maybe unreleased version) dependencies from source
         "$ROSWS" merge -t "$CATKIN_WORKSPACE/src" "file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME"
     else
-        error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/$ROSINSTALL_FILENAME[.$ROS_DISTRO]' does not exist"
+        ici_error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/$ROSINSTALL_FILENAME[.$ROS_DISTRO]' does not exist"
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
@@ -139,7 +139,7 @@ ln -sf "$TARGET_REPO_PATH" "$CATKIN_WORKSPACE/src"
 
 if [ "${USE_MOCKUP// }" != "" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
-        error "mockup directory '$USE_MOCKUP' does not exist"
+        ici_error "mockup directory '$USE_MOCKUP' does not exist"
     fi
     ln -sf "$TARGET_REPO_PATH/$USE_MOCKUP" "$CATKIN_WORKSPACE/src"
 fi
@@ -183,7 +183,7 @@ if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     if catkin_lint --explain "${lint_args[@]}" "$TARGET_REPO_PATH"; then
       echo "catkin_lint passed."
     else
-      error "catkin_lint failed by either/both errors and/or warnings"
+      ici_error "catkin_lint failed by either/both errors and/or warnings"
     fi
     ici_time_end  # catkin_lint
 fi
@@ -265,7 +265,7 @@ if [ "$NOT_TEST_INSTALL" != "true" ]; then
           fi
         done
       done
-      [ $EXIT_STATUS -eq 0 ] || error  # unless all tests pass, raise error
+      [ $EXIT_STATUS -eq 0 ] || ici_error # unless all tests pass, raise error
     fi
 
     ici_time_end  # catkin_install_run_tests
