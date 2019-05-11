@@ -152,7 +152,7 @@ function ici_mark_deprecated {
 # Returns:
 #   (None)
 #######################################
-function error {
+function ici_error {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
         ici_color_output ${ANSI_RED} "$1"
@@ -167,7 +167,7 @@ function ici_enforce_deprecated {
     local e=$1
     shift
     if [ "${!e}" ]; then
-      error "'$e' is not used anymore. $*"
+      ici_error "'$e' is not used anymore. $*"
     fi
 }
 

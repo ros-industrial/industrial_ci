@@ -79,10 +79,10 @@ function run_abi_check() {
     export ABICHECK_URL
 
     if [ "$ABICHECK_URL" = "auto" ]; then
-        error "ABICHECK_MERGE auto mode is available for travis only. "
+        ici_error "ABICHECK_MERGE auto mode is available for travis only. "
     fi
     if [ -z "$ABICHECK_URL" ]; then
-        error "Please set ABICHECK_URL"
+        ici_error "Please set ABICHECK_URL"
     fi
 
     if [[ $ABICHECK_URL =~ ([^:]+):([^#]+)#(.+) ]]; then
@@ -98,7 +98,7 @@ function run_abi_check() {
                 ABICHECK_URL="https://gitlab.com/${BASH_REMATCH[2]}/repository/$ABICHECK_VERSION/archive.tar.gz"
                 ;;
             *)
-                error "scheme '${BASH_REMATCH[1]}' is not supported for ABICHECK_URL"
+                ici_error "scheme '${BASH_REMATCH[1]}' is not supported for ABICHECK_URL"
         esac
     fi
 
@@ -108,7 +108,7 @@ function run_abi_check() {
           ABICHECK_URL="#${ref_list[1]}"
           ABICHECK_VERSION="${ref_list[1]}"
       else
-          error "Could not find merge commit for ABI check"
+          ici_error "Could not find merge commit for ABI check"
       fi
     fi
 
@@ -166,6 +166,6 @@ function run_abi_check() {
     done
 
     if [ "${#broken[@]}" -gt "0" ]; then
-        error "Broken libraries: ${broken[*]}"
+        ici_error "Broken libraries: ${broken[*]}"
     fi
 }

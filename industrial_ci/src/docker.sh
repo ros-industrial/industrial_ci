@@ -81,7 +81,7 @@ function ici_run_cmd_in_docker() {
 
   if [ -n "$INJECT_QEMU" ]; then
     local qemu_path
-    qemu_path=$(which "qemu-$INJECT_QEMU-static") || error "please install qemu-user-static"
+    qemu_path=$(which "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
     run_opts+=(-v "$qemu_path:$qemu_path:ro")
   fi
 
@@ -197,7 +197,7 @@ function ici_prepare_docker_image() {
 function ici_build_default_docker_image() {
   if [ -n "$INJECT_QEMU" ]; then
     local qemu_path
-    qemu_path=$(which "qemu-$INJECT_QEMU-static") || error "please install qemu-user-static"
+    qemu_path=$(which "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
     echo "Inject qemu..."
     local qemu_temp
     qemu_temp=$(mktemp -d)

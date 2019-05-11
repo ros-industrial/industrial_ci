@@ -31,7 +31,7 @@ function run_clang_format_check() {
 
   if [ -n "$USE_MOCKUP" ]; then
     if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
-        error "mockup directory '$USE_MOCKUP' does not exist"
+        ici_error "mockup directory '$USE_MOCKUP' does not exist"
     fi
     path="$TARGET_REPO_PATH/$USE_MOCKUP"
   fi
@@ -44,7 +44,7 @@ function run_clang_format_check() {
   done < <(find "$path"/* -iname '*.h' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.cc' -or -iname '*.cpp' -or -iname '*.cxx')
 
   if [ "$err" -ne "0" ]; then
-      error "Clang format check failed for $err file(s)."
+      ici_error "Clang format check failed for $err file(s)."
       echo "Changes required to comply to formatting rules. See diff above."
       exit 1
   fi
