@@ -33,6 +33,8 @@ function ici_color_output {
 
 #######################################
 # Starts a timer section on Travis CI
+# based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_start.bash
+#      and https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_fold.bash
 #
 # Globals:
 #   DEBUG_BASH (read-only)
@@ -48,19 +50,25 @@ function ici_color_output {
 
 function ici_time_start {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
-    ICI_START_TIME=$(date +%s%N)
-    ICI_TIME_ID=$(printf "%x" "$ICI_START_TIME")
+    ICI_START_TIME=$(date -u +%s%N)
+    ICI_TIME_ID="$(printf %08x $((RANDOM * RANDOM)))"
     ICI_FOLD_NAME=$1
+
+    echo # blank line
+
     if [ "$_DO_NOT_FOLD" != "true" ]; then
-        echo -e "\e[0Kici_fold:start:$ICI_FOLD_NAME"
-        echo -en "\e[0Kici_time:start:$ICI_TIME_ID"
+        echo -e "ici_fold:start:$ICI_FOLD_NAME"
+        echo -en "ici_time:start:$ICI_TIME_ID"
     fi
+
     ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    ici_color_output $ANSI_BLUE "Starting function '$ICI_FOLD_NAME'"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
 #######################################
 # Wraps up the timer section on Travis CI (that's started mostly by ici_time_start function).
+# based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_finish.bash
 #
 # Globals:
 #   DEBUG_BASH (read-only)
@@ -80,14 +88,14 @@ function ici_time_end {
     local name=$ICI_FOLD_NAME
 
     if [ -z "$ICI_START_TIME" ]; then ici_warn "[ici_time_end] var ICI_START_TIME is not set. You need to call ici_time_start in advance. Returning."; return; fi
-    local end_time; end_time=$(date +%s%N)
+    local end_time; end_time=$(date -u +%s%N)
     local elapsed_seconds; elapsed_seconds=$(( (end_time - ICI_START_TIME)/1000000000 ))
     if [ "$_DO_NOT_FOLD" != "true" ]; then
-        echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$((end_time - ICI_START_TIME))\e[0K"
+        echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$((end_time - ICI_START_TIME))"
         echo -en "ici_fold:end:$name"
     fi
     ici_color_output "$color_wrap" "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    echo -e "\e[0K\e[${color_wrap}mFunction $name returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec \e[0m\n"
+    ici_color_output "$color_wrap" "Function '$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 
     unset ICI_FOLD_NAME
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
