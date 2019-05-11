@@ -55,12 +55,12 @@ function catkin {
 
 ici_time_start setup_apt
 
-sudo apt-get update -qq
+ici_asroot apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
     add_debs=($ADDITIONAL_DEBS)
-    sudo apt-get install -qq -y "${add_debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
+    ici_asroot apt-get install -qq -y "${add_debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
 fi
 # shellcheck source=/dev/null
 source "/opt/ros/$ROS_DISTRO/setup.bash"
@@ -69,7 +69,7 @@ ici_time_end  # setup_apt
 
 if [ "$CCACHE_DIR" ]; then
     ici_time_start setup_ccache
-    sudo apt-get install -qq -y ccache || ici_error "Could not install ccache. Exiting."
+    ici_asroot apt-get install -qq -y ccache || ici_error "Could not install ccache. Exiting."
     export PATH="/usr/lib/ccache:$PATH"
     ici_time_end  # setup_ccache
 fi
@@ -79,7 +79,7 @@ ici_time_start setup_rosdep
 # Setup rosdep
 rosdep --version
 if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
-    sudo rosdep init
+    ici_asroot rosdep init
 fi
 
 update_opts=()
@@ -174,7 +174,7 @@ ici_time_end  # rosdep_install
 
 if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_start catkin_lint
-    sudo pip install catkin-lint
+    ici_asroot pip install catkin-lint
 
     lint_args=($CATKIN_LINT_ARGS)
     if [ "$CATKIN_LINT" == "pedantic" ]; then

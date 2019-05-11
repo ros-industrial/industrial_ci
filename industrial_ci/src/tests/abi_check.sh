@@ -16,15 +16,15 @@
 # limitations under the License.
 
 function abi_install() {
-    sudo apt-get update -qq
-    sudo apt-get install -y -qq libelf-dev elfutils autoconf pkg-config links bsdtar wget
+    ici_asroot apt-get update -qq
+    ici_asroot apt-get install -y -qq libelf-dev elfutils autoconf pkg-config links bsdtar wget
 
     wget -q -O /tmp/abi_installer.pl https://raw.githubusercontent.com/lvc/installer/master/installer.pl
-    sudo perl /tmp/abi_installer.pl -install -prefix /usr abi-compliance-checker
-    sudo perl /tmp/abi_installer.pl -install -prefix /usr abi-dumper
+    ici_asroot perl /tmp/abi_installer.pl -install -prefix /usr abi-compliance-checker
+    ici_asroot perl /tmp/abi_installer.pl -install -prefix /usr abi-dumper
 
     git clone --depth 1 https://github.com/universal-ctags/ctags.git /tmp/ctags
-    (cd /tmp/ctags && ./autogen.sh && ./configure && sudo make install)
+    (cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install)
 }
 
 
@@ -67,7 +67,7 @@ function abi_setup_rosdep() {
     # Setup rosdep
     rosdep --version
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
-        sudo rosdep init
+        ici_asroot rosdep init
     fi
     ret_rosdep=1
     rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
