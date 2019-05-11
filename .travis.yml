@@ -30,8 +30,8 @@ env:
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
     # - env: ROS_DISTRO=indigo PRERELEASE=true  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
-    - ROS_DISTRO=melodic PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=1 DOCKER_BASE_IMAGE=something
-    - ROS_DISTRO=melodic PRERELEASE=true USE_MOCKUP='industrial_ci/mockups/failing_test' EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=melodic PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=1
+    - ROS_DISTRO=melodic PRERELEASE=true TARGET_WORKSPACE='industrial_ci/mockups/failing_test' PRERELEASE_REPONAME="failing_test" EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic PRERELEASE=true PRERELEASE_REPONAME=industrial_ci
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian AFTER_SCRIPT='ccache 2> /dev/null && exit 1; [ "$?" = "127" ]'
      # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
@@ -64,6 +64,7 @@ env:
     - ROS_DISTRO=melodic NOT_TEST_DOWNSTREAM=true BUILDER=colcon _EXTERNAL_REPO='github:ros-controls/ros_control#melodic-devel' UPSTREAM_WORKSPACE="github:ros-controls/control_msgs#kinetic-devel github:ros-controls/realtime_tools#melodic-devel github:ros-controls/control_toolbox#melodic-devel" DOWNSTREAM_WORKSPACE="github:ros-controls/ros_controllers#melodic-devel"
     - ROS_DISTRO=bouncy _EXTERNAL_REPO='github:ros2/joystick_drivers#bouncy'
     - ROS_DISTRO=crystal _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
+    - ROS_DISTRO=crystal _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel' PRERELEASE=true
     - ROS_DISTRO=dashing _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
 
     # Format tests

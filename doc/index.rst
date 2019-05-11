@@ -409,9 +409,11 @@ Or with more configuration:
 
   ROS_DISTRO=indigo PRERELEASE=true PRERELEASE_REPONAME=industrial_core PRERELEASE_DOWNSTREAM_DEPTH=0
 
+In addition to the downstream packages from ROS distro, you can specify `UPSTREAM_WORKSPACE` and `DOWNSTREAM_WORKSPACE` as well.
+
 NOTE: A job that runs Prerelease Test does not run the checks that are defined in `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`__. To run both, use `matrix` in `CI config <#terminology>`__.
 
-See the usage sample in `.travis in indusrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`__.
+See the usage sample in `.travis in industrial_ci repository <https://github.com/ros-industrial/industrial_ci/blob/master/.travis.yml>`__.
 
 The following is some tips to be shared for running Prerelease Test on CI using `industrial_ci`.
 
