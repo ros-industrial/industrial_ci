@@ -159,6 +159,9 @@ function run_abi_check() {
                 links -dump "$reports_dir/$l.html"
                 broken+=("$l")
                 ici_time_end "${ANSI_YELLOW}" "$ret" # abi_check_*, yellow
+            elif [ "$ret" -eq "7" ]; then
+                ici_warn "'$(basename "$l" .dump)': Invalid input ABI dump. Perhaps this library does not any export symbols."
+                ici_time_end "${ANSI_YELLOW}"
             else
                 ici_exit "$ret"
             fi
