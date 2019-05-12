@@ -78,7 +78,7 @@ function run_abi_check() {
     export ABICHECK_VERSION
     export ABICHECK_URL
 
-    if [ "$ABICHECK_URL" = "auto" ]; then
+    if [ "$ABICHECK_MERGE" = "auto" ]; then
         error "ABICHECK_MERGE auto mode is available for travis only. "
     fi
     if [ -z "$ABICHECK_URL" ]; then
