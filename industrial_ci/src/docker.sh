@@ -42,6 +42,7 @@ function ici_require_run_in_docker() {
                           -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
                           -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
                           -t \
+                          --entrypoint '' \
                           "$DOCKER_IMAGE" \
                           /bin/bash $docker_ici_src_path/ci_main.sh
     exit
@@ -95,8 +96,8 @@ function ici_run_cmd_in_docker() {
   # detect user inside container
   local docker_image
   docker_image=$(docker inspect --format='{{.Config.Image}}' "$cid")
-  docker_uid=$(docker run --rm "${run_opts[@]}" "$docker_image" id -u)
-  docker_gid=$(docker run --rm "${run_opts[@]}" "$docker_image" id -g)
+  docker_uid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$docker_image" id -u)
+  docker_gid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$docker_image" id -g)
 
   # pass common credentials to container
   for d in .docker .ssh .subversion; do
