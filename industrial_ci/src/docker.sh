@@ -47,6 +47,8 @@ function ici_require_run_in_docker() {
                           "$DOCKER_IMAGE" \
                           /bin/bash $docker_ici_src_path/ci_main.sh
     exit
+  else
+    ici_run "init" ici_init_apt
   fi
 }
 

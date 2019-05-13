@@ -25,7 +25,6 @@ function run_clang_format_check() {
   local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
 
   ici_time_start install_clang_format
-  ici_asroot apt-get update -qq
   ici_quiet ici_asroot apt-get install -qq -y git-core "$clang_format_executable"
   ici_time_end # install_clang_format
 

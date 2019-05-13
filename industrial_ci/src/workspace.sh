@@ -50,6 +50,16 @@ function ici_resolve_scheme {
 
 }
 
+function ici_init_apt {
+    ici_asroot apt-get update -qq
+    # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
+    local -a debs
+    ici_parse_env_array debs ADDITIONAL_DEBS
+    if [ -n "${debs[*]}" ]; then
+        ici_asroot apt-get install -qq -y "${debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
+    fi
+}
+
 function ici_exec_for_command {
   local command=$1; shift
   if ! command -v "$command" > /dev/null; then
