@@ -231,3 +231,33 @@ function ici_install_dependencies {
     ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
     set +o pipefail
 }
+
+function ici_build_workspace {
+    local name=$1; shift
+    local extend=$1; shift
+    local ws=$1; shift
+
+    local -a ws_sources
+    ici_parse_env_array  ws_sources "${name^^}_WORKSPACE"
+    local sources=("$@" "${ws_sources[@]}")
+    local -a cmake_args ws_cmake_args
+    ici_parse_env_array  cmake_args CMAKE_ARGS
+    ici_parse_env_array  ws_cmake_args "${name^^}_CMAKE_ARGS"
+    local -a args
+    if [ ${#cmake_args[@]} -gt 0 ] || [ ${#ws_cmake_args[@]} -gt 0 ]; then
+        args+=(--cmake-args "${cmake_args[@]}" "${ws_cmake_args[@]}")
+    fi
+
+    ici_run "setup_${name}_workspace" ici_prepare_sourcespace "$ws/src" "${sources[@]}"
+    ici_run "install_${name}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$ws/src"
+    ici_run "build_${name}_workspace" builder_run_build "$extend" "$ws" "${args[@]}"
+}
+
+function ici_test_workspace {
+    local name=$1; shift
+    local extend=$1; shift
+    local ws=$1; shift
+
+    ici_run "run_${name}_test" builder_run_tests "$extend" "$ws"
+    builder_test_results "$extend" "$ws"
+}
