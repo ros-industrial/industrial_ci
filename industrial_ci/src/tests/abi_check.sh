@@ -16,7 +16,6 @@
 # limitations under the License.
 
 function abi_install() {
-    ici_asroot apt-get update -qq
     ici_asroot apt-get install -y -qq libelf-dev elfutils autoconf pkg-config links bsdtar wget
 
     wget -q -O /tmp/abi_installer.pl https://raw.githubusercontent.com/lvc/installer/master/installer.pl

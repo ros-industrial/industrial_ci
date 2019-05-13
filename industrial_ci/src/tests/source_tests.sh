@@ -45,20 +45,8 @@ ROSWS=wstool
 
 ici_time_end  # init_ici_environment
 
-ici_time_start setup_apt
-
-ici_asroot apt-get update -qq
-
-# If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
-if [ "$ADDITIONAL_DEBS" ]; then
-    declare -a add_debs
-    ici_parse_env_array add_debs ADDITIONAL_DEBS
-    ici_asroot apt-get install -qq -y "${add_debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
-fi
 # shellcheck source=/dev/null
 source "/opt/ros/$ROS_DISTRO/setup.bash"
-
-ici_time_end  # setup_apt
 
 if [ "$CCACHE_DIR" ]; then
     ici_time_start setup_ccache
