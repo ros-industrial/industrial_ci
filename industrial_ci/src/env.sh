@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ici_mark_deprecated USE_DEB "Please migrate to UPSTREAM_WORKSPACE."
+ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
 
 if [ -n "$NOT_TEST_INSTALL" ]; then
     if [ "$NOT_TEST_INSTALL" != true ]; then
@@ -25,22 +25,18 @@ if [ -n "$NOT_TEST_INSTALL" ]; then
         ici_mark_deprecated NOT_TEST_INSTALL "testing installed test files has been removed, NOT_TEST_INSTALL=false is superfluous"
     fi
 fi
+
+for v in BUILD_PKGS_WHITELIST PKGS_DOWNSTREAM TARGET_PKGS USE_MOCKUP; do
+    ici_enforce_deprecated "$v" "Please migrate to new workspace definition"
+done
+
+for v in CATKIN_PARALLEL_JOBS CATKIN_PARALLEL_TEST_JOBS ROS_PARALLEL_JOBS ROS_PARALLEL_TEST_JOBS; do
+    ici_mark_deprecated "$v" "Job control is not available anymore"
+done
+
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
-if [ ! "$CATKIN_PARALLEL_JOBS" ]; then export CATKIN_PARALLEL_JOBS="-p4"; fi
-if [ ! "$CATKIN_PARALLEL_TEST_JOBS" ]; then export CATKIN_PARALLEL_TEST_JOBS="$CATKIN_PARALLEL_JOBS"; fi
-if [ ! "$ROS_PARALLEL_JOBS" ]; then export ROS_PARALLEL_JOBS="-j8"; fi
-if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PARALLEL_JOBS"; fi
-# .rosintall file name
-if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi
-# For apt key stores
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
-if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-industrial/industrial_ci/pull/47#discussion_r64882878 for the discussion.
-    if [ "$USE_DEB" != "true" ]; then export UPSTREAM_WORKSPACE="file";
-    else export UPSTREAM_WORKSPACE="debian";
-    fi
-fi
-if [ ! "$UPSTREAM_WORKSPACE" ]; then export UPSTREAM_WORKSPACE="debian"; fi
 
 # variables in docker.env without default will be exported with empty string
 # this might break the build, e.g. for Makefile which rely on these variables
@@ -49,6 +45,17 @@ if [ -z "${CFLAGS}" ]; then unset CFLAGS; fi
 if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
 if [ -z "${CXX}" ]; then unset CXX; fi
 if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
+
+if [ -n "$USE_MOCKUP" ]; then
+  if [ -z "$TARGET_WORKSPACE" ]; then
+    TARGET_WORKSPACE="$USE_MOCKUP"
+    ici_warn "Replacing 'USE_MOCKUP=$USE_MOCKUP' with 'TARGET_WORKSPACE=$TARGET_WORKSPACE'"
+  else
+    ici_error "USE_MOCKUP is not supported anymore, please migrate to 'TARGET_WORKSPACE=$TARGET_WORKSPACE $USE_MOCKUP'"
+  fi
+fi
+
+TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
 
 export OS_CODE_NAME
 export OS_NAME
@@ -149,3 +156,33 @@ fi
 
 
 export TERM=${TERM:-dumb}
+
+# legacy support for UPSTREAM_WORKSPACE and USE_DEB
+if [ "$UPSTREAM_WORKSPACE" = "debian" ]; then
+  ici_warn "Setting 'UPSTREAM_WORKSPACE=debian' is superfluous and gets removed"
+  unset UPSTREAM_WORKSPACE
+fi
+
+if [ "$USE_DEB" = true ]; then
+  if [ "${UPSTREAM_WORKSPACE:-debian}" != "debian" ]; then
+    error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
+  fi
+  ici_warn "Setting 'USE_DEB=true' is superfluous"
+fi
+
+if [ "$UPSTREAM_WORKSPACE" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
+  ROSINSTALL_FILENAME="${ROSINSTALL_FILENAME:-.travis.rosinstall}"
+  if [ -f  "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO" ]; then
+    ROSINSTALL_FILENAME="$ROSINSTALL_FILENAME.$ROS_DISTRO"
+  fi
+
+  if [ "${USE_DEB:-true}" != true ]; then # means UPSTREAM_WORKSPACE=file
+      if [ "${UPSTREAM_WORKSPACE:-file}" != "file" ]; then
+        error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
+      fi
+      ici_warn "Replacing 'USE_DEB=false' with 'UPSTREAM_WORKSPACE=$ROSINSTALL_FILENAME'"
+  else
+      ici_warn "Replacing 'UPSTREAM_WORKSPACE=file' with 'UPSTREAM_WORKSPACE=$ROSINSTALL_FILENAME'"
+  fi
+  UPSTREAM_WORKSPACE="$ROSINSTALL_FILENAME"
+fi

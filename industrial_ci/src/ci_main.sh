@@ -53,6 +53,7 @@ elif [ -n "$CLANG_FORMAT_CHECK" ]; then
 else
   # shellcheck source=industrial_ci/src/tests/source_tests.sh
   source "${ICI_SRC_PATH}/tests/source_tests.sh"
+  run_source_tests
 fi
 
 ici_hook "after_script"

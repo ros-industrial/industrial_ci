@@ -14,19 +14,19 @@ git:
 env:
   global:
     - POST_PROCESS='echo "post processing reached"'
-    - "BEFORE_SCRIPT='echo current dir: $(pwd)'"
+    - "AFTER_SETUP_TARGET_WORKSPACE='echo current dir: $(pwd)'"
 
   matrix:
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=indigo TARGET_WORKSPACE='industrial_ci/mockups/testpkg_broken_install'  EXPECT_EXIT_CODE=1
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  CATKIN_CONFIG='--no-install -DCMAKE_CXX_FLAGS="-Werror=uninitialized -Werror=return-type"'
-    - DOCKER_IMAGE='arm32v7/ros:indigo-ros-core' ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip" INJECT_QEMU=arm BEFORE_SCRIPT='[[ $(uname -p) == armv7l ]]'
+    - DOCKER_IMAGE='arm32v7/ros:indigo-ros-core' ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip" INJECT_QEMU=arm BEFORE_INIT='[[ $(uname -p) == armv7l ]]'
     - ROS_DISTRO=melodic NOT_TEST_BUILD='true' _GUARD_INTERVAL=10
-    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_SCRIPT='test -z "${CXX+x}"' # test that CXX is not set
-    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' CXX=/usr/bin/gcc BEFORE_SCRIPT='test -z "${CXX+x}"' EXPECT_EXIT_CODE=1 # test the CXX test
+    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_INIT='test -z "${CXX+x}"' # test that CXX is not set
+    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' CXX=/usr/bin/gcc BEFORE_INIT='test -z "${CXX+x}"' EXPECT_EXIT_CODE=1 # test the CXX test
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
     - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
     - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
@@ -37,7 +37,7 @@ env:
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian AFTER_SCRIPT='ccache 2> /dev/null && exit 1; [ "$?" = "127" ]'
      # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file CCACHE_DIR=$HOME/.ccache AFTER_SCRIPT='num=($(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
+    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true EXPECT_EXIT_CODE=1 # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall
     - ROS_DISTRO=indigo USE_DEB=true  # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
@@ -46,21 +46,23 @@ env:
     - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
     - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
     - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS='eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT: \"{{.Size}}\" bytes"'
-    - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
+    - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=melodic AFTER_SCRIPT='grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=bionic /etc/os-release'
-    - ROS_DISTRO=melodic BEFORE_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release' EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=melodic BEFORE_INIT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release' EXPECT_EXIT_CODE=1
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=stretch AFTER_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release'
     - ROS_DISTRO=melodic OS_NAME=debian EXPECT_EXIT_CODE=1
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
 
     # External repositories
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/industrial_core@kinetic-devel'
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='gh:ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE'
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='gh:ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE='.travis.rosinstall -ros-industrial/industrial_experimental/IRC_v2'
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ipa320/cob_calibration_data#indigo_dev' ROS_REPO=ros UPSTREAM_WORKSPACE=file AFTER_SCRIPT='rosenv ./.travis.xacro_test.sh'
     - ROS_DISTRO=indigo _EXTERNAL_REPO='github:ros/actionlib#38ce66e2ae2ec9c19cf12ab22d57a8134a9285be' ROS_REPO=ros ABICHECK_URL=url ABICHECK_MERGE=true # actual URL will not be used in the case
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.5' ROS_REPO=ros ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.1' ABICHECK_MERGE=false EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.6' ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.5' ABICHECK_MERGE=false
+    - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE="ros_control.rosinstall -ros_control -ros_controllers"
+    - ROS_DISTRO=melodic NOT_TEST_DOWNSTREAM=true BUILDER=colcon _EXTERNAL_REPO='github:ros-controls/ros_control#melodic-devel' UPSTREAM_WORKSPACE="github:ros-controls/control_msgs#kinetic-devel github:ros-controls/realtime_tools#melodic-devel github:ros-controls/control_toolbox#melodic-devel" DOWNSTREAM_WORKSPACE="github:ros-controls/ros_controllers#melodic-devel"
 
     # Format tests
     - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM' CLANG_FORMAT_VERSION=3.8
