@@ -84,7 +84,7 @@ fi
 
 update_opts=()
 case "$ROS_DISTRO" in
-"hydro"|"jade")
+"hydro"|"jade"|"indigo")
     if rosdep update --help | grep -q -- --include-eol-distros; then
       update_opts+=(--include-eol-distros)
     fi
