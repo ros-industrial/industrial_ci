@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2019-05-22)
+------------------
 * [fix] ABICHECK_MERGE check, https://github.com/ros-industrial/industrial_ci/issues/258, https://github.com/ros-industrial/industrial_ci/issues/322
 * [capability] Introduce shellcheck
 * [improve] Continue supporting EOLed ROS distros (Jade, Indigo). https://github.com/ros-industrial/industrial_ci/issues/352
