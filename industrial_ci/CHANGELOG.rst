@@ -2,6 +2,14 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [fix] ABICHECK_MERGE check, https://github.com/ros-industrial/industrial_ci/issues/258, https://github.com/ros-industrial/industrial_ci/issues/322
+* [capability] Introduce shellcheck
+* [improve] Continue supporting EOLed ROS distros (Jade, Indigo). https://github.com/ros-industrial/industrial_ci/issues/352
+* [improve] implemented CMAKE_ARGS (recommended over CATKIN_CONFIG)
+* Contributors: Isaac I.Y. Saito, Mathias Lüdtke
+
 0.7.0 (2019-01-02)
 ------------------
 * [capability] Add clang-format check (`#320 <https://github.com/ros-industrial/industrial_ci/issues/320>`_, `#340 <https://github.com/ros-industrial/industrial_ci/issues/340>`_)
