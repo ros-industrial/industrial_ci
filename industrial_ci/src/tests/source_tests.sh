@@ -84,7 +84,7 @@ fi
 
 update_opts=()
 case "$ROS_DISTRO" in
-"hydro"|"jade"|"indigo")
+"hydro"|"jade"|"indigo") # keep in sync with abi_check.sh
     if rosdep update --help | grep -q -- --include-eol-distros; then
       update_opts+=(--include-eol-distros)
     fi
