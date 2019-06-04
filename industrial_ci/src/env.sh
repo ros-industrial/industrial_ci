@@ -65,6 +65,7 @@ export OS_CODE_NAME
 export OS_NAME
 export DOCKER_BASE_IMAGE
 export ROS_DISTRO
+export ROS_VERSION_EOL
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
@@ -82,9 +83,11 @@ if [ -z "$OS_CODE_NAME" ]; then
     case "$ROS_DISTRO" in
     "hydro")
         OS_CODE_NAME="precise"
+        ROS_VERSION_EOL=true
         ;;
     "indigo"|"jade")
         OS_CODE_NAME="trusty"
+        ROS_VERSION_EOL=true
         ;;
     "kinetic"|"lunar")
         OS_CODE_NAME="xenial"

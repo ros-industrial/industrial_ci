@@ -83,13 +83,9 @@ if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
 fi
 
 update_opts=()
-case "$ROS_DISTRO" in
-"hydro"|"jade"|"indigo")
-    if rosdep update --help | grep -q -- --include-eol-distros; then
-      update_opts+=(--include-eol-distros)
-    fi
-    ;;
-esac
+if [ "$ROS_VERSION_EOL" = true ] && rosdep update --help | grep -q -- --include-eol-distros; then
+  update_opts+=(--include-eol-distros)
+fi
 
 ici_retry 2 rosdep update "${update_opts[@]}"
 
