@@ -43,24 +43,6 @@ if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
 if [ -z "${CXX}" ]; then unset CXX; fi
 if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
 
-# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
-if [ ! "$ROS_REPOSITORY_PATH" ]; then
-    case "${ROS_REPO:-ros-shadow-fixed}" in
-    "building")
-        ROS_REPOSITORY_PATH="http://repositories.ros.org/ubuntu/building/"
-        ;;
-    "ros"|"main")
-        ROS_REPOSITORY_PATH="http://packages.ros.org/ros/ubuntu"
-        ;;
-    "ros-shadow-fixed"|"testing")
-        ROS_REPOSITORY_PATH="http://packages.ros.org/ros-shadow-fixed/ubuntu"
-        ;;
-    *)
-        ici_error "ROS repo '$ROS_REPO' is not supported"
-        ;;
-    esac
-fi
-
 export OS_CODE_NAME
 export OS_NAME
 export DOCKER_BASE_IMAGE
@@ -109,6 +91,44 @@ if [ -z "$OS_CODE_NAME" ]; then
         ;;
     *)
         ici_error "ROS distro '$ROS_DISTRO' is not supported"
+        ;;
+    esac
+fi
+
+
+function use_snapshot() {
+    ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
+    HASHKEY_SKS="AD19BAB3CBF125EA"
+}
+
+function use_repo_or_final_snapshot() {
+    if [ "$ROS_VERSION_EOL" = true ]; then
+        use_snapshot final
+        if [ -n "$ROS_REPO" ]; then
+            ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
+        fi
+    else
+        ROS_REPOSITORY_PATH="$1"
+    fi
+}
+
+# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
+if [ ! "$ROS_REPOSITORY_PATH" ]; then
+    case "${ROS_REPO:-ros-shadow-fixed}" in
+    "building")
+        use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
+        ;;
+    "ros"|"main")
+        use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
+        ;;
+    "ros-shadow-fixed"|"testing")
+        use_repo_or_final_snapshot "http://packages.ros.org/ros-shadow-fixed/ubuntu"
+        ;;
+    "final"|????-??-??)
+        use_snapshot "${ROS_REPO}"
+        ;;
+    *)
+        ici_error "ROS repo '$ROS_REPO' is not supported"
         ;;
     esac
 fi
