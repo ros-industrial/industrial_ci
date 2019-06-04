@@ -34,6 +34,13 @@ function setup_environment() {
     else
         ici_error "Could not detect docker settings"
     fi
+    local keycmd
+
+    if [ -n "${APTKEY_STORE_HTTPS}" ]; then
+      keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
+    else
+      keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS}'"
+    fi
 
     ici_quiet docker build -t "industrial-ci/prerelease" - <<EOF
 FROM ubuntu:xenial
@@ -41,8 +48,7 @@ FROM ubuntu:xenial
 RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget apt-transport-https ca-certificates
 
 RUN echo "deb ${ROS_REPOSITORY_PATH} xenial main" > /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
-    || { wget "${APTKEY_STORE_HTTPS}" -O - | apt-key add -; }
+RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
 
 RUN echo "deb [arch=\$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu xenial stable" > /etc/apt/sources.list.d/docker.list
 RUN wget -O - https://download.docker.com/linux/ubuntu/gpg |  apt-key add -
