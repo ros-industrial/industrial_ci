@@ -108,20 +108,23 @@ function use_repo_or_final_snapshot() {
         fi
     else
         ROS_REPOSITORY_PATH="$1"
+        if [ "$ROS_REPO" = "ros-shadow-fixed" ]; then
+            ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
+        fi
     fi
 }
 
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 if [ ! "$ROS_REPOSITORY_PATH" ]; then
-    case "${ROS_REPO:-ros-shadow-fixed}" in
+    case "${ROS_REPO:-testing}" in
     "building")
         use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
         ;;
     "ros"|"main")
         use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
         ;;
-    "ros-shadow-fixed"|"testing")
-        use_repo_or_final_snapshot "http://packages.ros.org/ros-shadow-fixed/ubuntu"
+    "ros-shadow-fixed"|"ros-testing"|"testing")
+        use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
         ;;
     "final"|????-??-??)
         use_snapshot "${ROS_REPO}"
