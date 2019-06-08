@@ -69,9 +69,13 @@ function abi_setup_rosdep() {
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
         ici_asroot rosdep init
     fi
-    ret_rosdep=1
-    rosdep update || while [ $ret_rosdep != 0 ]; do sleep 1; rosdep update && ret_rosdep=0 || echo "rosdep update failed"; done
-    ici_quiet rosdep install -q --from-paths "$TARGET_REPO_PATH" --ignore-src -y
+
+    update_opts=()
+    if [ "$ROS_VERSION_EOL" = true ] && rosdep update --help | grep -q -- --include-eol-distros; then
+      update_opts+=(--include-eol-distros)
+    fi
+
+    ici_retry 2 rosdep update "${update_opts[@]}"
 }
 
 function run_abi_check() {

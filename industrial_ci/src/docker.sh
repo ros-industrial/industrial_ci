@@ -220,6 +220,14 @@ EOF
 }
 
 function ici_generate_default_dockerfile() {
+  local keycmd
+
+  if [ -n "${APTKEY_STORE_HTTPS}" ]; then
+    keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
+  else
+    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS}'"
+  fi
+
   cat <<EOF
 FROM $DOCKER_BASE_IMAGE
 
@@ -231,8 +239,7 @@ RUN apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates lsb-release
 
 RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
-RUN apt-key adv --keyserver "${APTKEY_STORE_SKS}" --recv-key "${HASHKEY_SKS}" \
-    || { wget "${APTKEY_STORE_HTTPS}" -O - | apt-key add -; }
+RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
 
 RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list \
     && apt-get update -qq \
