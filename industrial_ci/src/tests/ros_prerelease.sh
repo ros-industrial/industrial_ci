@@ -86,9 +86,9 @@ function run_ros_prerelease() {
     ici_time_end  # setup_environment
 
     ici_time_start setup_prerelease_scripts
-    mkdir -p "$WORKSPACE/catkin_workspace/src/"
+    mkdir -p "$WORKSPACE/ws/src/"
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
-    cp -a "$TARGET_REPO_PATH" "$WORKSPACE/catkin_workspace/src/$reponame"
+    cp -a "$TARGET_REPO_PATH" "$WORKSPACE/ws/src/$reponame"
 
     # ensure access rights
     ici_run_cmd_in_docker "${DIND_OPTS[@]}" -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci "$WORKSPACE"
@@ -98,7 +98,7 @@ function run_ros_prerelease() {
         if [ ! -d "$TARGET_REPO_PATH/$USE_MOCKUP" ]; then
             ici_error "mockup directory '$USE_MOCKUP' does not exist"
         fi
-        cp -a "$TARGET_REPO_PATH/$USE_MOCKUP" "$WORKSPACE/catkin_workspace/src"
+        cp -a "$TARGET_REPO_PATH/$USE_MOCKUP" "$WORKSPACE/ws/src"
     fi
 
     run_in_prerelease_docker generate_prerelease_script.py https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml "$ROS_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --level "$downstream_depth" --output-dir . --custom-repo "$reponame::::"
