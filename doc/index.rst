@@ -288,6 +288,20 @@ If your Gitlab CI jobs require access to private repos, additional settings are 
       # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
 
 #. Add a public key (reference for `Gitlab <https://docs.gitlab.com/ce/ssh/README.html#deploy-keys>`__ and for `GitHub <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`__) to the private repos your CI jobs accesses. You may need to ask the admin of that repo.
+#. Make sure that `TMPDIR` is set in your `.gitlab-ci.yml` file so that the SSH agent forwards properly ::
+    
+    # The docker runner does not expose /tmp to the docker-in-docker service
+    # This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
+    variables:
+      TMPDIR: "${CI_PROJECT_DIR}.tmp"
+#. If using a self-signed certificate you may need to make docker aware of your CA file ::
+    
+    kinetic:
+      script:
+        # Run the gitlab script. Since we are using a self-signed certificate we need to tell docker to
+        # mount the CA file and then pass it to git via the GIT_SSL_CAINFO environment variable.
+        - .industrial_ci/gitlab.sh DOCKER_RUN_OPTS="-v $CI_SERVER_TLS_CA_FILE:$CI_SERVER_TLS_CA_FILE -e GIT_SSL_CAINFO=$CI_SERVER_TLS_CA_FILE"
+
 
 References:
 
