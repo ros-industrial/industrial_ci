@@ -294,13 +294,12 @@ If your Gitlab CI jobs require access to private repos, additional settings are 
     # This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
     variables:
       TMPDIR: "${CI_PROJECT_DIR}.tmp"
-#. If using a self-signed certificate you may need to make docker aware of your CA file ::
+#. If using a self-signed certificate you may need to make the container aware of the runner's certs ::
     
     kinetic:
       script:
-        # Run the gitlab script. Since we are using a self-signed certificate we need to tell docker to
-        # mount the CA file and then pass it to git via the GIT_SSL_CAINFO environment variable.
-        - .industrial_ci/gitlab.sh DOCKER_RUN_OPTS="-v $CI_SERVER_TLS_CA_FILE:$CI_SERVER_TLS_CA_FILE -e GIT_SSL_CAINFO=$CI_SERVER_TLS_CA_FILE"
+        # Run the gitlab script, exposing the runner's SSL certs.
+        - .industrial_ci/gitlab.sh DOCKER_RUN_OPTS="-v /etc/ssl/certs:/etc/ssl/certs:ro"
 
 
 References:
