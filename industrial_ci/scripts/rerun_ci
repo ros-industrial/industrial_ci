@@ -28,7 +28,7 @@ EOF
 
 case "$1" in
 "--list")
-  images=($(docker images -q "industrial-ci/rerun_ci/*"))
+  mapfile -t images < <(docker images -q "industrial-ci/rerun_ci/*")
   exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' "${images[@]}" 2> /dev/null
     ;;
 "--rm")
@@ -54,7 +54,7 @@ repo_dir=$(cd "$1" && pwd)
 shift
 
 DOCKER_COMMIT_MSG="$repo_dir $*"
-env_hash=($(sha256sum <<< "$DOCKER_COMMIT_MSG"))
+env_hash=$(sha256sum <<< "$DOCKER_COMMIT_MSG")
 DOCKER_COMMIT="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
 
 if [ "$remove" ]; then

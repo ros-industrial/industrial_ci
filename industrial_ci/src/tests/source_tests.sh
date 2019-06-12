@@ -45,21 +45,14 @@ ROSWS=wstool
 
 ici_time_end  # init_ici_environment
 
-function catkin {
-  local path
-  path=$(which catkin) || ici_error "catkin not available. Make sure python-catkin-tools is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216"
-  local cmd=$1
-  shift
-  "$path" "$cmd" -w "$CATKIN_WORKSPACE" "$@"
-}
-
 ici_time_start setup_apt
 
 ici_asroot apt-get update -qq
 
 # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
 if [ "$ADDITIONAL_DEBS" ]; then
-    add_debs=($ADDITIONAL_DEBS)
+    declare -a add_debs
+    ici_parse_env_array add_debs ADDITIONAL_DEBS
     ici_asroot apt-get install -qq -y "${add_debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
 fi
 # shellcheck source=/dev/null
@@ -113,7 +106,7 @@ file) # When UPSTREAM_WORKSPACE is file, the dependended packages that need to b
         # install (maybe unreleased version) dependencies from source
         "$ROSWS" merge -t "$CATKIN_WORKSPACE/src" "file://$TARGET_REPO_PATH/$ROSINSTALL_FILENAME"
     else
-        ici_error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/$ROSINSTALL_FILENAME[.$ROS_DISTRO]' does not exist"
+        ici_error "UPSTREAM_WORKSPACE file '$TARGET_REPO_PATH/${ROSINSTALL_FILENAME}[.$ROS_DISTRO]' does not exist"
     fi
     ;;
 http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
@@ -140,11 +133,21 @@ if [ "${USE_MOCKUP// }" != "" ]; then
     ln -sf "$TARGET_REPO_PATH/$USE_MOCKUP" "$CATKIN_WORKSPACE/src"
 fi
 
-catkin config --install
-catkin_config=($CATKIN_CONFIG)
-if [ ${#catkin_config[@]} -ne 0 ]; then eval catkin config "${catkin_config[@]}"; fi
+catkin_path=$(command -v catkin) || ici_error "catkin not available. Make sure python-catkin-tools is installed. See also https://github.com/ros-industrial/industrial_ci/issues/216"
 
-cmake_args=(${CMAKE_ARGS})
+function catkin {
+  local cmd=$1
+  shift
+  "$catkin_path" "$cmd" -w "$CATKIN_WORKSPACE" "$@"
+}
+
+catkin config --install
+declare -a catkin_config
+ici_parse_env_array catkin_config CATKIN_CONFIG
+if [ ${#catkin_config[@]} -ne 0 ]; then catkin config "${catkin_config[@]}"; fi
+
+declare -a cmake_args
+ici_parse_env_array cmake_args CMAKE_ARGS
 if [ ${#cmake_args[@]} -gt 0 ]; then
   catkin config --cmake-args "${cmake_args[@]}"
 fi
@@ -163,7 +166,7 @@ fi
 
 ici_time_start rosdep_install
 
-rosdep_opts=(-q --from-paths $CATKIN_WORKSPACE/src --ignore-src --rosdistro $ROS_DISTRO -y)
+rosdep_opts=(-q --from-paths "$CATKIN_WORKSPACE/src" --ignore-src --rosdistro "$ROS_DISTRO" -y)
 if [ -n "$ROSDEP_SKIP_KEYS" ]; then
   rosdep_opts+=(--skip-keys "$ROSDEP_SKIP_KEYS")
 fi
@@ -177,7 +180,8 @@ if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_start catkin_lint
     ici_asroot pip install catkin-lint
 
-    lint_args=($CATKIN_LINT_ARGS)
+    declare -a lint_args
+    ici_parse_env_array lint_args CATKIN_LINT_ARGS
     if [ "$CATKIN_LINT" == "pedantic" ]; then
     	lint_args+=(--strict -W2)
     fi
@@ -200,13 +204,15 @@ if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "$
 if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "$CATKIN_WORKSPACE/src" --only-names); fi
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 
-pkgs_downstream=($PKGS_DOWNSTREAM)
-pkgs_whitelist=($BUILD_PKGS_WHITELIST)
+declare -a pkgs_downstream pkgs_whitelist catkin_parallel_jobs ros_parallel_jobs catkin_parallel_test_jobs ros_parallel_test_jobs
 
-catkin_parallel_jobs=($CATKIN_PARALLEL_JOBS)
-ros_parallel_jobs=($ROS_PARALLEL_JOBS)
-catkin_parallel_test_jobs=($CATKIN_PARALLEL_TEST_JOBS)
-ros_parallel_test_jobs=($ROS_PARALLEL_TEST_JOBS)
+ici_parse_env_array pkgs_downstream PKGS_DOWNSTREAM
+ici_parse_env_array pkgs_whitelist BUILD_PKGS_WHITELIST
+
+ici_parse_env_array catkin_parallel_jobs CATKIN_PARALLEL_JOBS
+ici_parse_env_array ros_parallel_jobs ROS_PARALLEL_JOBS
+ici_parse_env_array catkin_parallel_test_jobs CATKIN_PARALLEL_TEST_JOBS
+ici_parse_env_array ros_parallel_test_jobs ROS_PARALLEL_TEST_JOBS
 
 if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status "${pkgs_whitelist[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" ; fi
 

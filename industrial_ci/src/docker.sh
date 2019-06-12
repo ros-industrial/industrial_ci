@@ -64,7 +64,8 @@ function ici_require_run_in_docker() {
 #   (None)
 #######################################
 function ici_run_cmd_in_docker() {
-  local run_opts=($DOCKER_RUN_OPTS)
+  local -a run_opts
+  ici_parse_env_array run_opts DOCKER_RUN_OPTS
   local commit_image=$DOCKER_COMMIT
   unset DOCKER_COMMIT
 
@@ -81,7 +82,7 @@ function ici_run_cmd_in_docker() {
 
   if [ -n "$INJECT_QEMU" ]; then
     local qemu_path
-    qemu_path=$(which "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
+    qemu_path=$(command -v "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
     run_opts+=(-v "$qemu_path:$qemu_path:ro")
   fi
 
@@ -139,11 +140,12 @@ function docker_cp {
 #   (None)
 #######################################
 function ici_docker_build() {
-  local opts=($DOCKER_BUILD_OPTS)
+  local -a build_opts
+  ici_parse_env_array build_opts DOCKER_BUILD_OPTS
   if [ "$DOCKER_PULL" != false ]; then
-    opts+=("--pull")
+    build_opts+=("--pull")
   fi
-  docker build -t "$DOCKER_IMAGE" "${opts[@]}" "$@"
+  docker build -t "$DOCKER_IMAGE" "${build_opts[@]}" "$@"
 }
 
 #######################################
@@ -197,7 +199,7 @@ function ici_prepare_docker_image() {
 function ici_build_default_docker_image() {
   if [ -n "$INJECT_QEMU" ]; then
     local qemu_path
-    qemu_path=$(which "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
+    qemu_path=$(command -v "qemu-$INJECT_QEMU-static") || ici_error "please install qemu-user-static"
     echo "Inject qemu..."
     local qemu_temp
     qemu_temp=$(mktemp -d)
