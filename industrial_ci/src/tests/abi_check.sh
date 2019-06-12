@@ -108,7 +108,7 @@ function run_abi_check() {
 
     if [ "$ABICHECK_MERGE" = true ]; then
       local ref_list
-      if ref_list=($(cd "$TARGET_REPO_PATH" && git rev-list --parents -n 1 HEAD)) && [ "${#ref_list[@]}" -gt 2 ]; then
+      if ici_split_array ref_list "$(cd "$TARGET_REPO_PATH" && git rev-list --parents -n 1 HEAD)" && [ "${#ref_list[@]}" -gt 2 ]; then
           ABICHECK_URL="#${ref_list[1]}"
           ABICHECK_VERSION="${ref_list[1]}"
       else

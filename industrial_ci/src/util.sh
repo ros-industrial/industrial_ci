@@ -195,6 +195,7 @@ function ici_retry {
 
 function ici_quiet {
     local out; out=$(mktemp)
+    # shellcheck disable=SC2216
     "$@" &> "$out" | true # '|| err=$?' disables errexit
     local err=${PIPESTATUS[0]}
     if [ "$err" -ne 0 ]; then
@@ -205,9 +206,19 @@ function ici_quiet {
 }
 
 function ici_asroot {
-  if which sudo > /dev/null; then
+  if command -v sudo > /dev/null; then
       sudo "$@"
   else
       "$@"
   fi
+}
+
+function ici_split_array {
+    # shellcheck disable=SC2034
+    IFS=" " read -r -a "$1" <<< "$*"
+}
+
+function ici_parse_env_array {
+    # shellcheck disable=SC2034
+    eval "$1=(${!2})"
 }
