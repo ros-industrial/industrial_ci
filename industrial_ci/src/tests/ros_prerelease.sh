@@ -73,6 +73,8 @@ function run_in_prerelease_docker() {
     ici_run_cmd_in_docker "${DIND_OPTS[@]}" \
                           -v "$WORKSPACE:$WORKSPACE:rw" \
                           -e TRAVIS \
+                          -e "ABORT_ON_TEST_FAILURE_UNDERLAY=${ABORT_ON_TEST_FAILURE_UNDERLAY:-1}" \
+                          -e "ABORT_ON_TEST_FAILURE_OVERLAY=${ABORT_ON_TEST_FAILURE_OVERLAY:-1}" \
                           "industrial-ci/prerelease" \
                           "$@"
 
@@ -105,7 +107,7 @@ function run_ros_prerelease() {
     ici_time_end  # setup_prerelease_scripts
 
     ici_time_start prerelease.sh
-    run_in_prerelease_docker env ABORT_ON_TEST_FAILURE=1 ./prerelease.sh -y
+    run_in_prerelease_docker ./prerelease.sh -y
     ici_time_end  # prerelease.sh
 
     echo 'ROS Prerelease Test went successful.'
