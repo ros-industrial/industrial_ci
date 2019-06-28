@@ -667,7 +667,7 @@ Example:
 
 ::
 
-  $ cd ~/cws/src && git clone https://github.com/ros-industrial/industrial_ci.git && cd ~/cws
+  $ cd ~/cws/src && git clone https://github.com/ros-industrial/industrial_ci.git -b master && cd ~/cws
   $ catkin config --install
   $ catkin b industrial_ci
   $ source install/setup.bash
