@@ -25,6 +25,12 @@ Some features are not supported anymore:
 If you depend on these, you can still use the [legacy](https://github.com/ros-industrial/industrial_ci/tree/legacy) version.
 
 ## How can I migrate?
+
+First of all, you have to switch to the master branch in your CI config:
+```
+git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
+```
+
 There is a big chance that the new version works out of the box.
 However, the workspace layout and the locations are changed.
 

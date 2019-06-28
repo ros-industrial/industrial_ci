@@ -62,7 +62,7 @@ For Travis CI
       - ROS_DISTRO="indigo"
 
   install:
-    - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+    - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master
   script:
     - .industrial_ci/travis.sh
 
@@ -82,7 +82,7 @@ For Gitlab CI
      - docker:dind
    before_script:
      - apk add --update bash coreutils tar
-     - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci
+     - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci -b master
    indigo:
      script: .industrial_ci/gitlab.sh ROS_DISTRO=indigo
 
@@ -104,7 +104,7 @@ For Bitbucket Pipelines
               - docker
             script:
               - apk add --update bash coreutils tar
-              - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci
+              - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci -b master
               - .industrial_ci/bitbucket.sh ROS_DISTRO=indigo
 
    definitions:
