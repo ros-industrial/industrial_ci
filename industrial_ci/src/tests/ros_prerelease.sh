@@ -34,47 +34,29 @@ function setup_environment() {
     else
         ici_error "Could not detect docker settings"
     fi
-    local keycmd
-
-    if [ -n "${APTKEY_STORE_HTTPS}" ]; then
-      keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
-    else
-      keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS}'"
-    fi
-
     ici_quiet docker build -t "industrial-ci/prerelease" - <<EOF
-FROM ubuntu:xenial
-
-RUN apt-get update -qq && apt-get -qq install --no-install-recommends -y wget apt-transport-https ca-certificates
-
-RUN echo "deb ${ROS_REPOSITORY_PATH} xenial main" > /etc/apt/sources.list.d/ros-latest.list
-RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
-
-RUN echo "deb [arch=\$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu xenial stable" > /etc/apt/sources.list.d/docker.list
-RUN wget -O - https://download.docker.com/linux/ubuntu/gpg |  apt-key add -
-
+FROM ros:melodic-ros-core
 RUN apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y \
-        docker-ce \
+        docker.io \
         git \
         python-ros-buildfarm \
-        ros-kinetic-catkin \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 RUN $user_cmd
 USER ci
 ENV WORKSPACE $WORKSPACE
 WORKDIR $WORKSPACE
-ENTRYPOINT ["/opt/ros/kinetic/env.sh"]
+ENTRYPOINT ["/opt/ros/melodic/env.sh"]
 EOF
 }
 
 function run_in_prerelease_docker() {
-    ici_run_cmd_in_docker "${DIND_OPTS[@]}" \
-                          -v "$WORKSPACE:$WORKSPACE:rw" \
-                          -e TRAVIS \
-                          "industrial-ci/prerelease" \
-                          "$@"
+    ROS_DISTRO='' ici_run_cmd_in_docker "${DIND_OPTS[@]}" \
+                                      -v "$WORKSPACE:$WORKSPACE:rw" \
+                                      -e TRAVIS \
+                                      "industrial-ci/prerelease" \
+                                      "$@"
 
 }
 function run_ros_prerelease() {
@@ -91,7 +73,7 @@ function run_ros_prerelease() {
     cp -a "$TARGET_REPO_PATH" "$WORKSPACE/ws/src/$reponame"
 
     # ensure access rights
-    ici_run_cmd_in_docker "${DIND_OPTS[@]}" -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci "$WORKSPACE"
+    ROS_DISTRO='' ici_run_cmd_in_docker "${DIND_OPTS[@]}" -v "$WORKSPACE:$WORKSPACE:rw"  --user root  "industrial-ci/prerelease" chown -R ci:ci "$WORKSPACE"
 
 
     if [ "${USE_MOCKUP// }" != "" ]; then
