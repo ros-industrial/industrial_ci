@@ -1,10 +1,10 @@
+================
+Industrial CI
+================
 .. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
     :target: https://opensource.org/licenses/Apache-2.0
     :alt: License
 
-================
-Industrial CI
-================
 CI (Continuous Integration) configuration for `ROS` (`Robot Operating System <http://ros.org>`__).
 
 .. contents:: Table of Contents
