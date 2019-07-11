@@ -105,7 +105,7 @@ function use_snapshot() {
 }
 
 function use_repo_or_final_snapshot() {
-    if [ "$ROS_VERSION_EOL" = true ] && [ "$ROS_DISTRO" != "indigo" ]; then
+    if [ "$ROS_VERSION_EOL" = true ]; then
         use_snapshot final
         if [ -n "$ROS_REPO" ]; then
             ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
