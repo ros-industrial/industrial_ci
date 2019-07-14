@@ -1,6 +1,6 @@
-================
-Industrial CI
-================
+================================
+Industrial CI *(legacy version)*
+================================
 .. image:: https://travis-ci.com/ros-industrial/industrial_ci.svg?branch=legacy
     :target: https://travis-ci.com/ros-industrial/industrial_ci
     :alt: Travis CI status
@@ -15,6 +15,14 @@ CI (Continuous Integration) configuration for `ROS` (`Robot Operating System <ht
 
 .. contents:: Table of Contents
    :depth: 2
+
+Deprecation notice
+==================
+The `legacy` branch contains a deprecated version of `industrial_ci`, kept for compatibility with legacy/EOL CI setups only.
+Active development (new features, support for new ROS distros, etc.) is targeted at the `master <https://github.com/ros-industrial/industrial_ci/tree/master>`__ branch, which will soon become the default again.
+The current set of features will be maintained as long as it is possible and reasonable.
+
+Please consider `migrating to the new version <https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md>`__.
 
 Detailed documentation
 ========================
