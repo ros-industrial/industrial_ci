@@ -1,6 +1,6 @@
-================
-Industrial CI
-================
+================================
+Industrial CI *(legacy version)*
+================================
 Continuous integration repository for ROS-Industrial
 
 .. contents:: Table of Contents
