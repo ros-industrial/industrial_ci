@@ -7,11 +7,6 @@ services:
   - docker
 # Force travis to use its minimal image with default Python settings
 language: generic
-notifications:
-  #  Whoever receives success and/or failure via email
-  email:
-    recipients:
-      - gm130s@gmail.com  # Change this to yours should you copy this file.
 
 git:
   quiet: true
