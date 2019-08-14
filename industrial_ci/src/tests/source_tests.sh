@@ -27,6 +27,77 @@ function install_catkin_lint {
     ici_asroot pip install catkin-lint
 }
 
+function run_clang_tidy {
+    local regex="$1/.*"
+    local -n _run_clang_tidy_warnings=$2
+    local -n _run_clang_tidy_errors=$3
+    local db=$4
+    shift 4
+
+    mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
+    if [ "${#files[@]}" -eq 0 ]; then
+        return 0
+    fi
+
+    local build; build="$(dirname "$db")"
+    local name; name="$(basename "$build")"
+
+    local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
+    if ! [ "$max_jobs" -ge 1 ]; then
+        ici_error "CLANG_TIDY_JOBS=$CLANG_TIDY_JOBS is invalid."
+    fi
+
+    rm -rf "$db".{command,warn,error}
+    cat > "$db.command" << EOF
+#!/bin/bash
+fixes=\$(mktemp)
+clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" || { touch "$db.error"; echo "Errored for '\$*'"; }
+if [ -s "\$fixes" ]; then touch "$db.warn"; fi
+rm -rf "\$fixes"
+EOF
+    chmod +x "$db.command"
+
+    ici_time_start "clang_tidy_check_$name"
+    echo "run clang-tidy for ${#files[@]} file(s) in $max_jobs process(es)."
+
+    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" "$db.command" "$@"
+
+    if [ -f "$db.error" ]; then
+       _run_clang_tidy_errors+=("$name")
+       ici_time_end "${ANSI_RED}"
+    elif [ -f "$db.warn" ]; then
+        _run_clang_tidy_warnings+=("$name")
+        ici_time_end "${ANSI_YELLOW}"
+    else
+        ici_time_end
+    fi
+}
+
+function run_clang_tidy_check {
+    local target_ws=$1
+    local -a errors
+    local -a warnings
+    local -a clang_tidy_args
+    ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
+
+    ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
+
+    while read -r db; do
+        run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
+    done < <(find "$target_ws/build" -name compile_commands.json)
+
+    if [ "${#warnings[@]}" -gt "0" ]; then
+        ici_warn "Clang tidy warning(s) in: ${warnings[*]}"
+        if [ "$CLANG_TIDY" == "pedantic" ]; then
+            errors=( "${warnings[@]}" "${errors[@]}" )
+        fi
+    fi
+
+    if [ "${#errors[@]}" -gt "0" ]; then
+        ici_error "Clang tidy check(s) failed: ${errors[*]}"
+    fi
+}
+
 function run_source_tests {
     # shellcheck disable=SC1090
     source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
@@ -52,6 +123,9 @@ function run_source_tests {
         extend="$upstream_ws/install"
     fi
 
+    if [ "${CLANG_TIDY:-false}" != false ]; then
+        TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+    fi
     ici_with_ws "$target_ws" ici_build_workspace "target" "$extend" "$target_ws"
 
     if [ "$NOT_TEST_BUILD" != "true" ]; then
@@ -67,6 +141,9 @@ function run_source_tests {
         fi
         ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
 
+    fi
+    if [ "${CLANG_TIDY:-false}" != false ]; then
+        run_clang_tidy_check "$target_ws"
     fi
 
     extend="$target_ws/install"
