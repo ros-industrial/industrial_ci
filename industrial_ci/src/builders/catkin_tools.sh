@@ -37,7 +37,7 @@ function builder_run_tests {
     if [ "$VERBOSE_TESTS" != false ]; then
         opts+=("-v")
     fi
-    ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
+    ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- -i "${opts[@]}" --no-status
 }
 
 function builder_test_results {
