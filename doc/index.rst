@@ -191,6 +191,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **DOWNSTREAM_WORKSPACE** (default: not set): Definition of downstream `workspace <#workspace-management>`__.
 * **EXPECT_EXIT_CODE** (default: 0): exit code must match this value for test to succeed
 * **INJECT_QEMU** (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
+* **IMMEDIATE_TEST_OUTPUT** (default: not set): If true, test output is printed immediately during the tests
 * **NOT_TEST_BUILD** (default: not set): If true, tests in `build` space won't be run.
 * **NOT_TEST_DOWNSTREAM** (default: not set): If true, tests in the downstream workspace won't be run.
 * **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
