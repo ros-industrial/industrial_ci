@@ -34,7 +34,13 @@ function builder_run_build {
 function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" console_cohesion+
+    local output_handler
+    if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
+        output_handler="console_direct+"
+    else
+        output_handler="console_cohesion+"
+    fi
+    ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" "${output_handler}"
 }
 
 function builder_test_results {
