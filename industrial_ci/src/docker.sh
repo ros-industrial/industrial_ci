@@ -236,6 +236,7 @@ FROM $DOCKER_BASE_IMAGE
 ENV ROS_DISTRO $ROS_DISTRO
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN if [ -n '$_UBUNTU_MIRROR' ]; then sed -i -e 's%http://archive.ubuntu.com/ubuntu%$_UBUNTU_MIRROR%' /etc/apt/sources.list; fi
 
 RUN apt-get update -qq \
     && apt-get -qq install --no-install-recommends -y apt-utils gnupg wget ca-certificates lsb-release dirmngr
