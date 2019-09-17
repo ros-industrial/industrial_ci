@@ -21,6 +21,7 @@
 ## See ./README.rst for the detailed usage.
 
 set -e # exit script on errors
+set -a # export each variable / function (enables usage in after_script)
 if [ "$DEBUG_BASH" ]; then set -x; fi # print trace if DEBUG
 
 # Define some env vars that need to come earlier than util.sh
