@@ -24,13 +24,14 @@ function setup_environment() {
     export WORKSPACE
     WORKSPACE=$(mktemp -d)
     echo "WORKSPACE: $WORKSPACE"
+    mkdir -p "$WORKSPACE/home/.ccache"
 
     if [ -n "$DOCKER_PORT" ]; then
         DIND_OPTS=(-e "DOCKER_HOST=$DOCKER_PORT")
-        user_cmd="useradd ci"
+        user_cmd="useradd -d "$WORKSPACE/home" ci"
     elif [ -e /var/run/docker.sock ]; then
         DIND_OPTS=(-v /var/run/docker.sock:/var/run/docker.sock)
-        user_cmd="groupadd -o -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -G host_docker ci"
+        user_cmd="groupadd -o -g $(stat -c%g /var/run/docker.sock) host_docker && useradd -d "$WORKSPACE/home" -G host_docker ci"
     else
         ici_error "Could not detect docker settings"
     fi
