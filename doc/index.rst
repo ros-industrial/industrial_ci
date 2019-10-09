@@ -34,6 +34,7 @@ Following `ROS distributions <http://wiki.ros.org/Distributions>`__ / `ROS2 <htt
 * `Bouncy <https://index.ros.org/doc/ros2/Releases/Bouncy/>`__ *(EOL)*
 * `Crystal <https://index.ros.org/doc/ros2/Releases/Release-Crystal-Clemmys/>`__
 * `Dashing <https://index.ros.org/doc/ros2/Releases/Release-Dashing-Diademata/>`__
+* `Eloquent <https://index.ros.org/doc/ros2/Releases/Release-Eloquent-Elusor/>`__
 
 Supported CIs
 +++++++++++++

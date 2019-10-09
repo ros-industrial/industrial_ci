@@ -118,6 +118,10 @@ function set_ros_variables {
     "crystal"|"dashing")
         ros2_defaults "bionic"
         ;;
+    "eloquent")
+        ros2_defaults "bionic"
+        DEFAULT_DOCKER_IMAGE=
+        ;;
     esac
 
     local prefix=ros
