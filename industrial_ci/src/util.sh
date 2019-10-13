@@ -42,19 +42,19 @@ function ici_source_setup {
   fi
 }
 
-function rosenv() (
+function rosenv() {
   # if current_ws not set, use an invalid path to skip it
   for e in ${current_ws:-/dev/null} ~/downstream_ws ~/target_ws ~/base_ws ~/upstream_ws "/opt/ros/$ROS_DISTRO"; do
    if [ -f "$e/setup.bash" ]; then
      ici_source_setup "$e"
      if [ -n "$*" ]; then
-       exec "$@"
+       (exec "$@")
      fi
      return 0
    fi
   done
   return 1
-)
+}
 
 function ici_with_ws() {
   # shellcheck disable=SC2034
