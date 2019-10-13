@@ -23,7 +23,7 @@ function _run_catkin_make_isolated () {
 }
 
 function builder_setup {
-    ici_install_pkgs_for_command catkin_make_isolated python-catkin-tools
+    ici_install_pkgs_for_command catkin_make_isolated "ros-${ROS_DISTRO}-catkin"
 }
 
 function builder_run_build {
