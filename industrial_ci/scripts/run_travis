@@ -91,6 +91,19 @@ def read_env(env):
             g = ' '.join(env['global'])
     return g, m
 
+def read_allow_failures(config):
+    try:
+        af =  config['matrix']['allow_failures']
+    except:
+        return list()
+    return list(x['env'] for x in af)
+
+def read_num_include(config):
+    try:
+        return len(config['matrix']['include'])
+    except:
+        return 0
+
 def parse_extra_args(args):
     try:
         extra = args.index('--')
@@ -140,7 +153,12 @@ def main(scripts_dir, argv):
     args, extra_env = parse_extra_args(argv[1:])
 
     path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
-    global_env, job_envs = read_env(read_yaml(path)['env'])
+    config = read_yaml(path)
+    global_env, job_envs = read_env(config['env'])
+    allow_failures = read_allow_failures(config)
+    job_envs =   [ x for x in job_envs if x not in allow_failures ] \
+               + [None] * read_num_include(config) \
+               + [ x for x in job_envs if x in allow_failures ]
 
     if len(args) == 0:
         if(len(global_env) > 0):
@@ -148,7 +166,9 @@ def main(scripts_dir, argv):
         jobs = len(job_envs)
         digits = len(str(jobs))
         for i in range(jobs):
-            print('Job %s: %s' % ( str(i+1).rjust(digits), job_envs[i]))
+            print('Job %s%s: %s' % ( str(i+1).rjust(digits),
+                                     ' (allow_failures)' if job_envs[i] in allow_failures else '',
+                                     job_envs[i] if job_envs[i] is not None else "<unsupported job from 'include' section>"))
         print("run all with %s -" % sys.argv[0])
         sys.exit(0)
 
@@ -161,14 +181,18 @@ def main(scripts_dir, argv):
     selection = set(apply_ranges(ranges, len(job_envs)))
 
     for i in selection:
+        if job_envs[i] is None:
+            print("\033[1;43mSkipped job %d, because jobs from 'include' section are not supported\033[1;m" %(i+1,))
+            continue
         cmd = ' '.join(run_ci + [job_envs[i]] + map(gen_env, extra_env))
-        print('\033[1;44mRunning job %d: %s\033[1;m' %(i+1, cmd))
+        print('\033[1;44mRunning job %d%s: %s\033[1;m' %(i+1, ' (allow_failures)' if job_envs[i] in allow_failures else '', cmd))
 
         proc = subprocess.Popen(bash, stdin=subprocess.PIPE)
         proc.communicate(cmd)
         if proc.returncode:
             print('\033[1;41mFailed job %d: %s\033[1;m' %(i+1, cmd))
-            sys.exit(proc.returncode)
+            if job_envs[i] not in allow_failures:
+                sys.exit(proc.returncode)
 
 if __name__ == "__main__":
     main(os.path.abspath(os.path.dirname(__file__)), sys.argv)
