@@ -79,6 +79,10 @@ matrix:
   allow_failures:
     - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
   include:
+    - script:
+      - industrial_ci/scripts/run_travis
+      - industrial_ci/scripts/run_travis 1
+      env: [run_travis]
     - script: shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh industrial_ci/*.sh
       env: [shellcheck]
 
