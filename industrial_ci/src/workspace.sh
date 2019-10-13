@@ -216,8 +216,7 @@ function ici_setup_rosdep {
 function ici_exec_in_workspace {
     local extend=$1; shift
     local path=$1; shift
-    # shellcheck disable=SC1090
-    ( { [ ! -e "$extend/setup.bash" ] || source "$extend/setup.bash"; } && cd "$path" && exec "$@")
+    ( { [ ! -e "$extend/setup.bash" ] || ici_source_setup "$extend"; } && cd "$path" && exec "$@")
 }
 
 function ici_install_dependencies {

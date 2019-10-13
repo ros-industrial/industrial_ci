@@ -62,8 +62,7 @@ function abi_dump_libraries() {
     local output=$1; shift
 
     local ld_library_path
-    # shellcheck disable=SC1090
-    ld_library_path=$(source "$extend/setup.bash" && echo "$LD_LIBRARY_PATH")
+    ld_library_path=$(ici_source_setup "$extend" && echo "$LD_LIBRARY_PATH")
 
     mkdir -p "$output"
     for d in "$extend"/*/lib "$extend/lib"; do

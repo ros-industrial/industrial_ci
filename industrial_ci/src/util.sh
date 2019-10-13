@@ -31,14 +31,22 @@ function ici_color_output {
   echo -e "\e[${c}m$*\e[0m"
 }
 
+function ici_source_setup {
+  local u_set=1
+  [[ $- =~ u ]] || u_set=0
+  set +u
+  # shellcheck disable=SC1090
+  source "$1/setup.bash"
+  if [ $u_set ]; then
+    set -u
+  fi
+}
+
 function rosenv() (
   # if current_ws not set, use an invalid path to skip it
   for e in ${current_ws:-/dev/null} ~/downstream_ws ~/target_ws ~/base_ws ~/upstream_ws "/opt/ros/$ROS_DISTRO"; do
    if [ -f "$e/setup.bash" ]; then
-     set +u
-     # shellcheck disable=SC1090
-     source "$e/setup.bash"
-     set -u
+     ici_source_setup "$e"
      if [ -n "$*" ]; then
        exec "$@"
      fi
