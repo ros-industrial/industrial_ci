@@ -51,6 +51,10 @@ function ici_resolve_scheme {
 }
 
 function ici_init_apt {
+    if [ -n "$APT_PROXY" ]; then
+      echo "Acquire::http::Proxy \"$APT_PROXY\";" > /etc/apt/apt.conf.d/99-industrial_ci-proxy
+    fi
+
     ici_asroot apt-get update -qq
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
     local -a debs

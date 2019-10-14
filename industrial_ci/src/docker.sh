@@ -246,6 +246,11 @@ EOF
 
 function ici_generate_default_dockerfile() {
   local keycmd
+  local run_apt_config
+
+  if [ -n "$APT_PROXY" ]; then
+    run_apt_config="RUN echo 'Acquire::http::Proxy \"$APT_PROXY\";' > /etc/apt/apt.conf.d/99-industrial_ci-proxy"
+  fi
 
   if [ -n "${APTKEY_STORE_HTTPS}" ]; then
     keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
@@ -262,6 +267,7 @@ ENV LC_ALL C.UTF-8
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+$run_apt_config
 RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr python-pip python3-pip
 
 RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done

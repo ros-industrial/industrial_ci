@@ -30,6 +30,10 @@ if [ "$ABICHECK_MERGE" = "auto" ]; then
   [ "$TRAVIS_PULL_REQUEST" = "false" ] || ABICHECK_MERGE=true
 fi
 
+if [ -f /etc/apt/apt.conf.d/99-travis-apt-proxy ]; then
+  export APT_PROXY=${APT_PROXY-$TRAVIS_APT_PROXY}
+fi
+
 function watch_output() {
   while read -r -t "${_GUARD_INTERVAL:-540}" ||
         { [[ $? -gt 128 ]] &&
