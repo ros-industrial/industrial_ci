@@ -103,6 +103,9 @@ function ici_setup_gpg_key {
 }
 
 function ici_init_apt {
+    if [ -n "$APT_PROXY" ]; then
+      echo "Acquire::http::Proxy \"$APT_PROXY\";" > /etc/apt/apt.conf.d/99-industrial_ci-proxy
+    fi
     export DEBIAN_FRONTEND=noninteractive
 
     ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
