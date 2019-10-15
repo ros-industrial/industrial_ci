@@ -184,6 +184,11 @@ function run_abi_check() {
     ici_run "${BUILDER}_setup" ici_quiet builder_setup
     ici_run "setup_rosdep" ici_setup_rosdep
 
+    if [ "$CCACHE_DIR" ]; then
+        ici_run "setup_ccache" ici_asroot apt-get install -qq -y ccache
+        export PATH="/usr/lib/ccache:$PATH"
+    fi
+
     extend="/opt/ros/$ROS_DISTRO"
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
