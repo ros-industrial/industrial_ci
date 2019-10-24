@@ -211,6 +211,7 @@ EOF
     unset INJECT_QEMU
     export DOCKER_BASE_IMAGE="$DOCKER_BASE_IMAGE-qemu"
     DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_quiet ici_docker_build "$qemu_temp"
+    DOCKER_PULL=false
     rm -rf "$qemu_temp"
   fi
   # choose a unique image name
