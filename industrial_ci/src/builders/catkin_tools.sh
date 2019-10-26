@@ -16,7 +16,7 @@
 # limitations under the License.
 
 function builder_setup {
-  ici_install_pkgs_for_command catkin python-catkin-tools
+  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools"
 }
 
 function builder_run_build {
