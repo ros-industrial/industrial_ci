@@ -23,7 +23,7 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function install_catkin_lint {
-    ici_install_pkgs_for_command pip python-pip
+    ici_install_pkgs_for_command pip "${PYTHON_VERSION_NAME}-pip"
     ici_asroot pip install catkin-lint
 }
 

@@ -83,7 +83,7 @@ function ici_import_repository {
     local sourcespace=$1; shift
     local url=$1; shift
 
-    ici_install_pkgs_for_command vcs python-vcstool
+    ici_install_pkgs_for_command vcs "${PYTHON_VERSION_NAME}-vcstool"
 
     IFS=" " read -r -a parts <<< "$(ici_resolve_scheme "$url")" # name, type, url, version
 
@@ -107,7 +107,7 @@ function ici_import_file {
         bsdtar -C "$sourcespace" -xf "$file"
         ;;
     *)
-        ici_install_pkgs_for_command vcs python-vcstool
+        ici_install_pkgs_for_command vcs "${PYTHON_VERSION_NAME}-vcstool"
         ici_setup_git_client
         vcs import "$sourcespace" < "$file"
     ;;
@@ -128,7 +128,7 @@ function ici_import_url {
         processor=(bsdtar -C "$sourcespace" -xf-)
         ;;
     *)
-        ici_install_pkgs_for_command vcs python-vcstool
+        ici_install_pkgs_for_command vcs "${PYTHON_VERSION_NAME}-vcstool"
         ici_setup_git_client
         processor=(vcs import "$sourcespace")
     ;;
@@ -205,7 +205,7 @@ function ici_prepare_sourcespace {
 }
 
 function ici_setup_rosdep {
-    ici_install_pkgs_for_command rosdep python-rosdep
+    ici_install_pkgs_for_command rosdep "${PYTHON_VERSION_NAME}-rosdep"
     # Setup rosdep
     rosdep --version
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then

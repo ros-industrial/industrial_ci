@@ -25,7 +25,8 @@
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
   <exec_depend>coreutils</exec_depend>
-  <exec_depend>python-yaml</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION != 3">python-yaml</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-yaml</exec_depend>
 
   <export>
       <build_type condition="$ROS_VERSION != 2">catkin</build_type>
