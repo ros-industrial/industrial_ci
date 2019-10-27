@@ -106,6 +106,10 @@ function set_ros_variables {
         ROS_VERSION_EOL=true
         ;;
     "melodic")
+        if [ "$ROS_PYTHON_VERSION" = 3 ]; then
+          BUILDER=${BUILDER:-colcon}
+          export ROS_FROM_SCRATCH=true
+        fi
         ros1_defaults "bionic"
         ;;
     "ardent")
