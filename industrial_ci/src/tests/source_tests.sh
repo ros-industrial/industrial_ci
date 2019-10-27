@@ -55,13 +55,20 @@ function run_source_tests {
         if [ "$ROS_VERSION" = "1" ]; then
             ici_run "install_catkin_from_source" install_catkin_from_source
         fi
-        if [ -z "$UPSTREAM_WORKSPACE" ]; then
-            ici_install_pkgs_for_command rosinstall_generator "${PYTHON_VERSION_NAME}-rosinstall-generator"
-            rosinstall_generator --rosdistro "$ROS_DISTRO" --deps --deps-only --upstream-devel --from-path "$TARGET_REPO_PATH" --exclude-path "$extend" > /tmp/target.rosinstall
-            if [ -s /tmp/target.rosinstall ]; then
-                UPSTREAM_WORKSPACE=/tmp/target.rosinstall
-            fi
+        ici_time_start "generate_rosinstall"
+        ici_install_pkgs_for_command rosinstall_generator "${PYTHON_VERSION_NAME}-rosinstall-generator"
+        local alldeps=("$ROSDEP_SKIP_KEYS")
+        local deps=(" ")
+        while [ ${#deps} -gt 0 ]; do
+          mapfile -t deps < <(ROS_DISTRO='' rosdep check -n -i --from-paths "$TARGET_REPO_PATH" "$extend" --skip-keys "${alldeps[*]}" |& grep -oP '(?<=rosdep key : ).*' | sort -u)
+          alldeps+=("${deps[@]}")
+        done
+        echo "${deps[@]}"
+        rosinstall_generator --rosdistro "$ROS_DISTRO" --deps "${alldeps[@]}" --exclude-path "$extend" > /tmp/target.rosinstall || [ -n "$UPSTREAM_WORKSPACE" ]
+        if [ -s /tmp/target.rosinstall ]; then
+            UPSTREAM_WORKSPACE="/tmp/target.rosinstall $UPSTREAM_WORKSPACE"
         fi
+        ici_time_end
     fi
 
     ici_run "${BUILDER}_setup" ici_quiet builder_setup
