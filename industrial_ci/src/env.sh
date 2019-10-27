@@ -112,6 +112,13 @@ function set_ros_variables {
         fi
         ros1_defaults "bionic"
         ;;
+    "noetic")
+        ros1_defaults "buster"
+        OS_NAME=debian
+        DEFAULT_DOCKER_IMAGE=
+        export ROS_FROM_SCRATCH=true
+        ROS_PYTHON_VERSION=3
+        ;;
     "ardent")
         ros2_defaults "xenial"
         DEFAULT_DOCKER_IMAGE=
