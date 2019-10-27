@@ -27,6 +27,13 @@ function install_catkin_lint {
     ici_asroot pip install catkin-lint
 }
 
+function install_catkin_from_source {
+    ici_prepare_sourcespace /tmp/bootstrap_ws/src "github:ros/catkin#HEAD"
+    ici_install_dependencies "" "" /tmp/bootstrap_ws/src
+    ici_exec_in_workspace "" /tmp/bootstrap_ws "python${ROS_PYTHON_VERSION}" ./src/catkin/bin/catkin_make -DCMAKE_INSTALL_PREFIX="/opt/ros/$ROS_DISTRO" install
+    rm -rf /tmp/bootstrap_ws
+}
+
 function run_source_tests {
     # shellcheck disable=SC1090
     source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
@@ -40,12 +47,24 @@ function run_source_tests {
         ici_run "setup_ccache" ici_asroot apt-get install -qq -y ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
-
-    ici_run "${BUILDER}_setup" ici_quiet builder_setup
-
     ici_run "setup_rosdep" ici_setup_rosdep
 
     extend="/opt/ros/$ROS_DISTRO"
+
+    if [ "$ROS_FROM_SCRATCH" = true ]; then
+        if [ "$ROS_VERSION" = "1" ]; then
+            ici_run "install_catkin_from_source" install_catkin_from_source
+        fi
+        if [ -z "$UPSTREAM_WORKSPACE" ]; then
+            ici_install_pkgs_for_command rosinstall_generator "${PYTHON_VERSION_NAME}-rosinstall-generator"
+            rosinstall_generator --rosdistro "$ROS_DISTRO" --deps --deps-only --upstream-devel --from-path "$TARGET_REPO_PATH" --exclude-path "$extend" > /tmp/target.rosinstall
+            if [ -s /tmp/target.rosinstall ]; then
+                UPSTREAM_WORKSPACE=/tmp/target.rosinstall
+            fi
+        fi
+    fi
+
+    ici_run "${BUILDER}_setup" ici_quiet builder_setup
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"

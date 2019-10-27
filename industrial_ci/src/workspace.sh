@@ -231,14 +231,20 @@ function ici_install_dependencies {
     local extend=$1; shift
     local skip_keys=$1; shift
     local cmake_prefix_path
+    local rosdep_install=()
     cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*')" || true
 
-    rosdep_opts=(-q --from-paths "$@" --ignore-src -y)
-    if [ -n "$skip_keys" ]; then
-      rosdep_opts+=(--skip-keys "$skip_keys")
+    if [ "$ROS_FROM_SCRATCH" = true ]; then
+      rosdep_install+=(env "ROS_DISTRO=")
     fi
+
+    rosdep_install+=(rosdep install -q --from-paths "$@" --ignore-src -y)
+    if [ -n "$skip_keys" ]; then
+      rosdep_install+=(--skip-keys "$skip_keys")
+    fi
+
     set -o pipefail # fail if rosdep install fails
-    ROS_PACKAGE_PATH=$cmake_prefix_path ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
+    ROS_PACKAGE_PATH=$cmake_prefix_path ici_exec_in_workspace "$extend" "." "${rosdep_install[@]}" | { grep "executing command" || true; }
     set +o pipefail
 }
 
