@@ -199,9 +199,11 @@ ici_time_start catkin_build
 export TARGET_PKGS
 export PKGS_DOWNSTREAM
 
+set +e # not fail catkin_topological_order for empty workspace
 if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "${TARGET_REPO_PATH}" --only-names); fi
 # fall-back to all workspace packages if target repo does not contain any packages (#232)
 if [ "${TARGET_PKGS// }" == "" ]; then TARGET_PKGS=$(catkin_topological_order "$CATKIN_WORKSPACE/src" --only-names); fi
+set -e # exit on failure
 if [ "${PKGS_DOWNSTREAM// }" == "" ]; then PKGS_DOWNSTREAM=$( [ "${BUILD_PKGS_WHITELIST// }" == "" ] && echo "$TARGET_PKGS" || echo "$BUILD_PKGS_WHITELIST"); fi
 
 declare -a pkgs_downstream pkgs_whitelist catkin_parallel_jobs ros_parallel_jobs catkin_parallel_test_jobs ros_parallel_test_jobs
