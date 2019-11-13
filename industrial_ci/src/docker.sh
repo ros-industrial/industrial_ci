@@ -262,7 +262,7 @@ ENV LC_ALL C.UTF-8
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr "${PYTHON_VERSION_NAME}-pip"
+RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr build-essential
 
 RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
 RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list
