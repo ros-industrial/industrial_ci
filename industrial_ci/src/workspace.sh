@@ -72,6 +72,13 @@ function ici_install_pkgs_for_command {
   ici_exec_for_command "$command" ici_asroot apt-get -qq install --no-install-recommends -y "$@"
 }
 
+function ici_setup_git_client {
+  ici_install_pkgs_for_command git git-core
+  if [ -d ~/.ssh ]; then
+    ici_install_pkgs_for_command ssh ssh-client
+  fi
+}
+
 function ici_import_repository {
     local sourcespace=$1; shift
     local url=$1; shift
@@ -82,7 +89,7 @@ function ici_import_repository {
 
     case "${parts[1]}" in
         git)
-          ici_install_pkgs_for_command git git-core
+          ici_setup_git_client
             ;;
         *)
             ;;
@@ -101,7 +108,7 @@ function ici_import_file {
         ;;
     *)
         ici_install_pkgs_for_command vcs python-vcstool
-        ici_install_pkgs_for_command git git-core
+        ici_setup_git_client
         vcs import "$sourcespace" < "$file"
     ;;
     esac
@@ -122,7 +129,7 @@ function ici_import_url {
         ;;
     *)
         ici_install_pkgs_for_command vcs python-vcstool
-        ici_install_pkgs_for_command git git-core
+        ici_setup_git_client
         processor=(vcs import "$sourcespace")
     ;;
     esac
