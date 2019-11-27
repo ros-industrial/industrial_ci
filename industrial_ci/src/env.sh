@@ -97,6 +97,7 @@ function set_ros_variables {
         ros1_defaults "trusty"
         DEFAULT_DOCKER_IMAGE=""
         ROS_VERSION_EOL=true
+        DOCKER_BASE_IMAGE=${DOCKER_BASE_IMAGE:-ubuntu:trusty-20190515}
         ;;
     "kinetic")
         ros1_defaults "xenial"
