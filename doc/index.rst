@@ -32,7 +32,7 @@ Following `ROS distributions <http://wiki.ros.org/Distributions>`__ / `ROS2 <htt
 * `Melodic <http://wiki.ros.org/melodic>`__
 * `Ardent <https://index.ros.org/doc/ros2/Releases/Release-Ardent-Apalone/>`__ *(EOL)*
 * `Bouncy <https://index.ros.org/doc/ros2/Releases/Bouncy/>`__ *(EOL)*
-* `Crystal <https://index.ros.org/doc/ros2/Releases/Release-Crystal-Clemmys/>`__
+* `Crystal <https://index.ros.org/doc/ros2/Releases/Release-Crystal-Clemmys/>`__ *(EOL)*
 * `Dashing <https://index.ros.org/doc/ros2/Releases/Release-Dashing-Diademata/>`__
 * `Eloquent <https://index.ros.org/doc/ros2/Releases/Release-Eloquent-Elusor/>`__
 
