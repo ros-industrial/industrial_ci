@@ -114,11 +114,11 @@ function set_ros_variables {
         DEFAULT_DOCKER_IMAGE=
         ROS_VERSION_EOL=true
         ;;
-    "bouncy")
+    "bouncy"|"crystal")
         ros2_defaults "bionic"
         ROS_VERSION_EOL=true
         ;;
-    "crystal"|"dashing")
+    "dashing")
         ros2_defaults "bionic"
         ;;
     "eloquent")
