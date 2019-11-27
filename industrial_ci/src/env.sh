@@ -69,6 +69,7 @@ if [ -z "$OS_CODE_NAME" ]; then
     "indigo"|"jade")
         OS_CODE_NAME="trusty"
         ROS_VERSION_EOL=true
+        DOCKER_BASE_IMAGE=${DOCKER_BASE_IMAGE:-ubuntu:trusty-20190515}
         ;;
     "lunar")
         OS_CODE_NAME="xenial"
