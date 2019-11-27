@@ -122,7 +122,6 @@ function set_ros_variables {
         ;;
     "eloquent")
         ros2_defaults "bionic"
-        DEFAULT_DOCKER_IMAGE=
         ;;
     esac
 
