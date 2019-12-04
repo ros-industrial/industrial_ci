@@ -94,7 +94,7 @@ function ici_import_repository {
         *)
             ;;
     esac
-    vcs import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
+    vcs import --recursive "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
 }
 
 function ici_import_file {
@@ -109,7 +109,7 @@ function ici_import_file {
     *)
         ici_install_pkgs_for_command vcs "${PYTHON_VERSION_NAME}-vcstool"
         ici_setup_git_client
-        vcs import "$sourcespace" < "$file"
+        vcs import --recursive "$sourcespace" < "$file"
     ;;
     esac
 
@@ -130,7 +130,7 @@ function ici_import_url {
     *)
         ici_install_pkgs_for_command vcs "${PYTHON_VERSION_NAME}-vcstool"
         ici_setup_git_client
-        processor=(vcs import "$sourcespace")
+        processor=(vcs import --recursive "$sourcespace")
     ;;
     esac
 
