@@ -38,8 +38,8 @@ function run_clang_tidy {
         return 0
     fi
 
-    local build; build="$(dirname "$db")"
-    local name; name="$(basename "$build")"
+    local build="$(dirname "$db")"
+    local name="$(basename "$build")"
 
     local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
     if ! [ "$max_jobs" -ge 1 ]; then
