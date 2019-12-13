@@ -1,11 +1,11 @@
 <launch>
   <!-- This launch file is used to test the rostest on CI server works. It can be any ROS tests that are generic enough -->
 
-  <param name="hztest1/topic" value="chatter" />
-  <param name="hztest1/hz" value="10.0" />
-  <param name="hztest1/hzerror" value="0.5" />
-  <param name="hztest1/test_duration" value="1.0" />
-  <param name="hztest1/wait_time" value="1.0" />
-  <test test-name="hztest_test" pkg="rostest" type="hztest"
-        name="hztest1" />
+  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
+    <param name="topic" value="chatter" />
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />
+    <param name="wait_time" value="5.0" />
+  </test>
 </launch>
