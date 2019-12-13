@@ -209,6 +209,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ROSINSTALL_FILENAME** (*deprecated*, default: .travis.rosinstall): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
+* **TEST_CMAKE_ARGS** (default: not set): CMake arguments that get passed to the builder during run_test phase
 * **UPSTREAM_CMAKE_ARGS** (default: not set): Addtional CMake arguments for upstream `workspace <#workspace-management>`__.
 * **UPSTREAM_WORKSPACE** (default: not set): Definition of upstream `workspace <#workspace-management>`__.
 * **VERBOSE_OUTPUT** (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode.

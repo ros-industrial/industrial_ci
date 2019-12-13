@@ -272,6 +272,13 @@ function ici_test_workspace {
     local extend=$1; shift
     local ws=$1; shift
 
-    ici_run "run_${name}_test" builder_run_tests "$extend" "$ws"
+    local -a test_cmake_args
+    ici_parse_env_array  test_cmake_args TEST_CMAKE_ARGS
+    local -a args
+    if [ ${#test_cmake_args[@]} -gt 0 ]; then
+        args+=(--cmake-args "${test_cmake_args[@]}" --)
+    fi
+
+    ici_run "run_${name}_test" builder_run_tests "$extend" "$ws" "${args[@]}"
     builder_test_results "$extend" "$ws"
 }

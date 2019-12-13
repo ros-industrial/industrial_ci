@@ -40,7 +40,7 @@ function builder_run_tests {
     if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
         opts+=("-i")
     fi
-    ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
+    ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status "$@"
 }
 
 function builder_test_results {
