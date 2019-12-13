@@ -178,7 +178,7 @@ ici_time_end  # rosdep_install
 
 if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
     ici_time_start catkin_lint
-    ici_asroot pip install catkin-lint
+    ici_asroot apt-get install -qq -y python-catkin-lint
 
     declare -a lint_args
     ici_parse_env_array lint_args CATKIN_LINT_ARGS
