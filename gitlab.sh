@@ -23,6 +23,7 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export TARGET_REPO_PATH=$CI_PROJECT_DIR
 export TARGET_REPO_NAME=$CI_PROJECT_NAME
+export _FOLDING_TYPE=gitlab
 
 if [ -n "$SSH_PRIVATE_KEY" ]; then
   if [ "$CI_DISPOSABLE_ENVIRONMENT" != true ] && ! [ -f /.dockerenv ] ; then
