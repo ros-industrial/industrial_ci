@@ -25,6 +25,5 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export TARGET_REPO_PATH=$BITBUCKET_CLONE_DIR
 export TARGET_REPO_NAME=${BITBUCKET_REPO_SLUG##*/}
 export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
-export _DO_NOT_FOLD=true
 
 env "$@" bash "$DIR_THIS/industrial_ci/src/ci_main.sh"

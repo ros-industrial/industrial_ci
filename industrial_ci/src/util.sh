@@ -31,6 +31,10 @@ function ici_color_output {
   echo -e "\e[${c}m$*\e[0m"
 }
 
+function ici_ansi_cleared_line {
+  echo -en "$*\r\e[0K"
+}
+
 function ici_source_setup {
   local u_set=1
   [[ $- =~ u ]] || u_set=0
@@ -79,8 +83,11 @@ function ici_hook() {
   fi
 }
 
+# shellcheck disable=SC1090
+source "${ICI_SRC_PATH}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
+
 #######################################
-# Starts a timer section on Travis CI
+# Starts a timer section in a folding section
 # based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_start.bash
 #      and https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_fold.bash
 #
@@ -105,10 +112,7 @@ function ici_time_start {
 
     echo # blank line
 
-    if [ "$_DO_NOT_FOLD" != "true" ]; then
-        echo -e "ici_fold:start:$ICI_FOLD_NAME"
-        echo -en "ici_time:start:$ICI_TIME_ID"
-    fi
+    ici_start_fold "$ICI_TIME_ID" "$ICI_FOLD_NAME" "$ICI_START_TIME"
 
     ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     ici_color_output $ANSI_BLUE "Starting function '$ICI_FOLD_NAME'"
@@ -116,7 +120,7 @@ function ici_time_start {
 }
 
 #######################################
-# Wraps up the timer section on Travis CI (that's started mostly by ici_time_start function).
+# Wraps up the timer section that was started by ici_time_start function
 # based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_finish.bash
 #
 # Globals:
@@ -139,10 +143,9 @@ function ici_time_end {
     if [ -z "$ICI_START_TIME" ]; then ici_warn "[ici_time_end] var ICI_START_TIME is not set. You need to call ici_time_start in advance. Returning."; return; fi
     local end_time; end_time=$(date -u +%s%N)
     local elapsed_seconds; elapsed_seconds=$(( (end_time - ICI_START_TIME)/1000000000 ))
-    if [ "$_DO_NOT_FOLD" != "true" ]; then
-        echo -e "ici_time:end:$ICI_TIME_ID:start=$ICI_START_TIME,finish=$end_time,duration=$((end_time - ICI_START_TIME))"
-        echo -en "ici_fold:end:$name"
-    fi
+
+    ici_end_fold "$ICI_TIME_ID" "$name" "$ICI_START_TIME" "$end_time"
+
     ici_color_output "$color_wrap" "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     ici_color_output "$color_wrap" "Function '$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 

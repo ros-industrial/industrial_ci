@@ -32,7 +32,6 @@ fi
 export TARGET_REPO_PATH
 TARGET_REPO_PATH=$(cd "$repo_dir" && pwd)
 export TARGET_REPO_NAME=${TARGET_REPO_PATH##*/}
-export _DO_NOT_FOLD=true
 echo "Testing $TARGET_REPO_PATH"
 
 if [ -f "$script_dir/../src/ci_main.sh" ]; then # devel space
