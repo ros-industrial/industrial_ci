@@ -24,6 +24,7 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export TARGET_REPO_PATH=$TRAVIS_BUILD_DIR
 export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
 export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
+export _FOLDING_TYPE=travis
 
 if [ "$ABICHECK_MERGE" = "auto" ]; then
   export ABICHECK_MERGE=false
