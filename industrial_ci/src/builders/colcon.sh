@@ -40,6 +40,12 @@ function builder_run_tests {
     else
         output_handler="console_cohesion+"
     fi
+    local -a opts
+    if [ "$PARALLEL_TESTS" == false ]; then
+        opts+=("--executor sequential --parallel-workers 1")
+    else
+        opts+=("--executor parallel")
+    fi
     ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" "${output_handler}"
 }
 
