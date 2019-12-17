@@ -272,13 +272,6 @@ function ici_test_workspace {
     local extend=$1; shift
     local ws=$1; shift
 
-    local -a test_make_args
-    ici_parse_env_array  test_make_args TEST_MAKE_ARGS
-    local -a args
-    if [ ${#test_make_args[@]} -gt 0 ]; then
-        args+=(--make-args "${test_make_args[@]}" --)
-    fi
-
-    ici_run "run_${name}_test" builder_run_tests "$extend" "$ws" "${args[@]}"
+    ici_run "run_${name}_test" builder_run_tests "$extend" "$ws"
     builder_test_results "$extend" "$ws"
 }

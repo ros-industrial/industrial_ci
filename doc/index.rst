@@ -196,6 +196,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **EXPECT_EXIT_CODE** (default: 0): exit code must match this value for test to succeed
 * **INJECT_QEMU** (default: not set): Inject static qemu emulator for cross-platform builds, e.g. `INJECT_QEMU=arm`. This requires to install `qemu-user-static` on the host. The emulated build might take much longer!
 * **IMMEDIATE_TEST_OUTPUT** (default: not set): If true, test output is printed immediately during the tests
+* **NOT_PARALLEL_TESTS** (default: not set): If `true`, build tool (e.g. Catkin) executes `run_tests` step sequentially, i.e. only one job at a time (equal to `-j1`).
 * **NOT_TEST_BUILD** (default: not set): If true, tests in `build` space won't be run.
 * **NOT_TEST_DOWNSTREAM** (default: not set): If true, tests in the downstream workspace won't be run.
 * **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
@@ -209,7 +210,6 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ROSINSTALL_FILENAME** (*deprecated*, default: .travis.rosinstall): Only used when `UPSTREAM_WORKSPACE` is set to `file`. See `UPSTREAM_WORKSPACE` description.
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
-* **TEST_MAKE_ARGS** (default: not set): Make arguments that get passed to the builder during run_test phase
 * **UPSTREAM_CMAKE_ARGS** (default: not set): Addtional CMake arguments for upstream `workspace <#workspace-management>`__.
 * **UPSTREAM_WORKSPACE** (default: not set): Definition of upstream `workspace <#workspace-management>`__.
 * **VERBOSE_OUTPUT** (default: not set): If `true`, build tool (e.g. Catkin) output prints in verbose mode.
