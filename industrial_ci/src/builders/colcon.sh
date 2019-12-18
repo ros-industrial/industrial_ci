@@ -46,7 +46,7 @@ function builder_run_tests {
     else
         opts+=("--executor parallel")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" "${output_handler}"
+    ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" "${output_handler}" "${opts}"
 }
 
 function builder_test_results {
