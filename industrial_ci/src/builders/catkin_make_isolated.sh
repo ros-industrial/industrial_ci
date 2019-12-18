@@ -35,7 +35,7 @@ function builder_run_tests {
     if [ "$PARALLEL_TESTS" == false ]; then
         opts+=("-j1")
     fi
-    _run_catkin_make_isolated run_tests "$1" "$2" "$opts"
+    _run_catkin_make_isolated run_tests "$1" "$2" "${opts[@]}"
 }
 
 function builder_test_results {
