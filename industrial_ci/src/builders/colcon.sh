@@ -42,11 +42,11 @@ function builder_run_tests {
     fi
     local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
     if [ "$PARALLEL_TESTS" == false ]; then
-        opts+=("--executor sequential)
+        opts+=("--executor sequential")
     else
         opts+=("--executor parallel")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@}"
+    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
 }
 
 function builder_test_results {
