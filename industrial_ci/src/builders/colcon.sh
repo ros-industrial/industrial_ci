@@ -42,7 +42,7 @@ function builder_run_tests {
     fi
     local -a opts
     if [ "$PARALLEL_TESTS" == false ]; then
-        opts+=("--executor sequential --parallel-workers 1")
+        opts+=("--executor sequential)
     else
         opts+=("--executor parallel")
     fi
