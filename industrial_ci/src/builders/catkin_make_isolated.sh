@@ -33,7 +33,7 @@ function builder_run_build {
 function builder_run_tests {
     local -a opts
     if [ "$PARALLEL_TESTS" == false ]; then
-        opts+=("-j1")
+        opts+=(-j1)
     fi
     _run_catkin_make_isolated run_tests "$1" "$2" "${opts[@]}"
 }

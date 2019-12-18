@@ -30,7 +30,7 @@ function builder_run_tests {
     local ws=$1; shift
     local -a opts
     if [ "$PARALLEL_TESTS" == false ]; then
-        opts+=("-j1")
+        opts+=(-j1)
     fi
     ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args run_tests "${opts[@]}" "$@"
 }
