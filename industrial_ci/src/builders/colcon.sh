@@ -42,7 +42,7 @@ function builder_run_tests {
     fi
     local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
     if [ "$PARALLEL_TESTS" == false ]; then
-        opts+=(--executor sequential)
+        opts+=(--executor sequential  --ctest-args -j1)
     else
         opts+=(--executor parallel)
     fi
