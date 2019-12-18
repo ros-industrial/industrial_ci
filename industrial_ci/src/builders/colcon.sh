@@ -40,7 +40,7 @@ function builder_run_tests {
     else
         output_handler="console_cohesion+"
     fi
-    local -a opts
+    local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
     if [ "$PARALLEL_TESTS" == false ]; then
         opts+=("--executor sequential)
     else
