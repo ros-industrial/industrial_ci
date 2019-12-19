@@ -28,7 +28,11 @@ function builder_run_build {
 function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args run_tests "$@"
+    local -a opts
+    if [ "$PARALLEL_TESTS" == false ]; then
+        opts+=(-j1)
+    fi
+    ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args run_tests "${opts[@]}" "$@"
 }
 
 function builder_test_results {

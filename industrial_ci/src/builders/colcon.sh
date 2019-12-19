@@ -40,7 +40,13 @@ function builder_run_tests {
     else
         output_handler="console_cohesion+"
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test --event-handlers "${_colcon_event_handlers[@]}" "${output_handler}"
+    local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
+    if [ "$PARALLEL_TESTS" == false ]; then
+        opts+=(--executor sequential  --ctest-args -j1)
+    else
+        opts+=(--executor parallel)
+    fi
+    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
 }
 
 function builder_test_results {
