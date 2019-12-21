@@ -123,6 +123,10 @@ function set_ros_variables {
     "eloquent")
         ros2_defaults "bionic"
         ;;
+    "foxy")
+        ros2_defaults "bionic"
+        DOCKER_IMAGE=${DOCKER_IMAGE:-osrf/ros2:nightly}
+        ;;
     esac
 
     local prefix=ros
