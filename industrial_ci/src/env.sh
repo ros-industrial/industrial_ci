@@ -18,6 +18,7 @@
 
 ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
 ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not available anymore."
+ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"
 
 if [ -n "$NOT_TEST_INSTALL" ]; then
     if [ "$NOT_TEST_INSTALL" != true ]; then
