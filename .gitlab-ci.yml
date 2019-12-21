@@ -14,7 +14,7 @@ services:
   - docker:dind
 
 before_script:
-  - apk add --update bash coreutils tar # install industrial_ci dependencies
+  - apk add --update bash coreutils tar grep # install industrial_ci dependencies
   # for regular users: - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci -b master
   - mkdir .industrial_ci && cp -a * .industrial_ci # this is only needed for branch testing of industrial_ci itself
 
@@ -62,3 +62,8 @@ docker_no_pull:
     - docker pull rosindustrial/ci:kinetic-xenial-shadow-fixed
     - docker tag rosindustrial/ci:kinetic-xenial-shadow-fixed industrial-ci/ubuntu:xenial
     - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
+
+test_arm:
+  script:
+    - docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
+    - .industrial_ci/gitlab.sh DOCKER_IMAGE='arm32v7/ros:melodic-ros-core' BEFORE_INIT='[[ $(uname -p) == armv7l ]] && exit 42' EXPECT_EXIT_CODE=42

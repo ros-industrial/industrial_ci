@@ -20,6 +20,7 @@ Some features are not supported anymore:
 * Support of ROS hydro
 * Devel space builds
 * Testing installed \*.test files
+* Injecting QEMU (see [`INJECT_QEMU`](#inject_qemu))
 * Job control settings have been removed for now
 
 If you depend on these, you can still use the [legacy](https://github.com/ros-industrial/industrial_ci/tree/legacy) version.
@@ -54,6 +55,7 @@ Special care must be taken, if you use any of these variables:
 * [`DOCKER_IMAGE`](#docker_image)
 * [`HASHKEY_SKS`](#hashkey_sks)
 * [`NOT_TEST_INSTALL`](#not_test_install)
+* [`INJECT_QEMU`](#inject_qemu)
 * [`PKGS_DOWNSTREAM`](#pkgs_downstream)
 * [`ROSINSTALL_FILENAME`](#rosinstall_filename)
 * [`ROS_PARALLEL_JOBS`](#ros_parallel_jobs)
@@ -196,6 +198,14 @@ This variable is still supported, but the [workspace layout has changed](#worksp
 ### HASHKEY_SKS
 
 Will only be used if [`APTKEY_STORE_HTTPS`](#aptkey_store_https) is not set.
+
+### INJECT_QEMU
+
+This option was removed. It is not needed for newer versions of `qemu-user-static` (host OS: Ubuntu cosmic or newer, Debian buster or newer).
+For older versions, please try
+```
+docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
+```
 
 ### NOT_TEST_INSTALL
 
