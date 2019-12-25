@@ -35,13 +35,13 @@ function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
     local output_handler
-    if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
+    if ici_is_true "$IMMEDIATE_TEST_OUTPUT"; then
         output_handler="console_direct+"
     else
         output_handler="console_cohesion+"
     fi
     local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
-    if [ "$PARALLEL_TESTS" == false ]; then
+    if ici_is_false_or_unset "$PARALLEL_TESTS"; then
         opts+=(--executor sequential  --ctest-args -j1)
     else
         opts+=(--executor parallel)

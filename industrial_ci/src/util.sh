@@ -35,6 +35,36 @@ function ici_ansi_cleared_line {
   echo -en "$*\r\e[0K"
 }
 
+function ici_is_true {
+  local v=$1; shift
+  case "${v,,}" in
+    "true" | "on" | "enabled" | "1")
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+function ici_is_false {
+  local v=$1; shift
+  case "${v,,}" in
+    "false" | "off" | "disabled" | "0")
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+function ici_is_true_or_unset {
+  local v=$1; shift
+  [ -z "$v" ] || ici_is_true "$v"
+}
+
+function ici_is_false_or_unset {
+  local v=$1; shift
+  [ -z "$v" ] || ici_is_false "$v"
+}
+
 function ici_source_setup {
   local u_set=1
   [[ $- =~ u ]] || u_set=0
@@ -105,7 +135,7 @@ source "${ICI_SRC_PATH}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding
 
 function ici_time_start {
     ici_hook "before_${1}"
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
+    if ici_is_true "$DEBUG_BASH"; then set +x; fi
     ICI_START_TIME=$(date -u +%s%N)
     ICI_TIME_ID="$(printf %08x $((RANDOM * RANDOM)))"
     ICI_FOLD_NAME=$1
@@ -116,7 +146,7 @@ function ici_time_start {
 
     ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     ici_color_output $ANSI_BLUE "Starting function '$ICI_FOLD_NAME'"
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
+    if ici_is_true "$DEBUG_BASH"; then set -x; fi
 }
 
 #######################################
@@ -135,7 +165,7 @@ function ici_time_start {
 #   (None)
 #######################################
 function ici_time_end {
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
+    if ici_is_true "$DEBUG_BASH"; then set +x; fi
     local color_wrap=${1:-${ANSI_GREEN}}
     local exit_code=${2:-$?}
     local name=$ICI_FOLD_NAME
@@ -150,7 +180,7 @@ function ici_time_end {
     ici_color_output "$color_wrap" "Function '$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 
     unset ICI_FOLD_NAME
-    if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
+    if ici_is_true "$DEBUG_BASH"; then set -x; fi
     ici_hook "after_${name}"
 
 }

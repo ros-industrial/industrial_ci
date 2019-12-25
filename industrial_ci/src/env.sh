@@ -21,7 +21,7 @@ ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not avail
 ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"
 
 if [ -n "$NOT_TEST_INSTALL" ]; then
-    if [ "$NOT_TEST_INSTALL" != true ]; then
+    if ici_is_false "$NOT_TEST_INSTALL"; then
         ici_enforce_deprecated NOT_TEST_INSTALL "testing installed test files has been removed."
     else
         ici_mark_deprecated NOT_TEST_INSTALL "testing installed test files has been removed, NOT_TEST_INSTALL=false is superfluous"
@@ -80,7 +80,7 @@ function use_snapshot() {
 }
 
 function use_repo_or_final_snapshot() {
-    if [ "$ROS_VERSION_EOL" = true ]; then
+    if ici_is_true "$ROS_VERSION_EOL"; then
         use_snapshot final
         if [ -n "$ROS_REPO" ]; then
             ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
@@ -242,20 +242,20 @@ if [ "$UPSTREAM_WORKSPACE" = "debian" ]; then
   unset UPSTREAM_WORKSPACE
 fi
 
-if [ "$USE_DEB" = true ]; then
+if ici_is_true "$USE_DEB"; then
   if [ "${UPSTREAM_WORKSPACE:-debian}" != "debian" ]; then
     ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
   fi
   ici_warn "Setting 'USE_DEB=true' is superfluous"
 fi
 
-if [ "$UPSTREAM_WORKSPACE" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
+if [ "$UPSTREAM_WORKSPACE" = "file" ] || ici_is_false "$USE_DEB"; then
   ROSINSTALL_FILENAME="${ROSINSTALL_FILENAME:-.travis.rosinstall}"
   if [ -f  "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO" ]; then
     ROSINSTALL_FILENAME="$ROSINSTALL_FILENAME.$ROS_DISTRO"
   fi
 
-  if [ "${USE_DEB:-true}" != true ]; then # means UPSTREAM_WORKSPACE=file
+  if ici_is_false "$USE_DEB"; then # means UPSTREAM_WORKSPACE=file
       if [ "${UPSTREAM_WORKSPACE:-file}" != "file" ]; then
         ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
       fi

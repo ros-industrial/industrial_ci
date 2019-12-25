@@ -106,7 +106,7 @@ function run_source_tests {
     target_ws=~/target_ws
     downstream_ws=~/downstream_ws
 
-    if [ "$CCACHE_DIR" ]; then
+    if [ -n "$CCACHE_DIR" ]; then
         ici_run "setup_ccache" ici_asroot apt-get install -qq -y ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
@@ -122,16 +122,16 @@ function run_source_tests {
         extend="$upstream_ws/install"
     fi
 
-    if [ "${CLANG_TIDY:-false}" != false ]; then
+    if ! ici_is_false_or_unset "$CLANG_TIDY"; then
         TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
     fi
     ici_with_ws "$target_ws" ici_build_workspace "target" "$extend" "$target_ws"
 
-    if [ "$NOT_TEST_BUILD" != "true" ]; then
+    if ici_is_false_or_unset "$NOT_TEST_BUILD"; then
         ici_with_ws "$target_ws" ici_test_workspace "target" "$extend" "$target_ws"
     fi
 
-    if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
+    if ici_is_true "$CATKIN_LINT" || [ "$CATKIN_LINT" == "pedantic" ]; then
         ici_run "install_catkin_lint" install_catkin_lint
         local -a catkin_lint_args
         ici_parse_env_array catkin_lint_args CATKIN_LINT_ARGS
@@ -141,7 +141,7 @@ function run_source_tests {
         ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
 
     fi
-    if [ "${CLANG_TIDY:-false}" != false ]; then
+    if ! ici_is_false_or_unset "$CLANG_TIDY"; then
         run_clang_tidy_check "$target_ws"
     fi
 
@@ -150,7 +150,7 @@ function run_source_tests {
         ici_with_ws "$downstream_ws" ici_build_workspace "downstream" "$extend" "$downstream_ws"
         #extend="$downstream_ws/install"
 
-        if [ "$NOT_TEST_DOWNSTREAM" != "true" ]; then
+        if ici_is_true_or_unset "$NOT_TEST_DOWNSTREAM"; then
             ici_with_ws "$downstream_ws" ici_test_workspace "downstream" "$extend" "$downstream_ws"
         fi
     fi

@@ -145,7 +145,7 @@ function docker_cp {
 function ici_docker_build() {
   local -a build_opts
   ici_parse_env_array build_opts DOCKER_BUILD_OPTS
-  if [ "$DOCKER_PULL" != false ]; then
+  if ici_is_true_or_unset "$DOCKER_PULL"; then
     build_opts+=("--pull")
   fi
   docker build -t "$DOCKER_IMAGE" "${build_opts[@]}" "$@"
@@ -153,7 +153,7 @@ function ici_docker_build() {
 
 function ici_docker_try_pull {
     local image=$1
-    if [ "$DOCKER_PULL" != false ]; then
+    if ici_is_true_or_unset "$DOCKER_PULL"; then
         echo "Pulling Docker image '$image'..."
         ici_quiet docker pull "$image"
     fi

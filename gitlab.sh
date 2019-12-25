@@ -26,7 +26,7 @@ export TARGET_REPO_NAME=$CI_PROJECT_NAME
 export _FOLDING_TYPE=gitlab
 
 if [ -n "$SSH_PRIVATE_KEY" ]; then
-  if [ "$CI_DISPOSABLE_ENVIRONMENT" != true ] && ! [ -f /.dockerenv ] ; then
+  if ici_is_false_or_unset "$CI_DISPOSABLE_ENVIRONMENT" && ! [ -f /.dockerenv ] ; then
     echo "SSH auto set-up cannot be used in non-disposable environments"
     exit 1
   fi
