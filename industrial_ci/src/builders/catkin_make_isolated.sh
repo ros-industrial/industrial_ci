@@ -32,7 +32,7 @@ function builder_run_build {
 
 function builder_run_tests {
     local -a opts
-    if [ "$PARALLEL_TESTS" == false ]; then
+    if ici_is_false_or_unset "$PARALLEL_TESTS"; then
         opts+=(-j1)
     fi
     _run_catkin_make_isolated run_tests "$1" "$2" "${opts[@]}"

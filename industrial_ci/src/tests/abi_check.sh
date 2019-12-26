@@ -89,7 +89,7 @@ function abi_process_workspace() {
 }
 
 function abi_configure() {
-  if [ "$ABICHECK_MERGE" = true ]; then
+  if ici_is_true "$ABICHECK_MERGE"; then
     local ref_list
     if ici_split_array ref_list "$(cd "$TARGET_REPO_PATH" && git rev-list --parents -n 1 HEAD)" && [ "${#ref_list[@]}" -gt 2 ]; then
         ABICHECK_VERSION="${ref_list[1]}"
