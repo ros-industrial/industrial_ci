@@ -23,7 +23,7 @@ function builder_run_build {
     local extend=$1; shift
     local ws=$1; shift
     local -a opts
-    if [ "$VERBOSE_OUTPUT" != false ]; then
+    if [ "${VERBOSE_OUTPUT:-false}" != false ]; then
         opts+=("-vi")
     fi
     ici_exec_in_workspace "$extend" "$ws" catkin config --install
@@ -34,7 +34,7 @@ function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
     local -a opts
-    if [ "$VERBOSE_TESTS" != false ]; then
+    if [ "${VERBOSE_TESTS:-false}" != false ]; then
         opts+=(-v)
     fi
     if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
