@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>test_pylint</name>
+  <version>0.3.1</version>
+  <description>Test purpose only for industrial_ci package. Primary purpose
+    is to be a package used for pylint checks. 
+  </description>
+
+  <maintainer email="mathias.luedtke@ipa.fraunhofer.de">Mathias Lüdtke</maintainer>
+  <author email="felixmessmer@gmail.com">Felix Messmer</author>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <export />
+</package>

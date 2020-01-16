@@ -75,6 +75,15 @@ env:
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic CLANG_TIDY_ARGS="-checks=modernize-use-nullptr" EXPECT_EXIT_CODE=1
 
+    # Pylint
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT2_ARGS="--errors-only"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT3_CHECK=true PYLINT3_ARGS="--reports=no"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT3_CHECK=true PYLINT_ARGS="--output-format=parseable --errors-only"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT3_CHECK=true PYLINT_ARGS="--reports=no" PYLINT2_ARGS="--output-format=colorized"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT3_CHECK=true PYLINT_ARGS="--reports=no" PYLINT2_ARGS="--output-format=colorized" PYLINT3_ARGS="--output-format=parseable"
+    #- ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--disable=C0103,C0111"
+    #- ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--output-format=parseable --reports=no"
+
 matrix:
   allow_failures:
     - env: ROS_DISTRO=kinetic NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
