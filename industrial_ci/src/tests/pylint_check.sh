@@ -30,6 +30,6 @@ function run_pylint_check() {
 
   for cmd in "${pylint_versions[@]}"; do
       ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
-      ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$TARGET_REPO_PATH" -iname "*.py")"
+      ici_with_ws "$target_ws" ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$TARGET_REPO_PATH" -iname "*.py")"
   done
 }
