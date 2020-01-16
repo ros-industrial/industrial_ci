@@ -139,10 +139,21 @@ function run_source_tests {
           catkin_lint_args+=(--strict -W2)
         fi
         ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
-
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
+    fi
+    if [ "${PYLINT:-false}" != false ]; then
+        local -a pylint_versions
+        ici_parse_env_array pylint_versions PYLINT_VERSIONS
+        local -a pylint_args
+        ici_parse_env_array pylint_args PYLINT_ARGS
+
+        ici_run "install_pylint" ici_install_pkgs_for_command pylint "${pylint_versions[@]}"
+
+        for cmd in "${pylint_versions[@]}"; do
+            ici_run "pylint" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+        done
     fi
 
     extend="$target_ws/install"
