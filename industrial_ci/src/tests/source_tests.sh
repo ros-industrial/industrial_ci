@@ -149,10 +149,9 @@ function run_source_tests {
         local -a pylint_args
         ici_parse_env_array pylint_args PYLINT_ARGS
 
-        ici_run "install_pylint" ici_install_pkgs_for_command pylint "${pylint_versions[@]}"
-
         for cmd in "${pylint_versions[@]}"; do
-            ici_run "pylint" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+            ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
+            ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
         done
     fi
 
