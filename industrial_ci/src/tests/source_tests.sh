@@ -151,7 +151,7 @@ function run_source_tests {
 
         for cmd in "${pylint_versions[@]}"; do
             ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
-            ici_with_ws "$target_ws" ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+            ici_source_setup "$target_ws/install" ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
         done
     fi
 
