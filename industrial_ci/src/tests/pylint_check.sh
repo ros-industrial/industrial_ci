@@ -16,13 +16,12 @@
 # limitations under the License.
 
 function run_pylint_check() {
-
   ici_require_run_in_docker # this script must be run in docker
   target_ws=~/target_ws
 
   local -a sources
   ici_parse_env_array sources TARGET_WORKSPACE
-  ici_run "prepare_sourcespace" ici_prepare_sourcespace "$target_ws" "${sources[@]}"
+  ici_run "prepare_sourcespace" ici_prepare_sourcespace "$target_ws/src" "${sources[@]}"
 
   local -a pylint_versions
   ici_parse_env_array pylint_versions PYLINT_VERSIONS
@@ -31,6 +30,6 @@ function run_pylint_check() {
 
   for cmd in "${pylint_versions[@]}"; do
       ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
-      ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+      ici_run "run_$cmd" "$cmd" "${pylint_args[@]}" "$(find "$TARGET_REPO_PATH" -iname "*.py")"
   done
 }
