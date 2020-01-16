@@ -97,6 +97,68 @@ function run_clang_tidy_check {
     fi
 }
 
+function install_pylint {
+    local cmd=$1
+
+    ici_time_start "install_$cmd"
+    ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
+    ici_time_end # install_$cmd
+}
+
+function run_pylint {
+    local __result=$1; shift
+    local target_ws=$1; shift
+    local cmd=$1; shift
+    local pylint_args=("$@")
+    local path; path="$target_ws/src"
+    local status=0
+
+    ici_time_start "run_$cmd"
+    ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
+    while read -r file; do
+        echo "Checking '${file#$path/}'"
+        if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
+            ici_color_output "${ANSI_GREEN}" "$cmd check for '$file' passed"
+        else
+            status=$?
+            # shellcheck disable=SC2140
+            eval "$__result"="'$status'"
+            ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
+        fi
+    done < <(ici_find_nonhidden "$path" -type f -iname "*.py")
+    ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
+}
+
+function run_pylint_check {
+    local target_ws=$1
+    local exit_code=0
+
+    local -a cmd
+    local -a pylint_args
+    if [ "$PYLINT2_CHECK" == true ]; then
+        cmd="pylint"
+        ici_parse_env_array pylint_args PYLINT2_ARGS
+        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
+
+        install_pylint "$cmd"
+        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
+    fi
+    unset cmd
+    unset pylint_args
+    if [ "$PYLINT3_CHECK" == true ]; then
+        cmd="pylint3"
+        ici_parse_env_array pylint_args PYLINT3_ARGS
+        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
+
+        install_pylint "$cmd"
+        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
+    fi
+
+    if [ "$exit_code" -gt "0" ]; then
+        ici_error "pylint check(s) failed."
+    fi
+}
+
 function run_source_tests {
     # shellcheck disable=SC1090
     source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
@@ -139,10 +201,12 @@ function run_source_tests {
           catkin_lint_args+=(--strict -W2)
         fi
         ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
-
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
+    fi
+    if [ "$PYLINT2_CHECK" == "true" ] || [ "$PYLINT3_CHECK" == "true" ]; then
+        run_pylint_check "$target_ws"
     fi
 
     extend="$target_ws/install"
