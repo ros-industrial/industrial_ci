@@ -20,6 +20,10 @@ function run_pylint_check() {
   ici_require_run_in_docker # this script must be run in docker
   target_ws=~/target_ws
 
+  local -a sources
+  ici_parse_env_array sources TARGET_WORKSPACE
+  ici_run "prepare_sourcespace" ici_prepare_sourcespace "$target_ws" "${sources[@]}"
+
   local -a pylint_versions
   ici_parse_env_array pylint_versions PYLINT_VERSIONS
   local -a pylint_args
