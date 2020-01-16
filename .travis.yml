@@ -80,9 +80,9 @@ env:
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic CLANG_TIDY_ARGS="-checks=modernize-use-nullptr" EXPECT_EXIT_CODE=1
 
     # Pylint
-    - ROS_DISTRO=kinetic PYLINT=true PYLINT_ARGS="--errors-only" PYLINT_VERSIONS="pylint pylint3"
-    - ROS_DISTRO=kinetic PYLINT=true PYLINT_ARGS="--disable=C0103,C0111" PYLINT_VERSIONS="pylint pylint3"
-    - ROS_DISTRO=kinetic PYLINT=true PYLINT_ARGS="--output-format=parseable --reports=no" PYLINT_VERSIONS="pylint pylint3"
+    - ROS_DISTRO=kinetic PYLINT_CHECK=true PYLINT_ARGS="--errors-only" PYLINT_VERSIONS="pylint pylint3"
+    - ROS_DISTRO=kinetic PYLINT_CHECK=true PYLINT_ARGS="--disable=C0103,C0111" PYLINT_VERSIONS="pylint pylint3"
+    - ROS_DISTRO=kinetic PYLINT_CHECK=true PYLINT_ARGS="--output-format=parseable --reports=no" PYLINT_VERSIONS="pylint pylint3"
 
 matrix:
   allow_failures:

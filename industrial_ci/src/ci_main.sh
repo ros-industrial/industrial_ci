@@ -50,6 +50,10 @@ elif [ -n "$CLANG_FORMAT_CHECK" ]; then
   # shellcheck source=industrial_ci/src/tests/clang_format_check.sh
   source "${ICI_SRC_PATH}/tests/clang_format_check.sh"
   run_clang_format_check
+elif [ "$PYLINT_CHECK" == true ]; then
+  # shellcheck source=industrial_ci/src/tests/pylint_check.sh
+  source "${ICI_SRC_PATH}/tests/pylint_check.sh"
+  run_pylint_check
 else
   # shellcheck source=industrial_ci/src/tests/source_tests.sh
   source "${ICI_SRC_PATH}/tests/source_tests.sh"
