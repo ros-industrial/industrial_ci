@@ -79,7 +79,7 @@ env:
 
     # Pylint
     - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--reports=no"
-    #- ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--errors-only"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--reports=no --errors-only"
     #- ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--disable=C0103,C0111"
     #- ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT=true PYLINT_VERSIONS="pylint pylint3" PYLINT_ARGS="--output-format=parseable --reports=no"
 
