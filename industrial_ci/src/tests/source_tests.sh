@@ -108,15 +108,25 @@ function run_pylint_check {
     ici_parse_env_array pylint_args PYLINT_ARGS
 
     for cmd in "${pylint_versions[@]}"; do
+        status=0
+
+        ici_time_start "install_$cmd"
         ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
-        set +e
-        ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; status=$?
-        set -e
+        ici_time_end # install_$cmd
+
+        ici_time_start "run_$cmd"
+        if ! ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
+            status=$?
+            exit_code=1
+        fi
+        ici_time_end # run_$cmd
+
         ici_color_output "${ANSI_BLUE}" "STATUS: $status"
+        ici_color_output "${ANSI_BLUE}" "EXIT_CODE: $exit_code"
         if [ "$status" -eq 0 ]; then
             ici_color_output "${ANSI_GREEN}" "$cmd check passed"
         else
-            { ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"; exit_code=1; }
+            ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"
         fi
     done
     if [ "$exit_code" -gt "0" ]; then
