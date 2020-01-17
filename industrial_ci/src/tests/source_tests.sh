@@ -108,7 +108,7 @@ function run_pylint_check {
     ici_parse_env_array pylint_args PYLINT_ARGS
 
     for cmd in "${pylint_versions[@]}"; do
-        ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
+        ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
         set +e
         ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; status=$?
         set -e
