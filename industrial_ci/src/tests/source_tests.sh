@@ -99,6 +99,9 @@ function run_clang_tidy_check {
 
 function run_pylint_check {
     local target_ws=$1
+    local status=0
+    local exit_code=0
+
     local -a pylint_versions
     ici_parse_env_array pylint_versions PYLINT_VERSIONS
     local -a pylint_args
@@ -106,8 +109,15 @@ function run_pylint_check {
 
     for cmd in "${pylint_versions[@]}"; do
         ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
-        ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+        set +e
+        ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; status=$?
+        set -e
+        ici_color_output ${ANSI_BLUE} "STATUS: $status"
+        [ "$status" -eq 0 ] && ici_color_output ${ANSI_GREEN} "$cmd check passed" || { ici_color_output ${ANSI_YELLOW} "$cmd check failed with status $status"; exit_code=1; }
     done
+    if [ "$exit_code" -gt "0" ]; then
+        ici_error "pylint check(s) failed."
+    fi
 }
 
 function run_source_tests {
