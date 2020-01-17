@@ -112,8 +112,12 @@ function run_pylint_check {
         set +e
         ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; status=$?
         set -e
-        ici_color_output ${ANSI_BLUE} "STATUS: $status"
-        [ "$status" -eq 0 ] && ici_color_output ${ANSI_GREEN} "$cmd check passed" || { ici_color_output ${ANSI_YELLOW} "$cmd check failed with status $status"; exit_code=1; }
+        ici_color_output "${ANSI_BLUE}" "STATUS: $status"
+        if [ "$status" -eq 0 ]; then
+            ici_color_output "${ANSI_GREEN}" "$cmd check passed"
+        else
+            { ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"; exit_code=1; }
+        fi
     done
     if [ "$exit_code" -gt "0" ]; then
         ici_error "pylint check(s) failed."
