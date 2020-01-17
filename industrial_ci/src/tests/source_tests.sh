@@ -97,6 +97,19 @@ function run_clang_tidy_check {
     fi
 }
 
+function run_pylint_check {
+    local target_ws=$1
+    local -a pylint_versions
+    ici_parse_env_array pylint_versions PYLINT_VERSIONS
+    local -a pylint_args
+    ici_parse_env_array pylint_args PYLINT_ARGS
+
+    for cmd in "${pylint_versions[@]}"; do
+        ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
+        ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
+    done
+}
+
 function run_source_tests {
     # shellcheck disable=SC1090
     source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
@@ -144,15 +157,7 @@ function run_source_tests {
         run_clang_tidy_check "$target_ws"
     fi
     if [ "${PYLINT:-false}" != false ]; then
-        local -a pylint_versions
-        ici_parse_env_array pylint_versions PYLINT_VERSIONS
-        local -a pylint_args
-        ici_parse_env_array pylint_args PYLINT_ARGS
-
-        for cmd in "${pylint_versions[@]}"; do
-            ici_run "install_$cmd" ici_install_pkgs_for_command "$cmd" "$cmd"
-            ici_with_ws "$target_ws" ici_run "run_$cmd" ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"
-        done
+        run_pylint_check "$target_ws"
     fi
 
     extend="$target_ws/install"
