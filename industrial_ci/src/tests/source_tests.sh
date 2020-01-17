@@ -115,9 +115,12 @@ function run_pylint_check {
         ici_time_end # install_$cmd
 
         ici_time_start "run_$cmd"
-        if ! ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
+        if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
+            ici_color_output "${ANSI_GREEN}" "IF"
+        else
             status=$?
             exit_code=1
+            ici_color_output "${ANSI_GREEN}" "ELSE"
         fi
         ici_time_end # run_$cmd
 
