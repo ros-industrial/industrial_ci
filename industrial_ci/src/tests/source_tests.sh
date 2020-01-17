@@ -102,7 +102,12 @@ function run_pylint_check {
     local exit_code=0
 
     local -a pylint_versions
-    ici_parse_env_array pylint_versions PYLINT_VERSIONS
+    if [ "$PYLINT2_CHECK" == true ]; then
+        pylint_versions+=(pylint)
+    fi
+    if [ "$PYLINT3_CHECK" == true ]; then
+        pylint_versions+=(pylint3)
+    fi
     local -a pylint_args
     ici_parse_env_array pylint_args PYLINT_ARGS
 
@@ -171,7 +176,7 @@ function run_source_tests {
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
     fi
-    if [ "${PYLINT:-false}" != false ]; then
+    if [ "$PYLINT2_CHECK" == "true" ] || [ "$PYLINT3_CHECK" == "true" ]; then
         run_pylint_check "$target_ws"
     fi
 
