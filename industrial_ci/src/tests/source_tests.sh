@@ -110,6 +110,15 @@ function run_pylint_check {
     fi
     local -a pylint_args
     ici_parse_env_array pylint_args PYLINT_ARGS
+    echo "pylint_args: ${pylint_args[@]}"
+    local -a pylint2_args
+    ici_parse_env_array pylint2_args PYLINT2_ARGS
+    if [[ -z ${pylint2_args} ]]; then ici_parse_env_array pylint2_args PYLINT_ARGS; fi
+    echo "pylint2_args: ${pylint2_args[@]}"
+    local -a pylint3_args
+    ici_parse_env_array pylint3_args PYLINT3_ARGS
+    if [[ -z ${pylint3_args} ]]; then ici_parse_env_array pylint3_args PYLINT_ARGS; fi
+    echo "pylint3_args: ${pylint3_args[@]}"
 
     for cmd in "${pylint_versions[@]}"; do
         ici_time_start "install_$cmd"
