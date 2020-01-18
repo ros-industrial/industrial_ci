@@ -176,7 +176,7 @@ def main(scripts_dir, argv):
 
     run_ci = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), global_env]
 
-    bash = ['env', '-i'] +map(gen_env, ['DOCKER_PORT', 'PATH', 'SSH_AUTH_SOCK', 'TERM']) + ['bash','-e']
+    bash = ['env', '-i'] +map(gen_env, ['DOCKER_PORT', 'HOME', 'PATH', 'SSH_AUTH_SOCK', 'TERM']) + ['bash','-e']
 
     selection = set(apply_ranges(ranges, len(job_envs)))
 
