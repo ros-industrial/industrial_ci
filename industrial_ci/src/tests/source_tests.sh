@@ -118,6 +118,7 @@ function run_pylint {
         ici_color_output "${ANSI_GREEN}" "$cmd check passed"
     else
         status=$?
+        # shellcheck disable=SC2140
         eval "$__result"="'$status'"
         ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"
     fi
