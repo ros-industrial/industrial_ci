@@ -97,43 +97,58 @@ function run_clang_tidy_check {
     fi
 }
 
+function install_pylint {
+    local cmd=$1
+
+    ici_time_start "install_$cmd"
+    ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
+    ici_time_end # install_$cmd
+}
+
+function run_pylint {
+    local __result=$1
+    local cmd=$2
+    local pylint_args=$3
+    local target_ws=$4
+    local status=0
+
+    ici_time_start "run_$cmd"
+    ici_color_output "${ANSI_BLUE}" "pylint_args: ${pylint_args[*]}"
+    if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
+        ici_color_output "${ANSI_GREEN}" "$cmd check passed"
+    else
+        status=$?
+        eval "$__result"="'$status'"
+        ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"
+    fi
+    ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
+}
+
 function run_pylint_check {
     local target_ws=$1
     local exit_code=0
 
-    local -a pylint_versions
-    if [ "$PYLINT2_CHECK" == true ]; then
-        pylint_versions+=(pylint)
-    fi
-    if [ "$PYLINT3_CHECK" == true ]; then
-        pylint_versions+=(pylint3)
-    fi
+    local -a cmd
     local -a pylint_args
-    ici_parse_env_array pylint_args PYLINT_ARGS
-    echo "pylint_args: ${pylint_args[@]}"
-    local -a pylint2_args
-    ici_parse_env_array pylint2_args PYLINT2_ARGS
-    if [[ -z ${pylint2_args} ]]; then ici_parse_env_array pylint2_args PYLINT_ARGS; fi
-    echo "pylint2_args: ${pylint2_args[@]}"
-    local -a pylint3_args
-    ici_parse_env_array pylint3_args PYLINT3_ARGS
-    if [[ -z ${pylint3_args} ]]; then ici_parse_env_array pylint3_args PYLINT_ARGS; fi
-    echo "pylint3_args: ${pylint3_args[@]}"
+    if [ "$PYLINT2_CHECK" == true ]; then
+        cmd="pylint"
+        ici_parse_env_array pylint_args PYLINT2_ARGS
+        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
-    for cmd in "${pylint_versions[@]}"; do
-        ici_time_start "install_$cmd"
-        ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
-        ici_time_end # install_$cmd
+        install_pylint "$cmd"
+        run_pylint exit_code "$cmd" "${pylint_args[@]}" "$target_ws"
+    fi
+    unset cmd
+    unset pylint_args
+    if [ "$PYLINT3_CHECK" == true ]; then
+        cmd="pylint3"
+        ici_parse_env_array pylint_args PYLINT3_ARGS
+        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
-        ici_time_start "run_$cmd"
-        if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
-            ici_color_output "${ANSI_GREEN}" "$cmd check passed"
-        else
-            ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $?"
-            exit_code=1
-        fi
-        ici_time_end # run_$cmd
-    done
+        install_pylint "$cmd"
+        run_pylint exit_code "$cmd" "${pylint_args[@]}" "$target_ws"
+    fi
+
     if [ "$exit_code" -gt "0" ]; then
         ici_error "pylint check(s) failed."
     fi
