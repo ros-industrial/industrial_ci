@@ -107,9 +107,10 @@ function install_pylint {
 
 function run_pylint {
     local __result=$1
-    local cmd=$2
-    local pylint_args=$3
-    local target_ws=$4
+    local target_ws=$2
+    local cmd=$3
+    shift 3
+    local pylint_args=("$@")
     local status=0
 
     ici_time_start "run_$cmd"
@@ -137,7 +138,7 @@ function run_pylint_check {
         if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
         install_pylint "$cmd"
-        run_pylint exit_code "$cmd" "${pylint_args[@]}" "$target_ws"
+        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
     fi
     unset cmd
     unset pylint_args
@@ -147,7 +148,7 @@ function run_pylint_check {
         if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
         install_pylint "$cmd"
-        run_pylint exit_code "$cmd" "${pylint_args[@]}" "$target_ws"
+        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
     fi
 
     if [ "$exit_code" -gt "0" ]; then
