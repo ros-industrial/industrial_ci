@@ -5,4 +5,4 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-catkin_install_python(PROGRAMS script/sample_talker.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+catkin_install_python(PROGRAMS script/sample_talker.py script/sample_talker2.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
