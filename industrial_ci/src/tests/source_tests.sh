@@ -106,23 +106,24 @@ function install_pylint {
 }
 
 function run_pylint {
-    local __result=$1
-    local target_ws=$2
-    local cmd=$3
-    shift 3
+    local __result=$1; shift
+    local target_ws=$1; shift
+    local cmd=$1; shift
     local pylint_args=("$@")
     local status=0
 
     ici_time_start "run_$cmd"
-    ici_color_output "${ANSI_BLUE}" "pylint_args: ${pylint_args[*]}"
-    if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$(find "$target_ws/src" -iname "*.py")"; then
-        ici_color_output "${ANSI_GREEN}" "$cmd check passed"
-    else
-        status=$?
-        # shellcheck disable=SC2140
-        eval "$__result"="'$status'"
-        ici_color_output "${ANSI_YELLOW}" "$cmd check failed with status $status"
-    fi
+    ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
+    while read -r file; do
+        if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
+            ici_color_output "${ANSI_GREEN}" "$cmd check for '$file' passed"
+        else
+            status=$?
+            # shellcheck disable=SC2140
+            eval "$__result"="'$status'"
+            ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
+        fi
+    done < <(find "$target_ws/src" -type f -iname "*.py")
     ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
 }
 
