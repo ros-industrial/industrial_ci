@@ -115,7 +115,7 @@ function run_pylint {
     ici_time_start "run_$cmd"
     ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
     while read -r file; do
-        if ici_exec_in_workspace "$extend" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
+        if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
             ici_color_output "${ANSI_GREEN}" "$cmd check for '$file' passed"
         else
             status=$?
