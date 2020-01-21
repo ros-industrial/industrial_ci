@@ -123,7 +123,7 @@ function run_pylint {
             eval "$__result"="'$status'"
             ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
         fi
-    done < <(find "$target_ws/src" -type f -iname "*.py")
+    done < <(find "$target_ws/src" -not -path "*.industrial_ci*" -type f -iname "*.py")
     ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
 }
 
