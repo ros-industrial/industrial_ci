@@ -281,5 +281,14 @@ function ici_parse_env_array {
     eval "$1=(${!2})"
 }
 
+function ici_find_nonhidden {
+  local path=$1; shift
+  local args=()
+  if [ $# -gt 0 ]; then
+    args=(-a \( "$@" \))
+  fi
+  find "$path" \( \! \( -path "${path}*/.*" -prune \) \) "${args[@]}"
+}
+
 # shellcheck disable=SC1090
 source "${ICI_SRC_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
