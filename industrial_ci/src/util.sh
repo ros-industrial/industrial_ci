@@ -83,9 +83,6 @@ function ici_hook() {
   fi
 }
 
-# shellcheck disable=SC1090
-source "${ICI_SRC_PATH}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
-
 #######################################
 # Starts a timer section in a folding section
 # based on https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/bash/travis_time_start.bash
@@ -283,3 +280,6 @@ function ici_parse_env_array {
     # shellcheck disable=SC2034
     eval "$1=(${!2})"
 }
+
+# shellcheck disable=SC1090
+source "${ICI_SRC_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
