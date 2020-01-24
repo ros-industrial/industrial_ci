@@ -116,9 +116,7 @@ function run_pylint {
     ici_time_start "run_$cmd"
     ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
     while read -r file; do
-        local relpath=${file#$path/}
-        if [[ $relpath =~ /\. ]]; then continue; fi # skip files in hidden paths
-        echo "Checking '$relpath'"
+        echo "Checking '${file#$path/}'"
         if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
             ici_color_output "${ANSI_GREEN}" "$cmd check for '$file' passed"
         else
@@ -127,8 +125,7 @@ function run_pylint {
             eval "$__result"="'$status'"
             ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
         fi
-    #done < <(find "$target_ws/src" -not -path "*.industrial_ci*" -type f -iname "*.py")
-    done < <(find "$path"/* -type f -iname "*.py")
+    done < <(ici_find_nonhidden "$path" -type f -iname "*.py")
     ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
 }
 
