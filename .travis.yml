@@ -39,7 +39,7 @@ env:
      # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file CCACHE_DIR=$HOME/.ccache AFTER_SCRIPT='num=($(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'
     - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall
+    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/legacy/.travis.rosinstall
     - ROS_DISTRO=indigo USE_DEB=true  # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-indigo-opencv3" VERBOSE_OUTPUT='false'
