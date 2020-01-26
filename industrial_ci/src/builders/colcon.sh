@@ -41,7 +41,7 @@ function builder_run_tests {
         output_handler="console_cohesion+"
     fi
     local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
-    if [ "$PARALLEL_TESTS" == false ]; then
+    if [ "$PARALLEL_TESTS" != true ]; then
         opts+=(--executor sequential  --ctest-args -j1)
     else
         opts+=(--executor parallel)

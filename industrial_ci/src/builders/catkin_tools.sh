@@ -40,7 +40,7 @@ function builder_run_tests {
     if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
         opts+=(-i)
     fi
-    if [ "$PARALLEL_TESTS" == false ]; then
+    if [ "$PARALLEL_TESTS" != true ]; then
         opts+=(-j1 -p1)
     fi
     ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
