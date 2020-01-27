@@ -239,11 +239,11 @@ if [ "$NOT_TEST_BUILD" != "true" ]; then
             PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
 
             if [ "${ROS_LOG_DIR// }" == "" ]; then export ROS_LOG_DIR=~/.ros/test_results; fi # http://wiki.ros.org/ROS/EnvironmentVariables#ROS_LOG_DIR
-            if [ "$BUILDER" == catkin ] && [ -e "$ROS_LOG_DIR" ]; then catkin_test_results --all "$ROS_LOG_DIR" || error; fi
-            if [ "$BUILDER" == catkin ] && [ -e "$CATKIN_WORKSPACE/build/" ]; then catkin_test_results --all "$CATKIN_WORKSPACE/build/" || error; fi
-            if [ "$BUILDER" == catkin ] && [ -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || error; fi
+            if [ "$BUILDER" == catkin ] && [ -e "$ROS_LOG_DIR" ]; then catkin_test_results --all "$ROS_LOG_DIR" || ici_error; fi
+            if [ "$BUILDER" == catkin ] && [ -e "$CATKIN_WORKSPACE/build/" ]; then catkin_test_results --all "$CATKIN_WORKSPACE/build/" || ici_error; fi
+            if [ "$BUILDER" == catkin ] && [ -e ~/.ros/test_results/ ]; then catkin_test_results --all ~/.ros/test_results/ || ici_error; fi
         else
-            catkin_test_results --verbose "$CATKIN_WORKSPACE" || error
+            catkin_test_results --verbose "$CATKIN_WORKSPACE" || ici_error
         fi
     fi
     ici_time_end  # catkin_run_tests
