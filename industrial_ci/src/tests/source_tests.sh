@@ -111,10 +111,14 @@ function run_pylint {
     local cmd=$1; shift
     local pylint_args=("$@")
     local path; path="$target_ws/src"
+    local -a pylint_exclude
+    # shellcheck disable=SC2016
+    for p in $PYLINT_EXCLUDE; do pylint_exclude+=(-not -path '*$p*'); done
     local status=0
 
     ici_time_start "run_$cmd"
     ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
+    ici_color_output "${ANSI_BLUE}" "pylint_exclude: ${pylint_exclude[*]}"
     while read -r file; do
         echo "Checking '${file#$path/}'"
         if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
@@ -125,7 +129,7 @@ function run_pylint {
             eval "$__result"="'$status'"
             ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
         fi
-    done < <(ici_find_nonhidden "$path" -type f -iname "*.py")
+    done < <(ici_find_nonhidden "$path" "${pylint_exclude[@]}" "-type f -iname '*.py'")
     ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
 }
 

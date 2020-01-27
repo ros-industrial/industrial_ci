@@ -76,7 +76,7 @@ env:
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic CLANG_TIDY_ARGS="-checks=modernize-use-nullptr" EXPECT_EXIT_CODE=1
 
     # Pylint
-    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT2_ARGS="--errors-only"
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT2_ARGS="--errors-only" PYLINT_EXCLUDE="test_pylint"
     - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT3_CHECK=true PYLINT3_ARGS="--reports=no"
     - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT3_CHECK=true PYLINT_ARGS="--output-format=parseable --errors-only"
     - ROS_DISTRO=kinetic TARGET_WORKSPACE="industrial_ci/mockups/test_pylint" PYLINT2_CHECK=true PYLINT3_CHECK=true PYLINT_ARGS="--reports=no" PYLINT2_ARGS="--output-format=colorized"
