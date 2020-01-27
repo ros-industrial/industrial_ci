@@ -111,10 +111,16 @@ function run_pylint {
     local cmd=$1; shift
     local pylint_args=("$@")
     local path; path="$target_ws/src"
+    local -a pylint_find_patterns
+    if [ -z "$PYLINT_FIND_PATTERNS" ]; then
+        PYLINT_FIND_PATTERNS=" -type f -iname '*.py'" # find all python files
+    fi
+    ici_parse_env_array pylint_find_patterns PYLINT_FIND_PATTERNS
     local status=0
 
     ici_time_start "run_$cmd"
     ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
+    ici_color_output "${ANSI_BLUE}" "pylint_find_patterns: ${pylint_find_patterns[*]}"
     while read -r file; do
         echo "Checking '${file#$path/}'"
         if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
@@ -125,7 +131,7 @@ function run_pylint {
             eval "$__result"="'$status'"
             ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
         fi
-    done < <(ici_find_nonhidden "$path" -type f -iname "*.py")
+    done < <(ici_find_nonhidden "$path" "${pylint_find_patterns[@]}")
     ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
 }
 
