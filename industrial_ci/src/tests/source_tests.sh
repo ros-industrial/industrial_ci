@@ -105,48 +105,69 @@ function install_pylint {
     ici_time_end # install_$cmd
 }
 
+function run_pylint_file {
+    local _run_pylint_file_exit_code=$1; shift
+    local target_ws=$1; shift
+    local cmd=$1; shift
+    local file=$1; shift
+    local name=$1; shift
+    local pylint_args=("$@")
+    local status=0
+
+    ici_time_start "pylint_file_check_$name"
+
+    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
+        ici_time_end
+    else
+        status=$?
+        # shellcheck disable=SC2140
+        eval "$_run_pylint_file_exit_code"="'$status'"
+        ici_time_end "${ANSI_YELLOW}" "$status"
+    fi
+}
+
 function run_pylint {
-    local __result=$1; shift
+    local -n _run_pylint_errors=$1; shift
     local target_ws=$1; shift
     local cmd=$1; shift
     local pylint_args=("$@")
-    local path; path="$target_ws/src"
-    local -a pylint_exclude
-    # shellcheck disable=SC2016
-    for p in $PYLINT_EXCLUDE; do pylint_exclude+=(-not -path '*$p*'); done
-    local status=0
 
-    ici_time_start "run_$cmd"
-    ici_color_output "${ANSI_BLUE}" "${cmd}_args: ${pylint_args[*]}"
-    ici_color_output "${ANSI_BLUE}" "pylint_exclude: ${pylint_exclude[*]}"
+    local -a pylint_find_pattern
+    # shellcheck disable=SC2016,SC2034
+    for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path '*$p*'); done
+    pylint_find_pattern+=(-type f -iname '*.py')
+
+    local path; path="$target_ws/src"
+
     while read -r file; do
-        echo "Checking '${file#$path/}'"
-        if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
-            ici_color_output "${ANSI_GREEN}" "$cmd check for '$file' passed"
-        else
-            status=$?
-            # shellcheck disable=SC2140
-            eval "$__result"="'$status'"
-            ici_color_output "${ANSI_YELLOW}" "$cmd check for '$file' failed with status $status"
+        local name=${file#$path/}
+        local exit_code=0
+        run_pylint_file exit_code "$target_ws" "$cmd" "$file" "$name" "${pylint_args[@]}"
+        if [ "$exit_code" -gt "0" ]; then
+            _run_pylint_errors+=("$name")
         fi
-    done < <(ici_find_nonhidden "$path" "${pylint_exclude[@]}" "-type f -iname '*.py'")
-    ici_time_end "${ANSI_GREEN}" "$status" # run_$cmd
+    done < <(ici_find_nonhidden "$path" "${pylint_find_pattern[@]}")
 }
 
 function run_pylint_check {
     local target_ws=$1
-    local exit_code=0
-
+    local -a errors
     local -a cmd
     local -a pylint_args
+    failure=false
     if [ "$PYLINT2_CHECK" == true ]; then
         cmd="pylint"
         ici_parse_env_array pylint_args PYLINT2_ARGS
         if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
         install_pylint "$cmd"
-        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
+        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
     fi
+    if [ "${#errors[@]}" -gt "0" ]; then
+        ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
+        failure=true
+    fi
+    unset errors
     unset cmd
     unset pylint_args
     if [ "$PYLINT3_CHECK" == true ]; then
@@ -155,11 +176,14 @@ function run_pylint_check {
         if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
 
         install_pylint "$cmd"
-        run_pylint exit_code "$target_ws" "$cmd" "${pylint_args[@]}"
+        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
     fi
-
-    if [ "$exit_code" -gt "0" ]; then
-        ici_error "pylint check(s) failed."
+    if [ "${#errors[@]}" -gt "0" ]; then
+        ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
+        failure=true
+    fi
+    if [ "$failure" = true ] ; then
+        ici_error
     fi
 }
 
