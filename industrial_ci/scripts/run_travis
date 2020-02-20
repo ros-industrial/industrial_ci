@@ -18,6 +18,7 @@
 
 from __future__ import print_function
 
+import difflib
 import os
 import os.path
 import re
@@ -117,6 +118,17 @@ def gen_env(e):
         return e
     return '%s=%s' % (e, os.getenv(e, ''))
 
+# from https://github.com/travis-ci/travis-build/blob/73bf69a439bb546520a5e5b6b6847fb5424a7c9f/lib/travis/build/env/var.rb#L5
+travis_env = re.compile(r"([\w]+)=((?:[^\"'`\ ]?(\"|'|`).*?((?<!\\)\3))+|(?:[^\$]?\$\(.*?\))+|[^\"'\ ]+|(?=\s)|\Z)")
+def filter_env(e):
+    return ' '.join(map(lambda m: m.group(0), travis_env.finditer(e)))
+
+def highlight_diff(e, n=''):
+    f = filter_env(e)
+    def mark(d):
+        tag, chunk = d[0:2], d[2:]
+        return chunk if tag == "  " or not chunk.strip(' ') else "\033[1;41m%s\033[1;%sm" % (chunk, str(n))
+    return ''.join(mark(d) for d in difflib.ndiff(e, f, None, None))
 
 def print_help(cmd):
     print("""
@@ -162,21 +174,22 @@ def main(scripts_dir, argv):
 
     if len(args) == 0:
         if(len(global_env) > 0):
-            print('Globals: %s' % str(global_env))
+            print('Globals: %s' % str(highlight_diff(global_env)))
         jobs = len(job_envs)
         digits = len(str(jobs))
         for i in range(jobs):
             print('Job %s%s: %s' % ( str(i+1).rjust(digits),
                                      ' (allow_failures)' if job_envs[i] in allow_failures else '',
-                                     job_envs[i] if job_envs[i] is not None else "<unsupported job from 'include' section>"))
+                                     highlight_diff(job_envs[i]) if job_envs[i] is not None else "<unsupported job from 'include' section>"))
         print("run all with %s -" % sys.argv[0])
         sys.exit(0)
 
     ranges = parse_ranges(args, -1)
 
-    run_ci = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), global_env]
+    run_ci = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), filter_env(global_env)]
+    run_ci_diff = [os.path.join(scripts_dir, "run_ci"), os.path.dirname(path), highlight_diff(global_env, 44)]
 
-    bash = ['env', '-i'] +map(gen_env, ['DOCKER_PORT', 'HOME', 'PATH', 'SSH_AUTH_SOCK', 'TERM']) + ['bash','-e']
+    bash = ['env', '-i'] +list(map(gen_env, ['DOCKER_PORT', 'HOME', 'PATH', 'SSH_AUTH_SOCK', 'TERM'])) + ['bash','-e']
 
     selection = set(apply_ranges(ranges, len(job_envs)))
 
@@ -184,11 +197,12 @@ def main(scripts_dir, argv):
         if job_envs[i] is None:
             print("\033[1;43mSkipped job %d, because jobs from 'include' section are not supported\033[1;m" %(i+1,))
             continue
-        cmd = ' '.join(run_ci + [job_envs[i]] + map(gen_env, extra_env))
-        print('\033[1;44mRunning job %d%s: %s\033[1;m' %(i+1, ' (allow_failures)' if job_envs[i] in allow_failures else '', cmd))
+        cmd = ' '.join(run_ci + [filter_env(job_envs[i])] + list(map(gen_env, extra_env)))
+        cmd_diff = ' '.join(run_ci_diff + [highlight_diff(job_envs[i], 44)] + list(map(gen_env, extra_env)))
+        print('\033[1;44mRunning job %d%s: %s\033[1;m' %(i+1, ' (allow_failures)' if job_envs[i] in allow_failures else '', cmd_diff))
 
         proc = subprocess.Popen(bash, stdin=subprocess.PIPE)
-        proc.communicate(cmd)
+        proc.communicate(cmd.encode())
         if proc.returncode:
             print('\033[1;41mFailed job %d: %s\033[1;m' %(i+1, cmd))
             if job_envs[i] not in allow_failures:
