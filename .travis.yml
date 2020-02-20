@@ -41,7 +41,7 @@ env:
     - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='true' EXPECT_EXIT_CODE=100 # This should fail (trying from a wrong distro).
     - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
     - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
-    - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS='eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT: \"{{.Size}}\" bytes"'
+    - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS='eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT:\ \"{{.Size}}\" bytes"'
     - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=melodic AFTER_SCRIPT='grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=bionic /etc/os-release'
     - ROS_DISTRO=melodic BEFORE_INIT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release' EXPECT_EXIT_CODE=1
