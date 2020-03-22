@@ -42,6 +42,8 @@ Quick Start
 
 With a few steps, you can start in your client repository using CI confiurations stored in `industrial_ci`.
 
+* Note: This is the **legacy version**. For the new version, see the ``master`` branch.
+
 For Travis CI
 --------------
 
