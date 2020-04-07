@@ -9,7 +9,7 @@ Continuous integration repository for ROS-Industrial
 Introduction
 ============
 
-This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`__ configuration that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`__ organization. Non ros-industrial repositories in other organizations can utilize the CI config here too, as long as they are ROS-powered.
+This repository contains `CI (Continuous Integration) <https://en.wikipedia.org/wiki/Continuous_integration>`__ scripts that can be commonly used by the repositories in `ros-industrial <https://github.com/ros-industrial>`__ organization. Non ros-industrial repositories in other organizations can utilize the CI scripts here too, as long as they are ROS-powered.
 
 As of November 2019, this repo provides scripts for `Bitbucket CI`, `Gitlab CI`, `GitHub Actions` and `Travis CI`. The CI scripts in this repository are intended to be obtained by `git clone` feature. In client repos you can define custom, repository-specific checks, in addition to the generic configs stored in this repo.
 
@@ -23,7 +23,7 @@ Supported Platform
 Supported ROS Distributions
 +++++++++++++++++++++++++++
 
-Following `ROS distributions <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index.ros.org/doc/ros2/Releases/>`__ are supported.
+The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index.ros.org/doc/ros2/Releases/>`__  distributions are supported.
 
 * `Indigo <http://wiki.ros.org/indigo>`__ *(EOL)*
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
@@ -39,7 +39,9 @@ Following `ROS distributions <http://wiki.ros.org/Distributions>`__ / `ROS2 <htt
 Supported CIs
 +++++++++++++
 
+* Bitbucket CI
 * Gitlab CI
+* GitHub Actions
 * Travis CI
 
 As of January 2018, this document uses the format of `Travis CI` by default, unless specified.
@@ -108,20 +110,10 @@ Your client repository does NOT need to pass all of above steps; in fact you can
 * Step 3 will be skipped when no installation rule is defined.
 * Step 4 will be skipped when no downstream packages to be tested are defined.
 
-Prerequisite
-============
-
-To run `industrial_ci`, each package in your repository needs to be:
-
-* compatible on the `Supported Platform <#supported-platform>`__.
-* `"Catkin package" <http://wiki.ros.org/ROS/Tutorials/catkin/CreatingPackage>`__ (uses CMake for build configuration), since many checks are triggered by the `Catkin`-based commands.
-
 Basic Usage
 ===========
 
-Here are some operations in your client repositories.
-
-To start using CI config stored in this repo
+To start using the CI scripts stored in this repo
 --------------------------------------------------
 
 With the following few short steps, you can start in your client repository using `industrial_ci` scripts.
@@ -154,9 +146,7 @@ Advanced Usage
 Variables you can configure
 ------------------------------------
 
-You can configure the behavior in `CI config <#terminology>`__ in your client repository.
-
-* OS to use. Defined at `dist` tag.
+You can configure the behavior in the `CI config <#terminology>`__ in your client repository.
 
 Required environment variables:
 
@@ -320,10 +310,8 @@ As you see in the `optional variables section <./index.rst#optional-environment-
 Pulling Docker image from an online hub
 +++++++++++++++++++++++++++++++++++++++
 
-You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as long as the following requirement is met:
-
-* sources.list set up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`__).
-* `python-catkin-tools`, `python-pip`, `python-rosdep`, `python-wstool`. If your Docker image is missing any of the above libraries, then you can still pass their name by `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`__).
+You can pull any `Docker` image by specifying in `DOCKER_IMAGE` variable, as long as a  ROS package repository has been set-up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`__).
+If your Docker image is missing any required softwate, then you can add it by spef `ADDITIONAL_DEBS` (see `variables section <./index.rst#optional-environment-variables>`__).
 
 Some more notes:
 
