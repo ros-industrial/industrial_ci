@@ -1,83 +1,32 @@
 # This .travis.yml works to check "this" repository, namely `industrial_ci`.
-# A template for users can be found here: https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml
+# A template for users can be found here: https://github.com/ros-industrial/industrial_ci/blob/legacy/doc/.travis.yml
 
 # Greatly inspired by JSK travis: https://github.com/jsk-ros-pkg/jsk_travis
 
 services:
   - docker
-# Force travis to use its minimal image with default Python settings
+
 language: generic
 
 git:
   quiet: true
 
 env:
-  global:
-    - POST_PROCESS='echo "post processing reached"'
-    - "BEFORE_SCRIPT='echo current dir: $(pwd)'"
-
   matrix:
-    - ROS_DISTRO=hydro  USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true'
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/testpkg_broken_install'  CATKIN_CONFIG='--no-install -DCMAKE_CXX_FLAGS="-Werror=uninitialized -Werror=return-type"'
-    - DOCKER_IMAGE='arm32v7/ros:indigo-ros-core' ADDITIONAL_DEBS="build-essential python-catkin-tools python-pip" INJECT_QEMU=arm BEFORE_SCRIPT='[[ $(uname -p) == armv7l ]]'
-    - ROS_DISTRO=melodic NOT_TEST_BUILD='true' _GUARD_INTERVAL=10
-    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' BEFORE_SCRIPT='test -z "${CXX+x}"' # test that CXX is not set
-    - ROS_DISTRO=indigo NOT_TEST_INSTALL='true' CXX=/usr/bin/gcc BEFORE_SCRIPT='test -z "${CXX+x}"' EXPECT_EXIT_CODE=1 # test the CXX test
-    - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true'  # This may not make much sense. Only for testing purpose.
-    - ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
-    - ROS_DISTRO=indigo CATKIN_PARALLEL_JOBS='-p1' ROS_PARALLEL_JOBS='-j1'  # Intend build on low-power platform
-    # - env: ROS_DISTRO=indigo PRERELEASE=true  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
-    - ROS_DISTRO=melodic PRERELEASE=true PRERELEASE_DOWNSTREAM_DEPTH=1 DOCKER_BASE_IMAGE=something
-    - ROS_DISTRO=melodic PRERELEASE=true USE_MOCKUP='industrial_ci/mockups/failing_test' EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=kinetic PRERELEASE=true PRERELEASE_REPONAME=industrial_ci
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=debian AFTER_SCRIPT='ccache 2> /dev/null && exit 1; [ "$?" = "127" ]'
-     # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file CCACHE_DIR=$HOME/.ccache AFTER_SCRIPT='num=($(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=file USE_DEB=true  # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
-    - ROS_DISTRO=indigo UPSTREAM_WORKSPACE=https://raw.githubusercontent.com/ros-industrial/industrial_ci/legacy/.travis.rosinstall
-    - ROS_DISTRO=indigo USE_DEB=true  # Checking backup compatibility with UPSTREAM_WORKSPACE
-    - ROS_DISTRO=indigo USE_DEB=false # Checking backup compatibility with UPSTREAM_WORKSPACE
-    - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-indigo-opencv3" VERBOSE_OUTPUT='false'
-    - ROS_DISTRO=indigo ADDITIONAL_DEBS="ros-hydro-opencv3" DEBUG_BASH='true' EXPECT_EXIT_CODE=100 # This should fail (trying from a wrong distro).
-    - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file  ROSINSTALL_FILENAME=.ci.rosinstall  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
-    - ROS_DISTRO=kinetic   UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=.i.do.not.exist EXPECT_EXIT_CODE=1
-    - DOCKER_BASE_IMAGE="ros:kinetic-ros-base" ROS_REPO=ros NOT_TEST_BUILD='true' DEBUG_BASH='true' VERBOSE_OUTPUT='false' DOCKER_COMMIT="img_temp" POST_PROCESS='eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT: \"{{.Size}}\" bytes"'
-    - ROS_DISTRO=lunar ROS_REPO=ros-shadow-fixed USE_MOCKUP='industrial_ci/mockups/industrial_ci_testpkg'
-    - ROS_DISTRO=melodic AFTER_SCRIPT='grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=bionic /etc/os-release'
-    - ROS_DISTRO=melodic BEFORE_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release' EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=stretch AFTER_SCRIPT='grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release'
-    - ROS_DISTRO=melodic OS_NAME=debian EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
-
-    # External repositories
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/industrial_core#kinetic-devel'
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/motoman_experimental#kinetic-devel' UPSTREAM_WORKSPACE=file BEFORE_SCRIPT='touch $CATKIN_WORKSPACE/src/ros-industrial/industrial_experimental/IRC_v2/CATKIN_IGNORE' ROS_REPO=ros
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-controls/ros_control#kinetic-devel' UPSTREAM_WORKSPACE=file ROSINSTALL_FILENAME=ros_control.rosinstall ROS_PARALLEL_TEST_JOBS=-j1
-    - ROS_DISTRO=indigo _EXTERNAL_REPO='ros/actionlib#38ce66e2ae2ec9c19cf12ab22d57a8134a9285be' ROS_REPO=ros ABICHECK_URL=url ABICHECK_MERGE=true # actual URL will not be used in the case
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/ros_canopen#0.7.5' ROS_REPO=ros ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.1' ABICHECK_MERGE=false EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=kinetic _EXTERNAL_REPO='ros-industrial/ros_canopen#0.7.6' ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.5' ABICHECK_MERGE=false
-
-    # Format tests
-    - ROS_DISTRO=indigo USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM' CLANG_FORMAT_VERSION=3.8
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='LLVM'
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='LLVM' EXPECT_EXIT_CODE=1
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/WebKit' CLANG_FORMAT_CHECK='file'
-    - ROS_DISTRO=kinetic USE_MOCKUP='industrial_ci/mockups/format_tests/cpp/LLVM' CLANG_FORMAT_CHECK='WebKit' EXPECT_EXIT_CODE=1
+    - ROS_DISTRO=kinetic PRERELEASE=true
+    - ROS_DISTRO=melodic PRERELEASE=true
+    - ROS_DISTRO=kinetic ROS_REPO=ros
+    - ROS_DISTRO=melodic ROS_REPO=ros
+    - ROS_DISTRO=hydro
+    - ROS_DISTRO=indigo
+    - ROS_DISTRO=jade
+    - ROS_DISTRO=kinetic
+    - ROS_DISTRO=lunar
+    - ROS_DISTRO=melodic
 matrix:
-  allow_failures:
-    - env: ROS_DISTRO=indigo NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'
   include:
-    - script: shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh industrial_ci/*.sh
+    - script: shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh
       env: [shellcheck]
 
-
-install:
-  - sudo apt-get install qemu-user-static
 script:
-  - industrial_ci/_wrap_test.sh # this script is only for internal use
-  - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
+  - ./travis.sh
