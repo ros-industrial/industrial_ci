@@ -1,5 +1,10 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
-# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/legacy/README.rst)
+
+# The legacy branch contains a deprecated version of industrial_ci, kept for compatibility with legacy/EOL CI setups only.
+# Active development (new features, support for new ROS distros, etc.) is targeted at the master branch: https://github.com/ros-industrial/industrial_ci/tree/master
+# The current set of features will be maintained as long as it is possible and reasonable.
+# Please consider migrating to the new version: https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md
 
 language: generic # optional, just removes the language badge
 
@@ -16,7 +21,7 @@ git:
   quiet: true # optional, silences the cloning of the target repository
 
 # configure the build environment(s)
-# https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
+# https://github.com/ros-industrial/industrial_ci/blob/legacy/doc/index.rst#variables-you-can-configure
 env:
   global: # global settings for all jobs
     - ROS_REPO=ros
