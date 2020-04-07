@@ -19,7 +19,7 @@ CI (Continuous Integration) configuration for `ROS` (`Robot Operating System <ht
 Deprecation notice
 ==================
 The `legacy` branch contains a deprecated version of `industrial_ci`, kept for compatibility with legacy/EOL CI setups only.
-Active development (new features, support for new ROS distros, etc.) is targeted at the `master <https://github.com/ros-industrial/industrial_ci/tree/master>`__ branch, which will soon become the default again.
+Active development (new features, support for new ROS distros, etc.) is targeted at the `master <https://github.com/ros-industrial/industrial_ci/tree/master>`__ branch.
 The current set of features will be maintained as long as it is possible and reasonable.
 
 Please consider `migrating to the new version <https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md>`__.
@@ -55,7 +55,7 @@ For Travis CI
 
 1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`__). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
 
-2. Add `.travis.yml` file to your repository root (`complete template <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`__):
+2. Add `.travis.yml` file to your repository root (`complete template <https://github.com/ros-industrial/industrial_ci/blob/legacy/doc/.travis.yml>`__):
 
 ::
 
