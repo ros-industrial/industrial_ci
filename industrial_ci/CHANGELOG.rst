@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2020-04-08)
+------------------
 * [maintenance] deprecated legacy version
 * [fix] updated ROS repository keys
 * [improve] use snapshots repository for EOL distros
