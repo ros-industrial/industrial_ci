@@ -2,8 +2,8 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.0 (2020-04-08)
+-------------------
 * [maintenance] major refactoring
 * [improve] introduce PARALLEL_TESTS to disable the test jobs limit of 1
 * [improve] refactored folding to support different types: none, Gitlab CI, GitHub Actions, Travis CI

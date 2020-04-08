@@ -1,6 +1,6 @@
 <package format="3">
   <name>industrial_ci</name>
-  <version>0.8.0</version>
+  <version>0.10.0</version>
   <description>This package contains CI (Continuous Integration) configuration that any ROS-powered packages can commonly use. Some notable feature:
     <ul>
       <li>Checks if your package builds, installs without issues. If unit/system tests are defined run them. <a href = "http://wiki.ros.org/bloom/Tutorials/PrereleaseTest">ROS Prerelease Test</a> can optionally be run.</li>
