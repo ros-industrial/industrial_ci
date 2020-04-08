@@ -109,6 +109,11 @@ function set_ros_variables {
     "melodic")
         ros1_defaults "bionic"
         ;;
+    "noetic")
+        ros1_defaults "focal"
+        DEFAULT_DOCKER_IMAGE=
+        ROS_PYTHON_VERSION=3
+        ;;
     "ardent")
         ros2_defaults "xenial"
         DEFAULT_DOCKER_IMAGE=
