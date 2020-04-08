@@ -110,6 +110,7 @@ function set_ros_variables {
         ros1_defaults "bionic"
         ;;
     "noetic")
+        BUILDER=${BUILDER:-colcon}
         ros1_defaults "focal"
         DEFAULT_DOCKER_IMAGE=
         ROS_PYTHON_VERSION=3
