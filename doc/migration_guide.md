@@ -9,6 +9,7 @@ The new version comes with a number of improvements:
 * Added support for catkin_make, catkin_make_isolated and colcon
 * Use [vcstool](https://github.com/dirk-thomas/vcstool)(`vcs`) instead of `wstool` to support \*.rosinstall and \*.repos files
 * Added support for ROS2, and vcstool (rosinstall or repos files)
+* Available as GitHub Action
 * Separate upstream and downstream [workspaces](index.rst#workspace-management), even for prerelease tests
 * Fine-grained [hook system](index.rst#customize-within-the-ci-process) for customization
 * Writable target folder
@@ -21,7 +22,7 @@ Some features are not supported anymore:
 * Devel space builds
 * Testing installed \*.test files
 * Injecting QEMU (see [`INJECT_QEMU`](#inject_qemu))
-* Job control settings have been removed for now
+* Most job control settings have been removed for now
 
 If you depend on these, you can still use the [legacy](https://github.com/ros-industrial/industrial_ci/tree/legacy) version.
 
@@ -84,8 +85,10 @@ The upstream workspace packages are now located in `~/upstream_ws`.
 
 ### Job control
 
-`industrial_ci` does not set defaults for the number of jobs anymore.
+`industrial_ci` does not set defaults for the number of build jobs anymore.
 In addition the job-control options got removed for the time being.
+Only the number of parallel test is now limited to 1 per default to allow for reproducible tests.
+Specify `PARALLEL_TESTS=true` to opt out.
 
 ### Hook system
 
@@ -175,8 +178,8 @@ If it does not work, you should review the package dependencies in your reposito
 ### CATKIN_PARALLEL_TEST_JOBS
 
 This is not supported anymore (see [job control](#job-control)) as well.
-Just try your build without this setting.
-Please [open an issue](https://github.com/ros-industrial/industrial_ci/issues/new) if you really depend on this.
+The number of parallel test jobs is limited to 1 per default.
+Specify `PARALLEL_TESTS=true` to remove this limit.
 
 ### CMAKE_ARGS
 
@@ -234,8 +237,8 @@ If it does not work, you should review the package dependencies in your reposito
 ### ROS_PARALLEL_TEST_JOBS
 
 This is not supported anymore (see [job control](#job-control)) as well.
-Just try your build without this setting.
-Please [open an issue](https://github.com/ros-industrial/industrial_ci/issues/new) if you really depend on this.
+The number of parallel test jobs is limited to 1 per default.
+Specify `PARALLEL_TESTS=true` to remove this limit.
 
 ### ROS_REPOSITORY_PATH
 
@@ -263,7 +266,7 @@ If your rosinstall file contains your target repository as well, you might want 
 ### USE_DEB
 
 `USE_DEB=true` is superfluous and can simply get removed.
-`USE_DEB=false` is the same as [`UPSTREAM_WORKSPACE=file`] and should [get migrated](#upstream_workspace).
+`USE_DEB=false` is the same as `UPSTREAM_WORKSPACE=file` and should [get migrated](#upstream_workspace).
 
 ### USE_MOCKUP
 
