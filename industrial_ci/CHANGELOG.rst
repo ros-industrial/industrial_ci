@@ -2,6 +2,31 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [maintenance] major refactoring
+* [improve] introduce PARALLEL_TESTS to disable the test jobs limit of 1
+* [improve] refactored folding to support different types: none, Gitlab CI, GitHub Actions, Travis CI
+* [capability] implemented clang-tidy check
+* [improve] added support for ROS_PYTHON_VERSION and ROS1 noetic
+* [capability] added support for ROS2 (ardent to foxy)
+* [improve] added support for BUILDER: catkin_tools, colcon, catkin_make, catkin_make_isolated
+* [improve] new chained workspace layout: upstream, target, downstream
+* [capability] implemented new hook system and helpers
+* [capability] implemented workspace helpers with vcs support
+* [maintenance] remove support for INJECT_QEMU
+* [maintenance] remove support for CATKIN_CONFIG
+* [maintenance] drop support for ROS hydro
+* [maintenance] removed ROS install tests
+* Contributors: Alexander Gutenkunst, Felix Messmer, Mathias Lüdtke, Mikael Arguedas
+
+0.9.0 (2020-04-08)
+------------------
+* [maintenance] deprecated legacy version
+* [fix] updated ROS repository keys
+* [improve] use snapshots repository for EOL distros
+* Contributors: Felix Messmer, Mathias Lüdtke, Matthijs van der Burgh
+
 0.8.0 (2019-05-22)
 ------------------
 * [fix] ABICHECK_MERGE check, https://github.com/ros-industrial/industrial_ci/issues/258, https://github.com/ros-industrial/industrial_ci/issues/322
