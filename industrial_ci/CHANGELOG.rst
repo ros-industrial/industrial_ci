@@ -2,6 +2,13 @@
 Changelog for package industrial_ci
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [maintenance] deprecated legacy version
+* [fix] updated ROS repository keys
+* [improve] use snapshots repository for EOL distros
+* Contributors: Felix Messmer, Mathias Lüdtke, Matthijs van der Burgh
+
 0.8.0 (2019-05-22)
 ------------------
 * [fix] ABICHECK_MERGE check, https://github.com/ros-industrial/industrial_ci/issues/258, https://github.com/ros-industrial/industrial_ci/issues/322
