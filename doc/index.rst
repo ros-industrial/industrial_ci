@@ -201,8 +201,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
 * **UPSTREAM_CMAKE_ARGS** (default: not set): Addtional CMake arguments for upstream `workspace <#workspace-management>`__.
 * **UPSTREAM_WORKSPACE** (default: not set): Definition of upstream `workspace <#workspace-management>`__.
-* **VERBOSE_OUTPUT** (default: not set): If ``true``, build tool (e.g. Catkin) output prints in verbose mode.
-* **VERBOSE_TESTS** (default: ``true``): If ``true``, build tool (e.g. Catkin) output prints in verbose mode during ``run_tests`` step.
+* **VERBOSE_OUTPUT** (default: ``false``): If ``true``, build tool (e.g. Catkin) output prints in verbose mode.
+* **VERBOSE_TESTS** (default: ``false``): If ``true``, build tool (e.g. Catkin) output prints in verbose mode during ``run_tests`` step.
 
 
 Workspace management
