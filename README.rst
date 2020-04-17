@@ -50,8 +50,8 @@ With a few steps, you can start in your client repository using CI confiurations
 For Travis CI
 --------------
 
-1. Activate CI for your github repository on `Travis CI <https://travis-ci.org/>`__). You may do so either at https://travis-ci.org/profile/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.org/profile/YOUR_GITHUB_USER (depending on where your repository sits).
-
+1. Activate CI for your github repository on `Travis CI <https://travis-ci.com/>`__). You may do so either at https://travis-ci.com/github/YOUR_GITHUB_ORGANIZATION or at https://travis-ci.com/github/YOUR_GITHUB_USER (depending on where your repository sits).
+  1. Activate CI beta for your bitbucket repository is similar, but the target link that your status badge directs to needs to be modified from https://travis-ci.com/USERNAME/REPO_NAME to https://travis-ci.com/bitbucket/USERNAME/REPO_NAME. By default, the generated link directs to a github repository.
 2. Add `.travis.yml` file to your repository root (`complete template <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`__):
 
 ::
