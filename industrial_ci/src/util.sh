@@ -254,6 +254,7 @@ function ici_retry {
 function ici_quiet {
     local out; out=$(mktemp)
     # shellcheck disable=SC2216
+    # shellcheck disable=SC2260
     "$@" &> "$out" | true # '|| err=$?' disables errexit
     local err=${PIPESTATUS[0]}
     if [ "$err" -ne 0 ]; then
