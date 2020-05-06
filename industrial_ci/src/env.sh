@@ -131,8 +131,7 @@ function set_ros_variables {
         ros2_defaults "bionic"
         ;;
     "foxy")
-        ros2_defaults "bionic"
-        DOCKER_IMAGE=${DOCKER_IMAGE:-osrf/ros2:nightly}
+        ros2_defaults "focal"
         ;;
     esac
 
