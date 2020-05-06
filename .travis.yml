@@ -50,6 +50,7 @@ env:
     - ROS_DISTRO=melodic OS_NAME=debian OS_CODE_NAME=bionic EXPECT_EXIT_CODE=1
     - ROS_DISTRO=melodic ROS_REPO=ros BUILDER=colcon AFTER_SCRIPT='rosenv && [ "$CMAKE_PREFIX_PATH" = "/root/target_ws/install/industrial_ci:/opt/ros/melodic" ]'
     - ROS_DISTRO=noetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg'
+    - ROS_DISTRO=foxy
 
     # External repositories
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/industrial_core@kinetic-devel'
