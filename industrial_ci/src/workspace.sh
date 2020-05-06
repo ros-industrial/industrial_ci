@@ -217,7 +217,10 @@ function ici_setup_rosdep {
         ici_asroot rosdep init
     fi
 
-    update_opts=(--rosdistro "$ROS_DISTRO")
+    update_opts=()
+    if [ -z "$ROSDISTRO_INDEX_URL" ]; then
+        update_opts+=(--rosdistro "$ROS_DISTRO")
+    fi
     if [ "$ROS_VERSION_EOL" = true ]; then
         update_opts+=(--include-eol-distros)
     fi
