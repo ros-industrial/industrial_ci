@@ -104,7 +104,8 @@ function ici_run_cmd_in_docker() {
   # pass common credentials to container
   for d in .docker .ssh .subversion; do
     if [ -d "$HOME/$d" ]; then
-      docker exec $cid mkdir /root
+      mkdir "root"
+      docker_cp "root" "$cid:/root"
       docker_cp "$HOME/$d" "$cid:/root/"
     fi
   done
