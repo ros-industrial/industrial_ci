@@ -62,7 +62,7 @@ env:
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/ros_canopen#0.7.6' ABICHECK_URL='github:ros-industrial/ros_canopen#0.7.5' ABICHECK_MERGE=false
     - ROS_DISTRO=bouncy _EXTERNAL_REPO='github:ros2/joystick_drivers#bouncy'
     - ROS_DISTRO=crystal _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
-    - ROS_DISTRO=dashing _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
+    - ROS_DISTRO=dashing _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel' ROS_REPO=ros
     - ROS_DISTRO=eloquent _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel'
     - ROS_DISTRO=eloquent _EXTERNAL_REPO='github:ros-controls/control_msgs#crystal-devel' PRERELEASE=true
 
