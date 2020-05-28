@@ -187,6 +187,7 @@ export ROS_DISTRO
 export ROS_VERSION
 export ROS_VERSION_EOL
 export ROS_PYTHON_VERSION
+export DEFAULT_DOCKER_IMAGE
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
@@ -219,7 +220,7 @@ if [ -z "$OS_CODE_NAME" ]; then
             ici_error "ROS distro '$ROS_DISTRO' is not supported"
         fi
         OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
-        DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
+        #DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
         ;;
     esac
 else
