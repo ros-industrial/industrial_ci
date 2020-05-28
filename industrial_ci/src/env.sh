@@ -147,10 +147,10 @@ function set_ros_variables {
             use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
             DEFAULT_DOCKER_IMAGE=""
             ;;
-        "main")
+        "main"|"ros")
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
             ;;
-        "ros")
+        "ros1")
             use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
             ;;
         "ros2")
