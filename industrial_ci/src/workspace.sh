@@ -69,7 +69,7 @@ function ici_exec_for_command {
 
 function ici_install_pkgs_for_command {
   local command=$1; shift
-  ici_exec_for_command "$command" ici_asroot apt-get -qq install --no-install-recommends -y "$@"
+  ici_exec_for_command "$command" ici_asroot apt-get -qq install --no-upgrade --no-install-recommends -y "$@"
 }
 
 function ici_setup_git_client {

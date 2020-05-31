@@ -16,7 +16,7 @@
 # limitations under the License.
 
 function builder_setup {
-  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools"
+  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin"
 }
 
 function builder_run_build {
