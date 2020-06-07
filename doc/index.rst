@@ -126,6 +126,7 @@ With the following few short steps, you can start in your client repository usin
 2. In `CI config <#terminology>`__ file in your client repo include and run industrial_ci.
 
    * For Travis create the file `.travis.yml <https://github.com/ros-industrial/industrial_ci/blob/master/doc/.travis.yml>`__.
+   * A Github CI config can be found in `github-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/doc/github-ci.yml>`__.
    * A Gitlab CI config can be found in `.gitlab-ci.yml <https://github.com/ros-industrial/industrial_ci/blob/master/.gitlab-ci.yml>`__.
 
 That's it.
