@@ -79,7 +79,11 @@ function ici_hook() {
 
   local script=${!name}
   if [ -n "$script" ]; then
-    ici_run "$1" _sub_shell "$script"
+    if [ "${script%% *}" == "source" ]; then
+      ici_run "$1" eval "$script"
+    else
+      ici_run "$1" _sub_shell "$script"
+    fi
   fi
 }
 
