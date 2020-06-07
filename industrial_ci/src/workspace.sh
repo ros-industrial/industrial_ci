@@ -50,13 +50,17 @@ function ici_resolve_scheme {
 
 }
 
+function ici_apt_install {
+    ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
+}
+
 function ici_init_apt {
     ici_asroot apt-get update -qq
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
     local -a debs
     ici_parse_env_array debs ADDITIONAL_DEBS
     if [ -n "${debs[*]}" ]; then
-        ici_asroot apt-get install -qq -y "${debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
+        ici_apt_install "${debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
     fi
 }
 
@@ -69,7 +73,7 @@ function ici_exec_for_command {
 
 function ici_install_pkgs_for_command {
   local command=$1; shift
-  ici_exec_for_command "$command" ici_asroot apt-get -qq install --no-upgrade --no-install-recommends -y "$@"
+  ici_exec_for_command "$command" ici_apt_install "$@"
 }
 
 function ici_setup_git_client {
