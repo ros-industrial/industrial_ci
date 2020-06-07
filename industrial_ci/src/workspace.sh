@@ -215,6 +215,13 @@ function ici_prepare_sourcespace {
 function ici_setup_rosdep {
     ici_install_pkgs_for_command rosdep "${PYTHON_VERSION_NAME}-rosdep"
     ici_install_pkgs_for_command "pip${ROS_PYTHON_VERSION}" "${PYTHON_VERSION_NAME}-pip"
+
+    if [ "$ROS_DISTRO" = "indigo" ] || [ "$ROS_DISTRO" = "jade" ]; then
+        ici_quiet ici_apt_install "ros-$ROS_DISTRO-roslib"
+    else
+        ici_apt_install "ros-$ROS_DISTRO-ros-environment"
+    fi
+
     # Setup rosdep
     rosdep --version
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
