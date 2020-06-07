@@ -22,7 +22,6 @@ Some features are not supported anymore:
 * Devel space builds
 * Testing installed \*.test files
 * Injecting QEMU (see [`INJECT_QEMU`](#inject_qemu))
-* Most job control settings have been removed for now
 
 If you depend on these, you can still use the [legacy](https://github.com/ros-industrial/industrial_ci/tree/legacy) version.
 
@@ -86,9 +85,9 @@ The upstream workspace packages are now located in `~/upstream_ws`.
 ### Job control
 
 `industrial_ci` does not set defaults for the number of build jobs anymore.
-In addition the job-control options got removed for the time being.
-Only the number of parallel test is now limited to 1 per default to allow for reproducible tests.
-Specify `PARALLEL_TESTS=true` to opt out.
+`PARALLEL_BUILDS=N` can be used to enforce a limit.
+The number of parallel test is now limited to 1 per default to allow for reproducible tests.
+Specify `PARALLEL_TESTS=true` `PARALLEL_TESTS=N` to opt out.
 
 ### Hook system
 
@@ -171,15 +170,12 @@ Or even better: Add support for the install space.
 
 ### CATKIN_PARALLEL_JOBS
 
-This is not supported anymore (see [job control](#job-control)) as well.
-Just try your build without this setting.
-If it does not work, you should review the package dependencies in your repository.
+This is not supported anymore, use `PARALLEL_BUILDS` instead (see [job control](#job-control) as well).
 
 ### CATKIN_PARALLEL_TEST_JOBS
 
-This is not supported anymore (see [job control](#job-control)) as well.
-The number of parallel test jobs is limited to 1 per default.
-Specify `PARALLEL_TESTS=true` to remove this limit.
+This is not supported anymore. The number of parallel test jobs is limited to 1 per default.
+Specify `PARALLEL_TESTS=true` to remove this limit (see [job control](#job-control) as well).
 
 ### CMAKE_ARGS
 
@@ -231,14 +227,12 @@ If your rosinstall file contains your target repository as well, you might want 
 ### ROS_PARALLEL_JOBS
 
 This variable does not get processed by `industrial_ci` anymore, instead it just gets passed to the build tool.
-Just try your build without this setting.
-If it does not work, you should review the package dependencies in your repository.
+As an alternative, `PARALLEL_BUILDS` can be used (see [job control](#job-control) as well).
 
 ### ROS_PARALLEL_TEST_JOBS
 
-This is not supported anymore (see [job control](#job-control)) as well.
-The number of parallel test jobs is limited to 1 per default.
-Specify `PARALLEL_TESTS=true` to remove this limit.
+This is not supported anymore. The number of parallel test jobs is limited to 1 per default.
+Specify `PARALLEL_TESTS=true` to remove this limit (see [job control](#job-control) as well).
 
 ### ROS_REPOSITORY_PATH
 

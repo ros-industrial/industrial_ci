@@ -33,7 +33,7 @@ for v in BUILD_PKGS_WHITELIST PKGS_DOWNSTREAM TARGET_PKGS USE_MOCKUP; do
 done
 
 for v in CATKIN_PARALLEL_JOBS CATKIN_PARALLEL_TEST_JOBS ROS_PARALLEL_JOBS ROS_PARALLEL_TEST_JOBS; do
-    ici_mark_deprecated "$v" "Job control is not available anymore"
+    ici_mark_deprecated "$v" "Please migrate to PARALLEL_BUILDS and/or PARALLEL_TESTS"
 done
 
 ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPACE format"

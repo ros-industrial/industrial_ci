@@ -15,6 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function _append_job_opts() {
+    local -n _append_job_opts_res=$1
+    local jobs
+    ici_parse_jobs jobs "$2" "$3"
+    if [ "$jobs" -gt 1 ]; then
+        _append_job_opts_res+=("-j$jobs" "-l$jobs")
+    fi
+}
+
 function builder_setup {
     ici_install_pkgs_for_command catkin_make "ros-${ROS_DISTRO}-catkin"
 }
@@ -22,16 +31,16 @@ function builder_setup {
 function builder_run_build {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args install "$@"
+    local -a opts
+    _append_job_opts opts PARALLEL_BUILDS 0
+    ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args install "${opts[@]}" "$@"
 }
 
 function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
     local -a opts
-    if [ "$PARALLEL_TESTS" != true ]; then
-        opts+=(-j1)
-    fi
+    _append_job_opts opts PARALLEL_TESTS 1
     ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args run_tests "${opts[@]}" "$@"
 }
 

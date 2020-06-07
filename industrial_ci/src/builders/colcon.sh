@@ -28,7 +28,15 @@ function builder_setup {
 function builder_run_build {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" colcon build --event-handlers "${_colcon_event_handlers[@]}" "$@"
+    local opts=(--event-handlers "${_colcon_event_handlers[@]}")
+    local jobs
+    ici_parse_jobs jobs PARALLEL_BUILDS 0
+    if [ "$jobs" -eq 1 ]; then
+        opts+=(--executor sequential)
+    elif [ "$jobs" -gt 1 ]; then
+        opts+=(--executor parallel --parallel-workers "$jobs")
+    fi
+    ici_exec_in_workspace "$extend" "$ws" colcon build "${opts[@]}" "$@"
 }
 
 function builder_run_tests {
@@ -41,10 +49,12 @@ function builder_run_tests {
         output_handler="console_cohesion+"
     fi
     local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
-    if [ "$PARALLEL_TESTS" != true ]; then
-        opts+=(--executor sequential  --ctest-args -j1)
-    else
-        opts+=(--executor parallel)
+    local jobs
+    ici_parse_jobs jobs PARALLEL_TESTS 1
+    if [ "$jobs" -eq 1 ]; then
+        opts+=(--executor sequential --ctest-args -j1)
+    elif [ "$jobs" -gt 1 ]; then
+        opts+=(--executor parallel --parallel-workers "$jobs")
     fi
     ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
 }

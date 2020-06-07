@@ -76,10 +76,23 @@ function _sub_shell() (
 function ici_hook() {
   local name=${1^^}
   name=${name//[^A-Z0-9_]/_}
+  local name_embed="${name}_EMBED"
 
   local script=${!name}
-  if [ -n "$script" ]; then
-    ici_run "$1" _sub_shell "$script"
+  local script_embed=${!name_embed}
+
+  if [ -n "$script" ] || [ -n "$script_embed" ] ; then
+    ici_time_start "$1"
+
+    if [ -n "$script" ]; then
+      _sub_shell "$script"
+    fi
+
+    if [ -n "$script_embed" ]; then
+      eval "$script_embed"
+    fi
+
+    ici_time_end
   fi
 }
 
@@ -280,6 +293,26 @@ function ici_split_array {
 function ici_parse_env_array {
     # shellcheck disable=SC2034
     eval "$1=(${!2})"
+}
+
+function ici_parse_jobs {
+  local -n _ici_parse_jobs_res=$1
+  # shellcheck disable=SC2034
+  _ici_parse_jobs_res=${!2}
+
+  case "$_ici_parse_jobs_res" in
+  "")
+      _ici_parse_jobs_res="$3";;
+  "true")
+      _ici_parse_jobs_res="0";;
+  "false")
+      _ici_parse_jobs_res="1";;
+  *)
+      if ! [[ "$_ici_parse_jobs_res" =~ ^[0-9]+$ ]]; then
+          ici_error "cannot parse $2=$_ici_parse_jobs_res as a number"
+      fi
+      ;;
+  esac
 }
 
 function ici_find_nonhidden {
