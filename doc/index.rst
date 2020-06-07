@@ -36,7 +36,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Crystal <https://index.ros.org/doc/ros2/Releases/Release-Crystal-Clemmys/>`__ *(EOL)*
 * `Dashing <https://index.ros.org/doc/ros2/Releases/Release-Dashing-Diademata/>`__
 * `Eloquent <https://index.ros.org/doc/ros2/Releases/Release-Eloquent-Elusor/>`__
-* `Foxy <https://index.ros.org/doc/ros2/Releases/Release-Foxy-Fitzroy/`__
+* `Foxy <https://index.ros.org/doc/ros2/Releases/Release-Foxy-Fitzroy/>`__
 
 Supported CIs
 +++++++++++++
@@ -555,6 +555,23 @@ Multiple commands are easier to be handled if they are put into a dedicated scri
     - BEFORE_INIT='./my_before_script.sh'
 
 NOTE: In general the scripts are run as root in a Docker container. If you configure a different (base) Docker image, the user could be changed to non-root. But since we need to install packages the (base) image should set-up ``sudo`` for this user.
+
+The hooks will get run without a ROS environment (``setup.bash``).
+If you need this environment, you can use the ``rosenv`` helper.
+Optionally, it takes a command to be executed.
+
+Examples:
+
+* ``AFTER_SETUP_UPSTREAM_WORKSPACE='rosenv && echo "$ROS_DISTRO'"``
+* ``AFTER_SETUP_UPSTREAM_WORKSPACE='rosenv ./my_script.sh'``
+
+Furthermore, these  hooks scripts are run in a sub-shell and cannot change the build environment.
+If a dependency needs to extend the build environment, the `*_EMBED` script can be used::
+
+    - AFTER_INIT='./your_custom_PREprocess.sh'
+    - AFTER_INIT_EMBED='source /opt/dependency/prepare_environment.sh'
+
+**rosenv must not be used in \*_EMBED hooks!**
 
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
