@@ -16,7 +16,7 @@
 # limitations under the License.
 
 function _install_universal_ctags() {
-    ici_asroot apt-get install -y -qq autoconf pkg-config
+    ici_apt_install autoconf automake pkg-config
     ici_import_repository /tmp github:universal-ctags/ctags.git#HEAD
     (cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install)
     rm -rf /tmp/ctags
@@ -31,17 +31,17 @@ function _import_and_make_install() {
 }
 
 function _install_vtable_dumper() {
-    ici_asroot apt-get install -y -qq libelf-dev make
+    ici_apt_install libelf-dev make
     _import_and_make_install lvc/vtable-dumper
 }
 
 function _install_abi_dumper() {
-    ici_asroot apt-get install -y -qq binutils elfutils perl make
+    ici_apt_install binutils elfutils perl make
     _import_and_make_install lvc/abi-dumper
 }
 
 function _install_abi_compliance_checker() {
-    ici_asroot apt-get install -y -qq perl make
+    ici_apt_install perl make
     _import_and_make_install lvc/abi-compliance-checker
 }
 
@@ -90,6 +90,7 @@ function abi_process_workspace() {
 
 function abi_configure() {
   if [ "$ABICHECK_MERGE" = true ]; then
+    ici_setup_git_client
     local ref_list
     if ici_split_array ref_list "$(cd "$TARGET_REPO_PATH" && git rev-list --parents -n 1 HEAD)" && [ "${#ref_list[@]}" -gt 2 ]; then
         ABICHECK_VERSION="${ref_list[1]}"
@@ -185,7 +186,7 @@ function run_abi_check() {
     ici_run "setup_rosdep" ici_setup_rosdep
 
     if [ "$CCACHE_DIR" ]; then
-        ici_run "setup_ccache" ici_asroot apt-get install -qq -y ccache
+        ici_run "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
 

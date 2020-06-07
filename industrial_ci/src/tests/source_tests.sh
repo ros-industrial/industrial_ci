@@ -107,7 +107,7 @@ function run_source_tests {
     downstream_ws=~/downstream_ws
 
     if [ "$CCACHE_DIR" ]; then
-        ici_run "setup_ccache" ici_asroot apt-get install -qq -y ccache
+        ici_run "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
 
