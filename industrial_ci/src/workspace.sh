@@ -56,6 +56,15 @@ function ici_apt_install {
 
 function ici_init_apt {
     ici_asroot apt-get update -qq
+
+    local debs_default=(build-essential)
+    if [ -n "$_DEFAULT_DEBS" ]; then
+        ici_parse_env_array debs_default _DEFAULT_DEBS
+    fi
+    if [ -n "${debs_default[*]}" ]; then
+        ici_apt_install "${debs_default[@]}"
+    fi
+
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
     local -a debs
     ici_parse_env_array debs ADDITIONAL_DEBS

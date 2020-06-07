@@ -112,7 +112,6 @@ function set_ros_variables {
     "noetic")
         BUILDER=${BUILDER:-colcon}
         ros1_defaults "focal"
-        DEFAULT_DOCKER_IMAGE=
         ROS_PYTHON_VERSION=3
         ;;
     "ardent")
@@ -219,7 +218,7 @@ if [ -z "$OS_CODE_NAME" ]; then
             ici_error "ROS distro '$ROS_DISTRO' is not supported"
         fi
         OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
-        #DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
+        DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
         ;;
     esac
 else
