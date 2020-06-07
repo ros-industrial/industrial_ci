@@ -125,7 +125,11 @@ For GitHub Actions
 
    name: CI
 
-   on: [push, pull_request]
+   on:
+    push:
+      branches: [ master ]
+    pull_request:
+      branches: [ master ]
 
    jobs:
      industrial_ci:
@@ -135,8 +139,14 @@ For GitHub Actions
              - {ROS_DISTRO: melodic, ROS_REPO: testing}
              - {ROS_DISTRO: melodic, ROS_REPO: main}
        runs-on: ubuntu-latest
+       env:
+         CCACHE_DIR: /github/home/.ccache
        steps:
          - uses: actions/checkout@v1
+         - uses: actions/cache@v2
+           with:
+             path: ${{ env.CCACHE_DIR }}
+             key: ccache-${{ matrix.env.ROS_DISTRO }}
          - uses: 'ros-industrial/industrial_ci@master'
            env: ${{matrix.env}}
 
