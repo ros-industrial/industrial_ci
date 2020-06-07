@@ -85,7 +85,7 @@ function ici_hook() {
 
   local script_embed=${!name_embed}
   if [ -n "$script_embed" ]; then
-    ici_run "$1" eval "$script_embed"
+    ici_run "$1_embed" eval "$script_embed"
   fi
 }
 
