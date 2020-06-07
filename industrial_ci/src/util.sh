@@ -76,10 +76,16 @@ function _sub_shell() (
 function ici_hook() {
   local name=${1^^}
   name=${name//[^A-Z0-9_]/_}
+  local name_embed="${name}_EMBED"
 
   local script=${!name}
   if [ -n "$script" ]; then
     ici_run "$1" _sub_shell "$script"
+  fi
+
+  local script_embed=${!name_embed}
+  if [ -n "$script_embed" ]; then
+    ici_run "$1" eval "$script_embed"
   fi
 }
 
