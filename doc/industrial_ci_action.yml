@@ -4,13 +4,16 @@
 name: CI
 
 # This determines when this workflow is run
-on:
-  # When master or melodic-devel branch is pushed to
-  push:
-    branches: [ master, melodic-devel ]
-  # When there is a pull request against master
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request] # on all pushes and PRs
+
+# or more fine-grained
+# on:
+#   # When master or melodic-devel branch is pushed to
+#   push:
+#     branches: [ master, melodic-devel ]
+#   # When there is a pull request against master
+#   pull_request:
+#     branches: [ master ]
 
 jobs:
   industrial_ci:
