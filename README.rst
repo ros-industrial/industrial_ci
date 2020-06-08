@@ -119,7 +119,7 @@ For Bitbucket Pipelines
 For GitHub Actions
 -----------------------
 
-1. Create `.github/workflows/main.yml` (main.yml is arbitrary)  with the following configuration, (this snippet can be the entire content of the file), replacing melodic for your chosen distro:
+1. Create `.github/workflows/industrial_ci_action.yml` (industrial_ci_action.yml is arbitrary, `complete template <doc/industrial_ci_action.yml>`__)  with the following configuration, (this snippet can be the entire content of the file), replacing melodic for your chosen distro:
 
 ::
 
