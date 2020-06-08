@@ -295,6 +295,26 @@ function ici_parse_env_array {
     eval "$1=(${!2})"
 }
 
+function ici_parse_jobs {
+  local -n _ici_parse_jobs_res=$1
+  # shellcheck disable=SC2034
+  _ici_parse_jobs_res=${!2}
+
+  case "$_ici_parse_jobs_res" in
+  "")
+      _ici_parse_jobs_res="$3";;
+  "true")
+      _ici_parse_jobs_res="0";;
+  "false")
+      _ici_parse_jobs_res="1";;
+  *)
+      if ! [[ "$_ici_parse_jobs_res" =~ ^[0-9]+$ ]]; then
+          ici_error "cannot parse $2=$_ici_parse_jobs_res as a number"
+      fi
+      ;;
+  esac
+}
+
 function ici_find_nonhidden {
   local path=$1; shift
   local args=()
