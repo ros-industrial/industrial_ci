@@ -87,7 +87,7 @@ The upstream workspace packages are now located in `~/upstream_ws`.
 `industrial_ci` does not set defaults for the number of build jobs anymore.
 `PARALLEL_BUILDS=N` can be used to enforce a limit.
 The number of parallel test is now limited to 1 per default to allow for reproducible tests.
-Specify `PARALLEL_TESTS=true` `PARALLEL_TESTS=N` to opt out.
+Specify `PARALLEL_TESTS=true` or  `PARALLEL_TESTS=N` to opt out.
 
 ### Hook system
 
