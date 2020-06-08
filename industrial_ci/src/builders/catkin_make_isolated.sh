@@ -19,7 +19,7 @@ function _append_job_opts() {
     local -n _append_job_opts_res=$1
     local jobs
     ici_parse_jobs jobs "$2" "$3"
-    if [ "$jobs" -gt 1 ]; then
+    if [ "$jobs" -gt 0 ]; then
         _append_job_opts_res+=("-j$jobs" "-l$jobs")
     fi
 }
