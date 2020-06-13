@@ -17,14 +17,14 @@
 
 function _install_universal_ctags() {
     ici_apt_install autoconf automake pkg-config
-    ici_import_repository /tmp github:universal-ctags/ctags.git#HEAD
+    ici_import_repository /tmp github:universal-ctags/ctags.git#master
     (cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install)
     rm -rf /tmp/ctags
 }
 
 function _import_and_make_install() {
   local repo=$1; shift
-  ici_import_repository /tmp "github:$repo.git#HEAD"
+  ici_import_repository /tmp "github:$repo.git#master"
   local dir; dir=/tmp/$(basename "$repo")
   (cd "$dir" && ici_asroot make install prefix=/usr)
   rm -rf "$dir"
