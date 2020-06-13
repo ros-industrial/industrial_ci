@@ -111,7 +111,11 @@ function ici_import_repository {
         *)
             ;;
     esac
-    ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
+    if [ "${parts[3]}" = "HEAD" ]; then
+        ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}'}}}"
+    else
+        ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
+    fi
 }
 
 function ici_import_file {
