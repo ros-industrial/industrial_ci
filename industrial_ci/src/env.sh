@@ -145,7 +145,13 @@ function set_ros_variables {
             use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
             DEFAULT_DOCKER_IMAGE=""
             ;;
-        "main"|"ros")
+        "main")
+            use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
+            ;;
+        "ros")
+            if [ "$ROS_VERSION" -eq 2 ]; then
+                ici_warn "ROS_REPO=ros would select the ROS1 repository, please use ROS_REPO=main"
+            fi
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
             ;;
         "ros1")
@@ -159,6 +165,9 @@ function set_ros_variables {
             DEFAULT_DOCKER_IMAGE=""
             ;;
         "ros-shadow-fixed"|"ros-testing")
+            if [ "$ROS_VERSION" -eq 2 ]; then
+                ici_warn "ROS_REPO=$ROS_REPO would select the ROS1 repository, please use ROS_REPO=testing"
+            fi
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
             DEFAULT_DOCKER_IMAGE=""
             ;;
