@@ -651,7 +651,7 @@ Example:
   $ catkin b industrial_ci
   $ source install/setup.bash
   $ roscd ros_canopen   (or any package you test)
-  $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPO=ros-shadow-fixed
+  $ rosrun industrial_ci run_ci ROS_DISTRO=indigo ROS_REPO=main
 
 (ROS_DISTRO could be read from your environment as well)
 
@@ -682,7 +682,7 @@ Example:
 
 ::
 
-  $ rosrun industrial_ci rerun_ci . ROS_DISTRO=melodic ROS_REPO=ros-shadow-fixed
+  $ rosrun industrial_ci rerun_ci . ROS_DISTRO=melodic ROS_REPO=main
 
 This will run the tests and commit the result to a Docker image ``industrial-ci/rerun_ci/ros_canopen:$HASH``.
 The hash is unique for each argument list, so ``rerun_ci . ROS_DISTRO=melodic`` and ``rerun_ci . ROS_DISTRO=kinetic`` do not mix  up.
