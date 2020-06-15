@@ -19,17 +19,16 @@ git:
 # https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure
 env:
   global: # global settings for all jobs
-    - ROS_REPO=ros
     - CCACHE_DIR=$HOME/.ccache # enables C/C++ caching in industrial_ci
   matrix: # each line is a job
-    - ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed # overrides the global
+    - ROS_DISTRO="lunar" ROS_REPO=main # overrides the default
     - ROS_DISTRO="kinetic"
     - ROS_DISTRO="melodic"
 
 # allow failures, e.g. for unsupported distros
 matrix:
   allow_failures:
-    - env: ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed
+    - env: ROS_DISTRO="lunar" ROS_REPO=main
 
 # clone and run industrial_ci
 install:
