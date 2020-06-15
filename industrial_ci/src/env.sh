@@ -159,6 +159,10 @@ function set_ros_variables {
             DEFAULT_DOCKER_IMAGE=""
             ;;
         "ros-shadow-fixed"|"ros-testing")
+            use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
+            DEFAULT_DOCKER_IMAGE=""
+            ;;
+        "ros1-testing")
             use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
             DEFAULT_DOCKER_IMAGE=""
             ;;
