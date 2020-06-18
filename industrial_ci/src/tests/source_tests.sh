@@ -125,6 +125,13 @@ function run_source_tests {
     if [ "${CLANG_TIDY:-false}" != false ]; then
         TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
     fi
+    if [ "$RUN_ASAN" = "true" ]; then
+        TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS='-fsanitize=address' -DCMAKE_CXX_FLAGS='-fsanitize=address'"
+    fi
+
+    if [ "$RUN_TSAN" = "true" ]; then
+        TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS='-fsanitize=thread -O2 -g -fno-omit-frame-pointer' -DCMAKE_CXX_FLAGS='-fsanitize=thread -O2 -g -fno-omit-frame-pointer'"
+    fi
     ici_with_ws "$target_ws" ici_build_workspace "target" "$extend" "$target_ws"
 
     if [ "$NOT_TEST_BUILD" != "true" ]; then
