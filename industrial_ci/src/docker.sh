@@ -84,6 +84,10 @@ function ici_run_cmd_in_docker() {
      run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
   fi
 
+  if [ "$RUN_ASAN" = "true" ]; then
+    run_opts+=(--cap-add SYS_PTRACE)
+  fi
+
   local hooks=()
   for hook in $(env | grep -o '^\(BEFORE\|AFTER\)_[^=]*'); do
       hooks+=(-e "$hook")
