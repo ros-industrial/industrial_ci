@@ -73,7 +73,3 @@ test_arm:
   script:
     - docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
     - .industrial_ci/gitlab.sh DOCKER_IMAGE='arm32v7/ros:melodic-ros-core' BEFORE_INIT='[[ $(uname -p) == armv7l ]] && exit 42' EXPECT_EXIT_CODE=42
-    
-after_script:
-  - echo ${CCACHE_DIR}
-  - ls ${CCACHE_DIR}
