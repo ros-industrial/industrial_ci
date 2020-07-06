@@ -12,10 +12,6 @@ git:
   quiet: true
 
 env:
-  global:
-    - POST_PROCESS='echo "post processing reached"'
-    - "AFTER_SETUP_TARGET_WORKSPACE='echo current dir: $(pwd)'"
-
   matrix:
     - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
     - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
@@ -90,10 +86,6 @@ matrix:
       - industrial_ci/scripts/run_travis
       - industrial_ci/scripts/run_travis 1
       name: run_travis
-    - script: shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh industrial_ci/*.sh
-      name: shellcheck
-
 
 script:
   - industrial_ci/_wrap_test.sh # this script is only for internal use
-  - if ! [ -z "$POST_PROCESS" ]; then $POST_PROCESS; fi
