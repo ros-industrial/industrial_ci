@@ -27,7 +27,7 @@ export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 export _FOLDING_TYPE=travis
 
 # Update libseccomp to allow statx syscalls
-(sudo apt update && sudo apt install -y libseccomp2) &> "$(mktemp)"
+sudo apt-get update -qq && sudo apt-get install -y -qq libseccomp2
 
 if [ "$ABICHECK_MERGE" = "auto" ]; then
   export ABICHECK_MERGE=false
