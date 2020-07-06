@@ -26,6 +26,9 @@ export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
 export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 export _FOLDING_TYPE=travis
 
+# Update libseccomp to allow statx syscalls (https://travis-ci.community/t/docker-build-environments/7216/4)
+sudo apt-get update -qq && sudo apt-get install -y -qq libseccomp2
+
 if [ "$ABICHECK_MERGE" = "auto" ]; then
   export ABICHECK_MERGE=false
   [ "$TRAVIS_PULL_REQUEST" = "false" ] || ABICHECK_MERGE=true
