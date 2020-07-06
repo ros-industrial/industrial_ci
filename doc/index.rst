@@ -522,6 +522,15 @@ Or define ``CCACHE_DIR`` per job.
 NOTE:
   * Beware, if you use `run_ci <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#id39>`__, the files will be owned by root!
   * Caching may not work for packages with "smaller" number of files (see also `this discussion <https://github.com/ros-industrial/industrial_ci/pull/182>`__).
+  * With Gitlab CI, cache should always inside the project folder (`reference <https://docs.gitlab.com/ee/ci/yaml/README.html#cachepaths>`__)::
+
+     variables:
+       CCACHE_DIR: ${CI_PROJECT_DIR}/ccache
+      
+     cache:
+       key: "${CI_JOB_NAME}"
+       paths: 
+         - ccache
 
 Run pre/post-process custom commands
 -----------------------------------------
