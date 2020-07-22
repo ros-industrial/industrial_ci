@@ -132,6 +132,9 @@ function set_ros_variables {
     "foxy")
         ros2_defaults "focal"
         ;;
+    "rolling")
+        ros2_defaults "focal"
+        ;;
     esac
 
     local prefix=ros

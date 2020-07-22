@@ -48,6 +48,7 @@ env:
     - ROS_DISTRO=noetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg'
     - ROS_DISTRO=noetic PRERELEASE=true
     - ROS_DISTRO=foxy
+    - ROS_DISTRO=rolling
 
     # External repositories
     - ROS_DISTRO=kinetic _EXTERNAL_REPO='github:ros-industrial/industrial_core@kinetic-devel'
