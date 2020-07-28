@@ -94,6 +94,7 @@ function ici_setup_git_client {
 
 function ici_vcs_import {
     vcs import --recursive --force "$@"
+    vcs pull "$@"
 }
 
 function ici_import_repository {
