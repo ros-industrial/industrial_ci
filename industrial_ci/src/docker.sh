@@ -219,16 +219,22 @@ function ici_build_default_docker_image() {
   echo "Building image '$DOCKER_IMAGE':"
   local dockerfile; dockerfile=$(ici_generate_default_dockerfile)
   echo "$dockerfile"
-  ici_quiet ici_docker_build - <<< "$dockerfile"
+  ici_quiet ici_docker_build -f- . <<< "$dockerfile"
 }
 
 function ici_generate_default_dockerfile() {
   local keycmd
+  local copykeycmd
 
+  # Old Behavior
   if [ -n "${APTKEY_STORE_HTTPS}" ]; then
     keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
+  elif [ -n "${APTKEY_STORE_SKS}" ]; then
+    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
   else
-    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
+    # Use gpg keys directly
+    copykeycmd="COPY ${ROS_KEYFILE} /root/ros.key"
+    keycmd="apt-key add /root/ros.key"
   fi
 
   cat <<EOF
@@ -242,6 +248,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr build-essential
 
+$copykeycmd
 RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
 RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list
 

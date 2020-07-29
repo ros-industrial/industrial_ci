@@ -38,9 +38,10 @@ done
 
 ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPACE format"
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
-if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
-if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
 
+if [ ! "$ROS_KEYFILE" ]; then
+  ROS_KEYFILE=$(echo "${ICI_SRC_PATH}/keys/ros.key" | sed "s~$PWD/~~g"); export ROS_KEYFILE;
+fi
 # variables in docker.env without default will be exported with empty string
 # this might break the build, e.g. for Makefile which rely on these variables
 if [ -z "${CC}" ]; then unset CC; fi
@@ -76,7 +77,7 @@ function  ros2_defaults {
 }
 function use_snapshot() {
     ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
-    HASHKEY_SKS="AD19BAB3CBF125EA"
+    ROS_KEYFILE=$(echo "${ICI_SRC_PATH}/keys/ros_snapshot.key" | sed "s~$PWD/~~g")
 }
 
 function use_repo_or_final_snapshot() {
