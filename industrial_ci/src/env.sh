@@ -40,7 +40,7 @@ ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPAC
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 
 if [ ! "$ROS_KEYFILE" ]; then
-  ROS_KEYFILE=$(echo "${ICI_SRC_PATH}/keys/ros.key" | sed "s~$PWD/~~g"); export ROS_KEYFILE;
+  ROS_KEYFILE="${ICI_SRC_PATH}/keys/ros.key"; export ROS_KEYFILE;
 fi
 # variables in docker.env without default will be exported with empty string
 # this might break the build, e.g. for Makefile which rely on these variables
@@ -77,7 +77,7 @@ function  ros2_defaults {
 }
 function use_snapshot() {
     ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
-    ROS_KEYFILE=$(echo "${ICI_SRC_PATH}/keys/ros_snapshot.key" | sed "s~$PWD/~~g")
+    ROS_KEYFILE="${ICI_SRC_PATH}/keys/ros_snapshot.key"
 }
 
 function use_repo_or_final_snapshot() {

@@ -233,7 +233,7 @@ function ici_generate_default_dockerfile() {
     keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
   else
     # Use gpg keys directly
-    copykeycmd="COPY ${ROS_KEYFILE} /root/ros.key"
+    copykeycmd="COPY $(realpath --relative-to="$PWD" "$ROS_KEYFILE") /root/ros.key"
     keycmd="apt-key add /root/ros.key"
   fi
 
