@@ -101,7 +101,7 @@ function run_source_tests {
     # shellcheck disable=SC1090
     source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
 
-    if [ -z "$DO_NOT_RUN_IN_DOCKER" ]; then
+    if [ -z "$DISABLE_DOCKER_FOR_SOURCE_TESTS" ]; then
         ici_require_run_in_docker # this script must be run in docker
     fi
     upstream_ws=~/upstream_ws
