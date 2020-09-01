@@ -19,7 +19,7 @@ function run_clang_format_check() {
   local err=0
   local path; path=$(mktemp -d)
 
-  DOCKER_IMAGE="$DOCKER_BASE_IMAGE" ici_require_run_in_docker # this script must be run in docker
+  ici_require_run_in_docker # this script must be run in docker
 
   # Check whether a specific version of clang-format is desired
   local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"

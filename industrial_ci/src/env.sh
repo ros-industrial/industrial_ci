@@ -22,6 +22,7 @@ export LC_ALL=${LC_ALL:-C.UTF-8}
 ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
 ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not available anymore."
 ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"
+ici_enforce_deprecated DOCKER_FILE "Please build image separately"
 
 if [ -n "$NOT_TEST_INSTALL" ]; then
     if [ "$NOT_TEST_INSTALL" != true ]; then
@@ -29,6 +30,11 @@ if [ -n "$NOT_TEST_INSTALL" ]; then
     else
         ici_mark_deprecated NOT_TEST_INSTALL "testing installed test files has been removed, NOT_TEST_INSTALL=false is superfluous"
     fi
+fi
+
+if [ -n "$DOCKER_BASE_IMAGE" ]; then
+    ici_mark_deprecated DOCKER_BASE_IMAGE "Please set DOCKER_IMAGE=$DOCKER_BASE_IMAGE directly"
+    DOCKER_IMAGE=$DOCKER_BASE_IMAGE
 fi
 
 for v in BUILD_PKGS_WHITELIST PKGS_DOWNSTREAM TARGET_PKGS USE_MOCKUP; do
@@ -199,12 +205,11 @@ function set_ros_variables {
 # If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
 export OS_CODE_NAME
 export OS_NAME
-export DOCKER_BASE_IMAGE
+export DOCKER_IMAGE
 export ROS_DISTRO
 export ROS_VERSION
 export ROS_VERSION_EOL
 export ROS_PYTHON_VERSION
-export DEFAULT_DOCKER_IMAGE
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
@@ -221,10 +226,10 @@ fi
 if [ -z "$OS_CODE_NAME" ]; then
     case "$ROS_DISTRO" in
     "")
-        if [ -n "$DOCKER_IMAGE" ] || [ -n "$DOCKER_BASE_IMAGE" ]; then
+        if [ -n "$DOCKER_IMAGE" ]; then
           # try to reed ROS_DISTRO from (base) image
-          ici_docker_try_pull "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}"
-          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE:-$DOCKER_BASE_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
+          ici_docker_try_pull "${DOCKER_IMAGE}"
+          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
         fi
         if [ -z "$ROS_DISTRO" ]; then
             ici_error "Please specify ROS_DISTRO"
@@ -237,19 +242,21 @@ if [ -z "$OS_CODE_NAME" ]; then
             ici_error "ROS distro '$ROS_DISTRO' is not supported"
         fi
         OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
-        DEFAULT_DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
         ;;
     esac
 else
     set_ros_variables
 fi
 
-if [ -z "$DOCKER_BASE_IMAGE" ]; then
-    DOCKER_BASE_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
-else
-    DEFAULT_DOCKER_IMAGE=""
+# use default Docker image, if available
+if [ -z "$DOCKER_IMAGE" ]; then
+    DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
 fi
 
+# fallback to default base image
+if [ -z "$DOCKER_IMAGE" ]; then
+    DOCKER_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
+fi
 
 export TERM=${TERM:-dumb}
 
