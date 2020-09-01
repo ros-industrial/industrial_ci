@@ -9,10 +9,10 @@ image: docker:git # docker and git clients
 variables:
   TMPDIR: "${CI_PROJECT_DIR}.tmp" #
   CCACHE_DIR: ${CI_PROJECT_DIR}/ccache
-  
+
 cache:
   key: "${CI_JOB_NAME}" # https://docs.gitlab.com/ee/ci/caching/#sharing-caches-across-different-branches
-  paths: 
+  paths:
     - ccache
 
 # enable docker-in-docker
@@ -44,18 +44,6 @@ dashing:
   script: .industrial_ci/gitlab.sh ROS_DISTRO=dashing
 
 # some internal tests
-
-docker_pull_base:
-  script:
-    - docker pull ubuntu:xenial
-    - docker tag ubuntu:xenial industrial-ci/ubuntu:xenial
-    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_BASE_IMAGE="industrial-ci/ubuntu:xenial" EXPECT_EXIT_CODE=1
-
-docker_no_pull_base:
-  script:
-    - docker pull ubuntu:xenial
-    - docker tag ubuntu:xenial industrial-ci/ubuntu:xenial
-    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_BASE_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
 
 docker_pull:
   script:

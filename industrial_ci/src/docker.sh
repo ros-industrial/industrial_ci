@@ -34,7 +34,8 @@
 #######################################
 function ici_require_run_in_docker() {
   if ! [ "$IN_DOCKER" ]; then
-    ici_prepare_docker_image
+
+    ici_run "prepare_docker_image" ici_docker_try_pull "$DOCKER_IMAGE"
 
     local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
     local docker_ici_src_path=/root/ici
@@ -96,10 +97,10 @@ function ici_run_cmd_in_docker() {
       "$@")
 
   # detect user inside container
-  local docker_image
-  docker_image=$(docker inspect --format='{{.Config.Image}}' "$cid")
-  docker_uid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$docker_image" id -u)
-  docker_gid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$docker_image" id -g)
+  local image
+  image=$(docker inspect --format='{{.Config.Image}}' "$cid")
+  docker_uid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$image" id -u)
+  docker_gid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$image" id -g)
 
   # pass common credentials to container
   if [ "$DOCKER_COMMIT_CREDENTIALS" != false ]; then
@@ -134,123 +135,13 @@ function docker_cp {
   tar --numeric-owner --owner="${docker_uid:-root}" --group="${docker_gid:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
   set +o pipefail
 }
-#######################################
-# wrapper for docker build
-#
-# * images will by tagged automatically
-# * build option get passed from environment
-#
-# Globals:
-#   DOCKER_BUILD_OPTS (read-only)
-#   DOCKER_IMAGE (read-only)
-# Arguments:
-#   all argumentes will be forwarded
-# Returns:
-#   (None)
-#######################################
-function ici_docker_build() {
-  local -a build_opts
-  ici_parse_env_array build_opts DOCKER_BUILD_OPTS
-  if [ "$DOCKER_PULL" != false ]; then
-    build_opts+=("--pull")
-  fi
-  docker build -t "$DOCKER_IMAGE" "${build_opts[@]}" "$@"
-}
-
 function ici_docker_try_pull {
     local image=$1
+    if [ -z "$image" ]; then
+      ici_error "Could not determine Docker image"
+    fi
     if [ "$DOCKER_PULL" != false ]; then
         echo "Pulling Docker image '$image'..."
         ici_quiet docker pull "$image"
     fi
-}
-
-#######################################
-# set-ups the CI docker image
-#
-# * pull or build custom image
-# * fall-bak to default build
-#
-# Globals:
-#   DOCKER_FILE (read-only)
-#   DOCKER_IMAGE (read/write)
-#   TARGET_REPO_PATH (read-only)
-# Arguments:
-#   (None)
-# Returns:
-#   (None)
-function ici_prepare_docker_image() {
-  ici_time_start prepare_docker_image
-
-  if [ -n "$DOCKER_FILE" ]; then # docker file was provided
-    DOCKER_IMAGE=${DOCKER_IMAGE:"industrial-ci/custom"}
-    if [ -f "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if single file, run without context
-       ici_quiet ici_docker_build - < "$TARGET_REPO_PATH/$DOCKER_FILE"
-    elif [ -d "$TARGET_REPO_PATH/$DOCKER_FILE" ]; then # if path, run with context
-        ici_quiet ici_docker_build "$TARGET_REPO_PATH/$DOCKER_FILE"
-    else # url, run directly
-        ici_quiet ici_docker_build "$DOCKER_FILE"
-    fi
-  elif [ -z "$DOCKER_IMAGE" ]; then # image was not provided, use default
-    if [ -n "$DEFAULT_DOCKER_IMAGE" ]; then
-        DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE
-        ici_docker_try_pull "$DOCKER_IMAGE"
-    else
-        ici_build_default_docker_image
-    fi
-  else
-      ici_docker_try_pull "$DOCKER_IMAGE"
-  fi
-
-  ici_time_end # prepare_docker_image
-}
-
-#######################################
-# build the default docker image
-#
-# Globals:
-#   APTKEY_STORE_HTTPS (read-only)
-#   APTKEY_STORE_SKS (read-only)
-#   DOCKER_IMAGE (write-only)
-#   HASHKEY_SKS (read-only)
-#   UBUNTU_OS_CODE_NAME (read-only)
-# Arguments:
-#   (None)
-# Returns:
-#   (None)
-
-function ici_build_default_docker_image() {
-  # choose a unique image name
-  export DOCKER_IMAGE="industrial-ci/$ROS_DISTRO/$DOCKER_BASE_IMAGE"
-  echo "Building image '$DOCKER_IMAGE':"
-  local dockerfile; dockerfile=$(ici_generate_default_dockerfile)
-  echo "$dockerfile"
-  ici_quiet ici_docker_build - <<< "$dockerfile"
-}
-
-function ici_generate_default_dockerfile() {
-  local keycmd
-
-  if [ -n "${APTKEY_STORE_HTTPS}" ]; then
-    keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
-  else
-    keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
-  fi
-
-  cat <<EOF
-FROM $DOCKER_BASE_IMAGE
-
-ENV ROS_DISTRO $ROS_DISTRO
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
-RUN apt-get update -qq && apt-get -qq install -y apt-utils gnupg2 wget ca-certificates lsb-release dirmngr build-essential
-
-RUN for i in 1 2 3; do { $keycmd; } &&  break || sleep 1; done
-RUN echo "deb ${ROS_REPOSITORY_PATH} \$(lsb_release -sc) main" > /etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list
-
-RUN sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
-EOF
 }

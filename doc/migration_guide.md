@@ -21,6 +21,7 @@ Some features are not supported anymore:
 * Support of ROS hydro
 * Devel space builds
 * Testing installed \*.test files
+* Building Docker images
 * Injecting QEMU (see [`INJECT_QEMU`](#inject_qemu))
 
 If you depend on these, you can still use the [legacy](https://github.com/ros-industrial/industrial_ci/tree/legacy) version.
@@ -51,6 +52,7 @@ Special care must be taken, if you use any of these variables:
 * [`CATKIN_PARALLEL_TEST_JOBS`](#catkin_parallel_test_jobs)
 * [`CMAKE_ARGS`](#cmake_args)
 * [`DOCKER_BASE_IMAGE`](#docker_base_image)
+* [`DOCKER_BUILD_OPTS`](#docker_build_opts)
 * [`DOCKER_FILE`](#docker_file)
 * [`DOCKER_IMAGE`](#docker_image)
 * [`HASHKEY_SKS`](#hashkey_sks)
@@ -184,11 +186,15 @@ This variable was introduced recently and is still supported, but its content wi
 
 ### DOCKER_BASE_IMAGE
 
-This variable is still supported, but the [workspace layout has changed](#workspace-layout).
+This variable is not needed anymore. Please specify [DOCKER_IMAGE](#docker_image) instead.
+
+### DOCKER_BUILD_OPTS
+
+This variable is not used anymore, because support for building Docker images was removed.
 
 ### DOCKER_FILE
 
-This variable is still supported, but the [workspace layout has changed](#workspace-layout).
+This variable is not used anymore, because support for building Docker images was removed.
 
 ### DOCKER_IMAGE
 
