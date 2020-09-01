@@ -16,6 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export LANG=${LANG:-C.UTF-8}
+export LC_ALL=${LC_ALL:-C.UTF-8}
+
 ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
 ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not available anymore."
 ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"

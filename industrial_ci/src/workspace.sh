@@ -60,14 +60,36 @@ function ici_pip_install {
 
 function ici_init_apt {
     export DEBIAN_FRONTEND=noninteractive
+
+    sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
     ici_asroot apt-get update -qq
 
-    local debs_default=(build-essential)
+    local debs_default=(apt-utils build-essential)
+    if ! ls /etc/ssl/certs/* 2&> /dev/null; then
+        debs_default+=(ca-certificates)
+    fi
     if [ -n "$_DEFAULT_DEBS" ]; then
         ici_parse_env_array debs_default _DEFAULT_DEBS
     fi
     if [ -n "${debs_default[*]}" ]; then
         ici_apt_install "${debs_default[@]}"
+    fi
+
+    if ! [ -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
+        ici_apt_install lsb-release
+
+        local keycmd
+        if [ -n "${APTKEY_STORE_HTTPS}" ]; then
+            ici_install_pkgs_for_command wget wget
+            keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
+        else
+            keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
+            ici_apt_install gnupg2 dirmngr
+        fi
+
+        ici_retry 3 eval "$keycmd"
+        echo "deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list"
+        ici_asroot apt-get update -qq
     fi
 
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
