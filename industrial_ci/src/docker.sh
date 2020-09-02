@@ -34,6 +34,10 @@
 #######################################
 function ici_require_run_in_docker() {
   if ! [ "$IN_DOCKER" ]; then
+    # fallback to default base image
+    if [ -z "$DOCKER_IMAGE" ]; then
+      DOCKER_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
+    fi
 
     ici_run "prepare_docker_image" ici_docker_try_pull "$DOCKER_IMAGE"
 

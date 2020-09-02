@@ -47,6 +47,8 @@ done
 
 ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPACE format"
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
+ici_mark_deprecated DEFAULT_DOCKER_IMAGE "Official ROS Docker images are not the default anymore"
+
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
 
@@ -105,7 +107,6 @@ function set_ros_variables {
     case "$ROS_DISTRO" in
     "indigo"|"jade")
         ros1_defaults "trusty"
-        DEFAULT_DOCKER_IMAGE=""
         ROS_VERSION_EOL=true
         ;;
     "kinetic")
@@ -125,7 +126,6 @@ function set_ros_variables {
         ;;
     "ardent")
         ros2_defaults "xenial"
-        DEFAULT_DOCKER_IMAGE=
         ROS_VERSION_EOL=true
         ;;
     "bouncy"|"crystal")
@@ -155,7 +155,6 @@ function set_ros_variables {
         case "${ROS_REPO:-testing}" in
         "building")
             use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         "main")
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
@@ -174,26 +173,21 @@ function set_ros_variables {
             ;;
         "testing")
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         "ros-shadow-fixed"|"ros-testing")
             if [ "$ROS_VERSION" -eq 2 ]; then
                 ici_warn "ROS_REPO=$ROS_REPO would select the ROS1 repository, please use ROS_REPO=testing"
             fi
             use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         "ros1-testing")
             use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         "ros2-testing")
             use_repo_or_final_snapshot "http://packages.ros.org/ros2-testing/ubuntu"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         "final"|????-??-??)
             use_snapshot "${ROS_REPO}"
-            DEFAULT_DOCKER_IMAGE=""
             ;;
         *)
             ici_error "ROS repo '$ROS_REPO' is not supported"
@@ -246,16 +240,6 @@ if [ -z "$OS_CODE_NAME" ]; then
     esac
 else
     set_ros_variables
-fi
-
-# use default Docker image, if available
-if [ -z "$DOCKER_IMAGE" ]; then
-    DOCKER_IMAGE=${DEFAULT_DOCKER_IMAGE-ros:${ROS_DISTRO}-ros-core}
-fi
-
-# fallback to default base image
-if [ -z "$DOCKER_IMAGE" ]; then
-    DOCKER_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
 fi
 
 export TERM=${TERM:-dumb}
