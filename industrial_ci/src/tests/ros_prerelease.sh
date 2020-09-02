@@ -71,7 +71,7 @@ function run_ros_prerelease() {
     if [ -n "$CCACHE_DIR" ]; then
       opts+=(-v "$CCACHE_DIR:$WORKSPACE/home/.ccache")
     fi
-    DOCKER_RUN_OPTS="${opts[*]}" DOCKER_IMAGE=${DOCKER_DEFAULT_IMAGE:-ros:melodic-ros-core} ici_require_run_in_docker
+    DOCKER_RUN_OPTS="${opts[*]}" DOCKER_IMAGE=${DOCKER_IMAGE:-ros:melodic-ros-core} ici_require_run_in_docker
 
     ici_run "setup_ros_prerelease" setup_ros_prerelease
 

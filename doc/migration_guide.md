@@ -73,11 +73,6 @@ Special care must be taken, if you use any of these variables:
 
 ## Changes summary
 
-### Docker images
-
-Instead of creating a new Docker image on every build, `industrial_ci` will try to use the [official ROS images](https://hub.docker.com/_/ros/), if possible (ROS kinetic and newer, ROS_REPO=ros/ros2).
-You can set `DEFAULT_DOCKER_IMAGE=''` to opt-out.
-
 ### Workspace layout
 
 The workspace layout has changed (new [workspace management](index.rst#workspace-management)).
