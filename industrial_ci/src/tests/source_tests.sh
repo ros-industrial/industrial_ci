@@ -23,7 +23,7 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function install_catkin_lint {
-    ici_install_pkgs_for_command apt-add-repository software-properties-common
+    ici_apt_install software-properties-common
     ici_asroot apt-add-repository ppa:roehling/ros -y -u # -u for versions pre-Ubuntu 18.04
     ici_install_pkgs_for_command catkin_lint "${PYTHON_VERSION_NAME}-catkin-lint"
 }
