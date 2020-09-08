@@ -55,8 +55,8 @@ function ici_apt_install {
 }
 
 function ici_pip_install {
-    echo ${PYTHON_VERSION_NAME} -m pip install -q "$@"
-    ici_asroot ${PYTHON_VERSION_NAME} -m pip install -q "$@"
+    echo "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
+    ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
 }
 
 function ici_init_apt {
