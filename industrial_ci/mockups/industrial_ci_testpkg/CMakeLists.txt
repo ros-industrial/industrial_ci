@@ -7,7 +7,9 @@ endif()
 
 find_package(catkin REQUIRED COMPONENTS rospy_tutorials rostest)
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS rospy_tutorials
+)
 
 if (CATKIN_ENABLE_TESTING)
   add_rostest(test/example_ros.test)
