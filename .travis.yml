@@ -74,6 +74,9 @@ env:
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic
     - ROS_DISTRO=melodic TARGET_WORKSPACE='industrial_ci/mockups/test_clang_tidy' CLANG_TIDY=pedantic CLANG_TIDY_ARGS="-checks=modernize-use-nullptr" EXPECT_EXIT_CODE=1
 
+    # Legacy Catkin Lint Tests
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/legacy_catkin_lint_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true AFTER_INIT='ici_install_pkgs_for_command catkin_lint "${PYTHON_VERSION_NAME}-catkin-lint"'
+
 matrix:
   allow_failures:
     - env: ROS_DISTRO=kinetic NOT_TEST_BUILD='true' NOT_TEST_INSTALL='true' POST_PROCESS='I_am_supposed_to_fail'

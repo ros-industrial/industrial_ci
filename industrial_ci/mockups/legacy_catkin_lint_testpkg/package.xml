@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package>
+  <name>legacy_catkin_lint_testpkg</name>
+  <version>0.3.1</version>
+  <description>This package is for test purposes only.</description>
+
+  <maintainer email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</maintainer>
+  <author email="130s@2000.jukuin.keio.ac.jp">Isaac I. Y. Saito</author>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy_tutorials</build_depend>
+  <run_depend>rospy_tutorials</run_depend>
+  <build_depend>rostest</build_depend>
+  <run_depend>rostest</run_depend>
+  <export />
+</package>
