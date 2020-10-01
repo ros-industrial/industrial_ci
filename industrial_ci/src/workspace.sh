@@ -45,7 +45,7 @@ function ici_resolve_scheme {
                 ;;
         esac
     else
-        ici_error "could not parse URL '$url'"
+        ici_error "Could not parse URL '$url'. It does not match the expected pattern: <scheme>:<resource>#<version>."
     fi
 
 }
@@ -102,7 +102,9 @@ function ici_import_repository {
 
     ici_install_pkgs_for_command vcs python3-vcstool
 
-    IFS=" " read -r -a parts <<< "$(ici_resolve_scheme "$url")" # name, type, url, version
+    local resolved; resolved=$(ici_resolve_scheme "$url")
+    IFS=" " read -r -a parts <<< "$resolved" # name, type, url, version
+    echo "${parts[*]}"
 
     case "${parts[1]}" in
         git)
