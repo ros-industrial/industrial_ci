@@ -234,7 +234,7 @@ function ici_mark_deprecated {
 function ici_error {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
-        ici_color_output ${ANSI_RED} "$1"
+        >&2 ici_color_output ${ANSI_RED} "$1"
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
         ici_exit 1
