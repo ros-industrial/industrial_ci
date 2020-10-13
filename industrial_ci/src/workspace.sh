@@ -89,8 +89,8 @@ function ici_install_pkgs_for_command {
   ici_exec_for_command "$command" ici_apt_install "$@"
 }
 
-function ici_install_python_pkgs_for_command {
-    local command=$1; shift
+function ici_install_pypi_pkgs_for_command {
+  local command=$1; shift
   ici_exec_for_command "$command" ici_pip_install "$@"
 }
 
