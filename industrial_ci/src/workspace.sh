@@ -55,6 +55,7 @@ function ici_apt_install {
 }
 
 function ici_init_apt {
+    export DEBIAN_FRONTEND=noninteractive
     ici_asroot apt-get update -qq
 
     local debs_default=(build-essential)
