@@ -23,7 +23,7 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function install_catkin_lint {
-    ici_install_pkgs_for_command catkin_lint "${PYTHON_VERSION_NAME}-catkin-lint"
+    ici_install_pypi_pkgs_for_command catkin_lint "catkin-lint"
 }
 
 function run_clang_tidy {

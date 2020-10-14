@@ -13,7 +13,8 @@ git:
 
 env:
   matrix:
-    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' VERBOSE_OUTPUT='true' CATKIN_LINT=true AFTER_SCRIPT='[ "$(command -v catkin_lint)" = /usr/local/bin/catkin_lint ]'
+    - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=true ADDITIONAL_DEBS='python-catkin-lint' AFTER_SCRIPT='[ "$(command -v catkin_lint)" = /usr/bin/catkin_lint ]'
     - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CMAKE_ARGS="-DFAIL_CMAKE=true" EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' CATKIN_LINT=pedantic EXPECT_EXIT_CODE=1
     - ROS_DISTRO=kinetic TARGET_WORKSPACE='industrial_ci/mockups/industrial_ci_testpkg' ROSDEP_SKIP_KEYS="rospy_tutorials rostest" EXPECT_EXIT_CODE=1

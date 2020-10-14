@@ -54,6 +54,10 @@ function ici_apt_install {
     ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
 }
 
+function ici_pip_install {
+    ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
+}
+
 function ici_init_apt {
     export DEBIAN_FRONTEND=noninteractive
     ici_asroot apt-get update -qq
@@ -84,6 +88,11 @@ function ici_exec_for_command {
 function ici_install_pkgs_for_command {
   local command=$1; shift
   ici_exec_for_command "$command" ici_apt_install "$@"
+}
+
+function ici_install_pypi_pkgs_for_command {
+  local command=$1; shift
+  ici_exec_for_command "$command" ici_pip_install "$@"
 }
 
 function ici_setup_git_client {
