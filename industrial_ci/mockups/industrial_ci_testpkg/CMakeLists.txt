@@ -5,13 +5,12 @@ if(FAIL_CMAKE)
   message(FATAL_ERROR "CMake was requested to fail")
 endif()
 
-find_package(catkin REQUIRED COMPONENTS rospy_tutorials rostest)
+find_package(catkin REQUIRED)
 
-catkin_package(
-  CATKIN_DEPENDS rospy_tutorials
-)
+catkin_package()
 
 if (CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
   add_rostest(test/example_ros.test)
 endif()
 
