@@ -527,10 +527,10 @@ NOTE:
 
      variables:
        CCACHE_DIR: ${CI_PROJECT_DIR}/ccache
-      
+
      cache:
        key: "${CI_JOB_NAME}"
-       paths: 
+       paths:
          - ccache
 
 Run pre/post-process custom commands
@@ -707,6 +707,8 @@ Note for rerun_ci limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``rerun_ci`` is managing ``DOCKER_COMMIT`` and ``DOCKER_COMMIT_MSG`` variables under the hood, so if the user set them they will not take effect, unlike `normal cases <#re-use-the-container-image>`__.
+
+If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/target_ws/src/'``.
 
 For maintainers of industrial_ci repository
 ================================================
