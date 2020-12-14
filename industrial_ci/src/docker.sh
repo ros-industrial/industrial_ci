@@ -102,11 +102,17 @@ function ici_run_cmd_in_docker() {
   docker_gid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$docker_image" id -g)
 
   # pass common credentials to container
-  for d in .docker .ssh .subversion; do
-    if [ -d "$HOME/$d" ]; then
-      docker_cp "$HOME/$d" "$cid:/root/"
-    fi
-  done
+  if [ "$DOCKER_COMMIT_CREDENTIALS" != false ]; then
+    for d in .docker .ssh .subversion; do
+      if [ -d "$HOME/$d" ]; then
+        if [ -z "$commit_image" ] || [ "$DOCKER_COMMIT_CREDENTIALS" = true ]; then
+          docker_cp "$HOME/$d" "$cid:/root/"
+        else
+          ici_warn "Will not bundle'$d' unless 'DOCKER_COMMIT_CREDENTIALS=true'"
+        fi
+      fi
+    done
+  fi
 
   docker start -a "$cid" &
   trap 'docker kill $cid' INT
