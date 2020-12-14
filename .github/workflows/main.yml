@@ -38,3 +38,23 @@ jobs:
         env: ${{matrix.env}}
         run: |
           ./industrial_ci/_wrap_test.sh
+
+  test_arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
+      - uses: './'
+        env:
+          DOCKER_IMAGE: 'arm32v7/ros:melodic-ros-core'
+          BEFORE_INIT: '[[ $(uname -p) == armv7l ]] && exit 42'
+          EXPECT_EXIT_CODE: 42
+
+  run_travis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          industrial_ci/scripts/run_travis
+          industrial_ci/scripts/run_travis 1
