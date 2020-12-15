@@ -16,78 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export LANG=${LANG:-C.UTF-8}
-export LC_ALL=${LC_ALL:-C.UTF-8}
-
-ici_enforce_deprecated BEFORE_SCRIPT "Please migrate to new hook system."
-ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not available anymore."
-ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"
-ici_enforce_deprecated DOCKER_FILE "Please build image separately"
-
-if [ -n "$NOT_TEST_INSTALL" ]; then
-    if [ "$NOT_TEST_INSTALL" != true ]; then
-        ici_enforce_deprecated NOT_TEST_INSTALL "testing installed test files has been removed."
-    else
-        ici_mark_deprecated NOT_TEST_INSTALL "testing installed test files has been removed, NOT_TEST_INSTALL=false is superfluous"
-    fi
-fi
-
-if [ -n "$DOCKER_BASE_IMAGE" ]; then
-    ici_mark_deprecated DOCKER_BASE_IMAGE "Please set DOCKER_IMAGE=$DOCKER_BASE_IMAGE directly"
-    DOCKER_IMAGE=$DOCKER_BASE_IMAGE
-fi
-
-for v in BUILD_PKGS_WHITELIST PKGS_DOWNSTREAM TARGET_PKGS USE_MOCKUP; do
-    ici_enforce_deprecated "$v" "Please migrate to new workspace definition"
-done
-
-for v in CATKIN_PARALLEL_JOBS CATKIN_PARALLEL_TEST_JOBS ROS_PARALLEL_JOBS ROS_PARALLEL_TEST_JOBS; do
-    ici_mark_deprecated "$v" "Please migrate to PARALLEL_BUILDS and/or PARALLEL_TESTS"
-done
-
-ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPACE format"
-ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
-ici_mark_deprecated DEFAULT_DOCKER_IMAGE "Official ROS Docker images are not the default anymore"
-
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
 if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
 
-# variables in docker.env without default will be exported with empty string
-# this might break the build, e.g. for Makefile which rely on these variables
-if [ -z "${CC}" ]; then unset CC; fi
-if [ -z "${CFLAGS}" ]; then unset CFLAGS; fi
-if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
-if [ -z "${CXX}" ]; then unset CXX; fi
-if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
-
-if [ -n "$USE_MOCKUP" ]; then
-  if [ -z "$TARGET_WORKSPACE" ]; then
-    TARGET_WORKSPACE="$USE_MOCKUP"
-    ici_warn "Replacing 'USE_MOCKUP=$USE_MOCKUP' with 'TARGET_WORKSPACE=$TARGET_WORKSPACE'"
-  else
-    ici_error "USE_MOCKUP is not supported anymore, please migrate to 'TARGET_WORKSPACE=$TARGET_WORKSPACE $USE_MOCKUP'"
-  fi
-fi
-
-TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
-
 function  ros1_defaults {
     DEFAULT_OS_CODE_NAME=$1
-    ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
-    BUILDER=${BUILDER:-catkin_tools}
-    ROS_VERSION=1
-    ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-2}
+    export ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
+    export BUILDER=${BUILDER:-catkin_tools}
+    export ROS_VERSION=1
+    export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-2}
 }
 function  ros2_defaults {
     DEFAULT_OS_CODE_NAME=$1
-    ROS2_DISTRO=${ROS2_DISTRO:-$ROS_DISTRO}
-    BUILDER=${BUILDER:-colcon}
-    ROS_VERSION=2
-    ROS_PYTHON_VERSION=3
+    export ROS2_DISTRO=${ROS2_DISTRO:-$ROS_DISTRO}
+    export BUILDER=${BUILDER:-colcon}
+    export ROS_VERSION=2
+    export ROS_PYTHON_VERSION=3
 }
 function use_snapshot() {
-    ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
-    HASHKEY_SKS="AD19BAB3CBF125EA"
+    export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
+    export HASHKEY_SKS="AD19BAB3CBF125EA"
 }
 
 function use_repo_or_final_snapshot() {
@@ -97,7 +45,7 @@ function use_repo_or_final_snapshot() {
             ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
         fi
     else
-        ROS_REPOSITORY_PATH="$1"
+        export ROS_REPOSITORY_PATH="$1"
         if [ "$ROS_REPO" = "ros-shadow-fixed" ]; then
             ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
         fi
@@ -107,30 +55,30 @@ function set_ros_variables {
     case "$ROS_DISTRO" in
     "indigo"|"jade")
         ros1_defaults "trusty"
-        ROS_VERSION_EOL=true
+        export ROS_VERSION_EOL=true
         ;;
     "kinetic")
         ros1_defaults "xenial"
         ;;
     "lunar")
         ros1_defaults "xenial"
-        ROS_VERSION_EOL=true
+        export ROS_VERSION_EOL=true
         ;;
     "melodic")
         ros1_defaults "bionic"
         ;;
     "noetic")
-        BUILDER=${BUILDER:-colcon}
+        export BUILDER=${BUILDER:-colcon}
         ros1_defaults "focal"
-        ROS_PYTHON_VERSION=3
+        export ROS_PYTHON_VERSION=3
         ;;
     "ardent")
         ros2_defaults "xenial"
-        ROS_VERSION_EOL=true
+        export ROS_VERSION_EOL=true
         ;;
     "bouncy"|"crystal")
         ros2_defaults "bionic"
-        ROS_VERSION_EOL=true
+        export ROS_VERSION_EOL=true
         ;;
     "dashing")
         ros2_defaults "bionic"
@@ -196,25 +144,16 @@ function set_ros_variables {
     fi
 }
 
-# If not specified, use ROS Shadow repository http://wiki.ros.org/ShadowRepository
-export OS_CODE_NAME
-export OS_NAME
-export DOCKER_IMAGE
-export ROS_DISTRO
-export ROS_VERSION
-export ROS_VERSION_EOL
-export ROS_PYTHON_VERSION
-
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
 if [ -z "$OS_NAME" ]; then
-    OS_NAME=ubuntu
+    export OS_NAME=ubuntu
 elif [ -z "$OS_CODE_NAME" ]; then
     ici_error "please specify OS_CODE_NAME"
 fi
 
 if [ -n "$UBUNTU_OS_CODE_NAME" ]; then # for backward-compatibility
-    OS_CODE_NAME=$UBUNTU_OS_CODE_NAME
+    export OS_CODE_NAME=$UBUNTU_OS_CODE_NAME
 fi
 
 if [ -z "$OS_CODE_NAME" ]; then
@@ -223,6 +162,7 @@ if [ -z "$OS_CODE_NAME" ]; then
         if [ -n "$DOCKER_IMAGE" ]; then
           # try to reed ROS_DISTRO from (base) image
           ici_docker_try_pull "${DOCKER_IMAGE}"
+          export ROS_DISTRO
           ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
         fi
         if [ -z "$ROS_DISTRO" ]; then
@@ -235,48 +175,9 @@ if [ -z "$OS_CODE_NAME" ]; then
         if [ -z "$DEFAULT_OS_CODE_NAME" ]; then
             ici_error "ROS distro '$ROS_DISTRO' is not supported"
         fi
-        OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
+        export OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
         ;;
     esac
 else
     set_ros_variables
-fi
-
-export TERM=${TERM:-dumb}
-
-if [ "$ROS_PYTHON_VERSION" = 2 ]; then
-  export PYTHON_VERSION_NAME=python
-else
-  export PYTHON_VERSION_NAME=python3
-fi
-
-
-# legacy support for UPSTREAM_WORKSPACE and USE_DEB
-if [ "$UPSTREAM_WORKSPACE" = "debian" ]; then
-  ici_warn "Setting 'UPSTREAM_WORKSPACE=debian' is superfluous and gets removed"
-  unset UPSTREAM_WORKSPACE
-fi
-
-if [ "$USE_DEB" = true ]; then
-  if [ "${UPSTREAM_WORKSPACE:-debian}" != "debian" ]; then
-    ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
-  fi
-  ici_warn "Setting 'USE_DEB=true' is superfluous"
-fi
-
-if [ "$UPSTREAM_WORKSPACE" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
-  ROSINSTALL_FILENAME="${ROSINSTALL_FILENAME:-.travis.rosinstall}"
-  if [ -f  "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.$ROS_DISTRO" ]; then
-    ROSINSTALL_FILENAME="$ROSINSTALL_FILENAME.$ROS_DISTRO"
-  fi
-
-  if [ "${USE_DEB:-true}" != true ]; then # means UPSTREAM_WORKSPACE=file
-      if [ "${UPSTREAM_WORKSPACE:-file}" != "file" ]; then
-        ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
-      fi
-      ici_warn "Replacing 'USE_DEB=false' with 'UPSTREAM_WORKSPACE=$ROSINSTALL_FILENAME'"
-  else
-      ici_warn "Replacing 'UPSTREAM_WORKSPACE=file' with 'UPSTREAM_WORKSPACE=$ROSINSTALL_FILENAME'"
-  fi
-  UPSTREAM_WORKSPACE="$ROSINSTALL_FILENAME"
 fi
