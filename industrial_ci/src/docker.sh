@@ -33,7 +33,7 @@
 #   (None)
 #######################################
 function ici_require_run_in_docker() {
-  if ! [ "$IN_DOCKER" ]; then
+  if [ "$_IN_DOCKER" != true ]; then
     # fallback to default base image
     if [ -z "$DOCKER_IMAGE" ]; then
       DOCKER_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
@@ -45,14 +45,25 @@ function ici_require_run_in_docker() {
     local docker_ici_src_path=/root/ici
     ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
                           -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
+                          -e "ICI_SRC_PATH=$docker_ici_src_path" \
                           -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
                           -t \
                           --entrypoint '' \
                           -w "$docker_target_repo_path" \
                           "$DOCKER_IMAGE" \
-                          /bin/bash $docker_ici_src_path/ci_main.sh
+                          /bin/bash $docker_ici_src_path/run.sh "${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}" "${FUNCNAME[1]}"
     exit
   else
+    export LANG=${LANG:-C.UTF-8}
+    export LC_ALL=${LC_ALL:-C.UTF-8}
+    export TERM=${TERM:-dumb}
+
+    if [ -z "${CC}" ]; then unset CC; fi
+    if [ -z "${CFLAGS}" ]; then unset CFLAGS; fi
+    if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
+    if [ -z "${CXX}" ]; then unset CXX; fi
+    if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
+
     ici_run "init" ici_init_apt
   fi
 }

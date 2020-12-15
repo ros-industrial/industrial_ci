@@ -39,7 +39,7 @@ function ici_source_setup {
   local u_set=1
   [[ $- =~ u ]] || u_set=0
   set +u
-  # shellcheck disable=SC1091
+  # shellcheck disable=SC1090,SC1091
   source "$1/setup.bash"
   if [ $u_set ]; then
     set -u
