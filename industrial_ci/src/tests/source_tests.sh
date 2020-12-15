@@ -97,14 +97,7 @@ function run_clang_tidy_check {
     fi
 }
 
-function install_pylint {
-    local cmd=$1
-
-    ici_time_start "install_$cmd"
-    ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
-    ici_time_end # install_$cmd
-}
-
+# run pylint on a single file
 function run_pylint_file {
     local _run_pylint_file_exit_code=$1; shift
     local target_ws=$1; shift
@@ -126,6 +119,7 @@ function run_pylint_file {
     fi
 }
 
+# run pylint for a given target_ws
 function run_pylint {
     local -n _run_pylint_errors=$1; shift
     local target_ws=$1; shift
@@ -152,32 +146,22 @@ function run_pylint {
 function run_pylint_check {
     local target_ws=$1
     local -a errors
-    local -a cmd
     local -a pylint_args
     failure=false
-    if [ "$PYLINT2_CHECK" == true ]; then
-        cmd="pylint"
-        ici_parse_env_array pylint_args PYLINT2_ARGS
-        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
+    cmd="pylint"
 
-        install_pylint "$cmd"
-        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
-    fi
-    if [ "${#errors[@]}" -gt "0" ]; then
-        ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
-        failure=true
-    fi
-    unset errors
-    unset cmd
-    unset pylint_args
-    if [ "$PYLINT3_CHECK" == true ]; then
-        cmd="pylint3"
-        ici_parse_env_array pylint_args PYLINT3_ARGS
-        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
+    # parse PYLINT_ARGS
+    ici_parse_env_array pylint_args PYLINT_ARGS
 
-        install_pylint "$cmd"
-        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
-    fi
+    # install pylint
+    ici_time_start "install_$cmd"
+    ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
+    ici_time_end # install_$cmd
+
+    # run pylint
+    run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
+
+    # present errors
     if [ "${#errors[@]}" -gt "0" ]; then
         ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
         failure=true
@@ -233,7 +217,7 @@ function run_source_tests {
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
     fi
-    if [ "$PYLINT2_CHECK" == "true" ] || [ "$PYLINT3_CHECK" == "true" ]; then
+    if [ "$PYLINT_CHECK" == "true" ]; then
         run_pylint_check "$target_ws"
     fi
 
