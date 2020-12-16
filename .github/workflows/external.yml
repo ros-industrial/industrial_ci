@@ -15,6 +15,42 @@ jobs:
           - repo: 'ros-industrial/motoman_experimental'
             ref: 'kinetic-devel'
             env: {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: '.travis.rosinstall -ros-industrial/industrial_experimental/IRC_v2', ROS_REPO: ros}
+
+          - repo: 'ipa320/cob_calibration_data'
+            ref: 'indigo_dev'
+            env: {ROS_DISTRO: kinetic, ROS_REPO: ros, UPSTREAM_WORKSPACE: file, AFTER_SCRIPT: 'rosenv sh .travis.xacro_test.sh'}
+          
+          - repo: 'ros/actionlib'
+            ref: '38ce66e2ae2ec9c19cf12ab22d57a8134a9285be'
+            env: {ROS_DISTRO: indigo, ROS_REPO: ros, ABICHECK_URL: url, ABICHECK_MERGE: true} # actual URL will not be used in the case
+
+          - repo: 'ros-industrial/ros_canopen'
+            ref: '0.7.5'
+            env: {ROS_DISTRO: kinetic, ROS_REPO: ros, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.1', ABICHECK_MERGE: false, EXPECT_EXIT_CODE: 1}
+
+          - repo: 'ros-industrial/ros_canopen'
+            ref: '0.7.6'
+            env: {ROS_DISTRO: kinetic, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.5', ABICHECK_MERGE: false}
+          
+          - repo: 'ros2/joystick_drivers'
+            ref: 'bouncy'
+            env: {ROS_DISTRO: bouncy}
+
+          - repo: 'ros-controls/control_msgs'
+            ref: 'crystal-devel'
+            env: {ROS_DISTRO: crystal}
+          
+          - repo: 'ros-controls/control_msgs'
+            ref: 'crystal-devel'
+            env: {ROS_DISTRO: dashing, ROS_REPO: ros}
+          
+          - repo: 'ros-controls/control_msgs'
+            ref: 'crystal-devel'
+            env: {ROS_DISTRO: eloquent}
+          
+          - repo: 'ros-controls/control_msgs'
+            ref: 'crystal-devel'
+            env: {ROS_DISTRO: eloquent, PRERELEASE: true}
     
     runs-on: ubuntu-latest
     steps:
