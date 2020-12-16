@@ -39,11 +39,8 @@ else
 fi
 
 export TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
-
-# shellcheck source=industrial_ci/src/tests/source_tests.sh
-source "$1"
-shift
-"$@"
+echo "run.sh $1"
+ici_run_test "$1"
 
 ici_hook "after_script"
 

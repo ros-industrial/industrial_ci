@@ -43,6 +43,8 @@ function ici_require_run_in_docker() {
 
     local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
     local docker_ici_src_path=/root/ici
+    local testpath="${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}"
+    local testpath="${testpath/#$ICI_SRC_PATH/$docker_ici_src_path}"
     ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
                           -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
                           -e "ICI_SRC_PATH=$docker_ici_src_path" \
@@ -51,7 +53,7 @@ function ici_require_run_in_docker() {
                           --entrypoint '' \
                           -w "$docker_target_repo_path" \
                           "$DOCKER_IMAGE" \
-                          /bin/bash $docker_ici_src_path/run.sh "${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}" "${FUNCNAME[1]}"
+                          /bin/bash $docker_ici_src_path/run.sh "${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}"
     exit
   else
     export LANG=${LANG:-C.UTF-8}
