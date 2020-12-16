@@ -22,6 +22,7 @@ jobs:
           
           - repo: 'ros/actionlib'
             ref: '38ce66e2ae2ec9c19cf12ab22d57a8134a9285be'
+            depth: 0  # All history will be cloned
             env: {ROS_DISTRO: indigo, ROS_REPO: ros, ABICHECK_URL: url, ABICHECK_MERGE: true} # actual URL will not be used in the case
 
           - repo: 'ros-industrial/ros_canopen'
@@ -59,6 +60,7 @@ jobs:
         with:
           repository: ${{matrix.repo}}
           ref: ${{matrix.ref}}
+          fetch-depth: ${{matrix.depth}}
       
       - uses: actions/checkout@v2
         with:
