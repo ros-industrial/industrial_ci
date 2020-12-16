@@ -32,17 +32,4 @@ if [ -n "$_EXTERNAL_REPO" ]; then
     export TRAVIS_REPO_SLUG="${urldirname##*/}/${urlbasename%.git}"
 fi
 
-# Travis wrap test interface
-if [ "$TRAVIS" = true ]; then
-
-    ./travis.sh
-
-# Github Action wrap test interface
-elif [ "$GITHUB_ACTIONS" = true ]; then
-
-    export TARGET_REPO_PATH=$TRAVIS_BUILD_DIR
-    export TARGET_REPO_NAME=${TRAVIS_REPO_SLUG##*/}
-    export _FOLDING_TYPE=github_actions
-    ./ci.sh
-
-fi
+./travis.sh
