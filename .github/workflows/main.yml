@@ -17,10 +17,68 @@ jobs:
   industrial_ci:
     strategy:
       matrix:
+        experimental: [false]
         env:
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', VERBOSE_OUTPUT: true, CATKIN_LINT: true, AFTER_SCRIPT: '[ "$(command -v catkin_lint)" = /usr/local/bin/catkin_lint ]'}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: true, ADDITIONAL_DEBS: 'python-catkin-lint', AFTER_SCRIPT: '[ "$(command -v catkin_lint)" = /usr/bin/catkin_lint ]'}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CMAKE_ARGS: '-DFAIL_CMAKE=true', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: pedantic, EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', ROSDEP_SKIP_KEYS: "rospy_tutorials rostest", EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/testpkg_broken_install', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, NOT_TEST_BUILD: true, _GUARD_INTERVAL: 10}
+          - {ROS_DISTRO: kinetic, NOT_TEST_INSTALL: true, BEFORE_INIT: 'test -z "${CXX+x}"'} # test that CXX is not set
+          - {ROS_DISTRO: kinetic, NOT_TEST_INSTALL: true, CXX: '/usr/bin/gcc', BEFORE_INIT: 'test -z "${CXX+x}"', EXPECT_EXIT_CODE: 1} # test the CXX test
+          - {ROS_DISTRO: kinetic, NOT_TEST_BUILD: true, NOT_TEST_INSTALL: true}  # This may not make much sense. Only for testing purpose.
+          - {ROS_DISTRO: kinetic, CATKIN_PARALLEL_JOBS: '-p1', ROS_PARALLEL_JOBS: '-j1'}  # Intend build on low-power platform
+          
+          # - {ROS_DISTRO: indigo, PRERELEASE: true}  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
+          
+          - {ROS_DISTRO: melodic, PRERELEASE: true, PRERELEASE_DOWNSTREAM_DEPTH: 1}
+          - {ROS_DISTRO: melodic, PRERELEASE: true, TARGET_WORKSPACE: 'industrial_ci/mockups/failing_test', PRERELEASE_REPONAME: "failing_test", EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: kinetic, PRERELEASE: true, PRERELEASE_REPONAME: industrial_ci}
+          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: debian, AFTER_SCRIPT: 'ccache 2> /dev/null && exit 1; [ "$?" = "127" ]'}
+           # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
+          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, CCACHE_DIR: '/github/home/.ccache', AFTER_SCRIPT: 'num=($(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'}
+          - {ROS_DISTRO: indigo, UPSTREAM_WORKSPACE: file, USE_DEB: true, EXPECT_EXIT_CODE: 1} # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
+          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: 'https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall'}
+          - {ROS_DISTRO: indigo, ADDITIONAL_DEBS: 'ros-indigo-opencv3', VERBOSE_OUTPUT: false}
+          - {ROS_DISTRO: indigo, ADDITIONAL_DEBS: 'ros-hydro-opencv3', DEBUG_BASH: true, EXPECT_EXIT_CODE: 100} # This should fail (trying from a wrong distro).
+          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .ci.rosinstall}  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
+          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .i.do.not.exist, EXPECT_EXIT_CODE: 1}
+          - {DOCKER_IMAGE: 'ros:kinetic-ros-base', ROS_REPO: ros, NOT_TEST_BUILD: true, DEBUG_BASH: true, VERBOSE_OUTPUT: false, DOCKER_COMMIT: img_temp, POST_PROCESS: 'eval docker image inspect $DOCKER_COMMIT --format="$DOCKER_COMMIT:\ \"{{.Size}}\" bytes"'}
+          - {ROS_DISTRO: lunar, ROS_REPO: 'ros-shadow-fixed', TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
+          - {ROS_DISTRO: melodic, AFTER_SCRIPT: 'grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=bionic /etc/os-release'}
+          - {ROS_DISTRO: melodic, BEFORE_INIT: 'grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, OS_NAME: debian, OS_CODE_NAME: stretch, AFTER_SCRIPT: 'grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"9\" /etc/os-release'}
+          - {ROS_DISTRO: melodic, OS_NAME: debian, EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, OS_NAME: debian, OS_CODE_NAME: bionic, EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, ROS_REPO: ros, BUILDER: colcon, AFTER_SCRIPT: 'rosenv && [ "$CMAKE_PREFIX_PATH" = "/root/target_ws/install/industrial_ci:/opt/ros/melodic" ]'}
+          - {ROS_DISTRO: noetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
+          - {ROS_DISTRO: noetic, PRERELEASE: true}
+          - {ROS_DISTRO: foxy}
+          - {ROS_DISTRO: rolling}
+
           - {ROS_DISTRO: melodic}
           - {ROS_DISTRO: melodic, ROS_REPO: main}
+
+          # Format tests
+          - {ROS_DISTRO: indigo, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'LLVM', CLANG_FORMAT_VERSION: 3.8}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'LLVM'}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/WebKit', CLANG_FORMAT_CHECK: 'LLVM', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/WebKit', CLANG_FORMAT_CHECK: 'file'}
+          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'WebKit', EXPECT_EXIT_CODE: 1}
+
+          # Tidy
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, CLANG_TIDY_ARGS: "-checks=modernize-use-nullptr", EXPECT_EXIT_CODE: 1}
+        
+        include:
+          - env: {ROS_DISTRO: kinetic, NOT_TEST_BUILD: true, NOT_TEST_INSTALL: true, POST_PROCESS: 'I_am_supposed_to_fail'}
+            experimental: true
+
+
     runs-on: ubuntu-latest
+    continue-on-error: ${{matrix.experimental}}
     steps:
       - uses: actions/checkout@v1
       - uses: './'
