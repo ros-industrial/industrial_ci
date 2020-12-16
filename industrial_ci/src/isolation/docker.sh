@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# docker.sh script sets up Docker image.
-# It is dependent on environment variables that need to be exported in advance
-# (As of version 0.4.4 most of them are defined in ./env.sh).
+export DOCKER_COMMIT=${DOCKER_COMMIT:-}
+export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
+export DOCKER_COMMIT_CREDENTIALS=${DOCKER_COMMIT_CREDENTIALS:-false}
+export DOCKER_PULL=${DOCKER_PULL:-true}
 
 #######################################
 # rerun the CI script in docker container end exit the outer script
@@ -32,42 +33,26 @@
 # Returns:
 #   (None)
 #######################################
-function ici_require_run_in_docker() {
-  if [ "$_IN_DOCKER" != true ]; then
-    # fallback to default base image
-    if [ -z "$DOCKER_IMAGE" ]; then
-      DOCKER_IMAGE="$OS_NAME:$OS_CODE_NAME" # scheme works for all supported OS images
-    fi
+function ici_isolate() {
+  local file=${1}; shift
+  DOCKER_IMAGE=${DOCKER_IMAGE:-$OS_NAME:$OS_CODE_NAME} # scheme works for all supported OS images
 
-    ici_run "prepare_docker_image" ici_docker_try_pull "$DOCKER_IMAGE"
+  ici_run "prepare_docker_image" ici_docker_try_pull "$DOCKER_IMAGE"
 
-    local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
-    local docker_ici_src_path=/root/ici
-    local testpath="${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}"
-    local testpath="${testpath/#$ICI_SRC_PATH/$docker_ici_src_path}"
-    ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
-                          -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
-                          -e "ICI_SRC_PATH=$docker_ici_src_path" \
-                          -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
-                          -t \
-                          --entrypoint '' \
-                          -w "$docker_target_repo_path" \
-                          "$DOCKER_IMAGE" \
-                          /bin/bash $docker_ici_src_path/run.sh "${BASH_SOURCE[1]/#$ICI_SRC_PATH/$docker_ici_src_path}"
-    exit
-  else
-    export LANG=${LANG:-C.UTF-8}
-    export LC_ALL=${LC_ALL:-C.UTF-8}
-    export TERM=${TERM:-dumb}
+  local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
+  local docker_ici_src_path=/root/ici
+  file="${file/#$TARGET_REPO_PATH/$docker_target_repo_path}"
+  file="${file/#$ICI_SRC_PATH/$docker_ici_src_path}"
 
-    if [ -z "${CC}" ]; then unset CC; fi
-    if [ -z "${CFLAGS}" ]; then unset CFLAGS; fi
-    if [ -z "${CPPFLAGS}" ]; then unset CPPFLAGS; fi
-    if [ -z "${CXX}" ]; then unset CXX; fi
-    if [ -z "${CXXFLAGS}" ]; then unset CXXLAGS; fi
-
-    ici_run "init" ici_init_apt
-  fi
+  ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
+                        -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
+                        -e "ICI_SRC_PATH=$docker_ici_src_path" \
+                        -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
+                        -t \
+                        --entrypoint '' \
+                        -w "$docker_target_repo_path" \
+                        "$DOCKER_IMAGE" \
+                        /bin/bash $docker_ici_src_path/run.sh "$file" "$@"
 }
 
 #######################################
@@ -86,19 +71,19 @@ function ici_require_run_in_docker() {
 #   (None)
 #######################################
 function ici_run_cmd_in_docker() {
-  local -a run_opts
+  local run_opts=()
   ici_parse_env_array run_opts DOCKER_RUN_OPTS
   local commit_image=$DOCKER_COMMIT
-  unset DOCKER_COMMIT
+  DOCKER_COMMIT=
 
   #forward ssh agent into docker container
-  if [ "$SSH_AUTH_SOCK" ]; then
+  if [ -n "${SSH_AUTH_SOCK:-}" ]; then
      local auth_dir
      auth_dir=$(dirname "$SSH_AUTH_SOCK")
      run_opts+=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
   fi
 
-  if [ "$CCACHE_DIR" ]; then
+  if [ -n "${CCACHE_DIR}" ]; then
      run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
   fi
 
@@ -108,7 +93,7 @@ function ici_run_cmd_in_docker() {
   done
   local cid
   cid=$(docker create \
-      --env-file "${ICI_SRC_PATH}"/docker.env \
+      --env-file "${ICI_SRC_PATH}/isolation/docker.env" \
       "${hooks[@]}" \
       "${run_opts[@]}" \
       "$@")
@@ -139,7 +124,11 @@ function ici_run_cmd_in_docker() {
   trap - INT
   if [ -n "$commit_image" ]; then
     echo "Committing container to tag: '$commit_image'"
-    ici_quiet docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image"
+    local msg=()
+    if [ -n "$DOCKER_COMMIT_MSG" ]; then
+      msg=(-m "$DOCKER_COMMIT_MSG")
+    fi
+    ici_quiet docker commit "${msg[@]}" "$cid" "$commit_image"
   fi
   ici_quiet docker rm "$cid"
   return $ret
@@ -152,6 +141,7 @@ function docker_cp {
   tar --numeric-owner --owner="${docker_uid:-root}" --group="${docker_gid:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
   set +o pipefail
 }
+
 function ici_docker_try_pull {
     local image=$1
     if [ -z "$image" ]; then

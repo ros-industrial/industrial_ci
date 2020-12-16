@@ -21,7 +21,7 @@ ici_enforce_deprecated CATKIN_CONFIG "Explicit catkin configuration is not avail
 ici_enforce_deprecated INJECT_QEMU "Please check https://github.com/ros-industrial/industrial_ci/blob/master/doc/migration_guide.md#inject_qemu"
 ici_enforce_deprecated DOCKER_FILE "Please build image separately"
 
-if [ -n "$NOT_TEST_INSTALL" ]; then
+if [ -n "${NOT_TEST_INSTALL:-}" ]; then
     if [ "$NOT_TEST_INSTALL" != true ]; then
         ici_enforce_deprecated NOT_TEST_INSTALL "testing installed test files has been removed."
     else
@@ -29,7 +29,7 @@ if [ -n "$NOT_TEST_INSTALL" ]; then
     fi
 fi
 
-if [ -n "$DOCKER_BASE_IMAGE" ]; then
+if [ -n "${DOCKER_BASE_IMAGE:-}" ]; then
     ici_mark_deprecated DOCKER_BASE_IMAGE "Please set DOCKER_IMAGE=$DOCKER_BASE_IMAGE directly"
     export DOCKER_IMAGE=$DOCKER_BASE_IMAGE
 fi
@@ -46,7 +46,7 @@ ici_mark_deprecated ROSINSTALL_FILENAME "Please migrate to new UPSTREAM_WORKSPAC
 ici_mark_deprecated UBUNTU_OS_CODE_NAME "Was renamed to OS_CODE_NAME."
 ici_mark_deprecated DEFAULT_DOCKER_IMAGE "Official ROS Docker images are not the default anymore"
 
-if [ -n "$USE_MOCKUP" ]; then
+if [ -n "${USE_MOCKUP:-}" ]; then
   if [ -z "$TARGET_WORKSPACE" ]; then
     export TARGET_WORKSPACE="$USE_MOCKUP"
     ici_warn "Replacing 'USE_MOCKUP=$USE_MOCKUP' with 'TARGET_WORKSPACE=$TARGET_WORKSPACE'"
@@ -56,19 +56,19 @@ if [ -n "$USE_MOCKUP" ]; then
 fi
 
 # legacy support for UPSTREAM_WORKSPACE and USE_DEB
-if [ "$UPSTREAM_WORKSPACE" = "debian" ]; then
+if [ "${UPSTREAM_WORKSPACE:-}" = "debian" ]; then
   ici_warn "Setting 'UPSTREAM_WORKSPACE=debian' is superfluous and gets removed"
   unset UPSTREAM_WORKSPACE
 fi
 
-if [ "$USE_DEB" = true ]; then
+if [ "${USE_DEB:-}" = true ]; then
   if [ "${UPSTREAM_WORKSPACE:-debian}" != "debian" ]; then
     ici_error "USE_DEB and UPSTREAM_WORKSPACE are in conflict"
   fi
   ici_warn "Setting 'USE_DEB=true' is superfluous"
 fi
 
-if [ "$UPSTREAM_WORKSPACE" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
+if [ "${UPSTREAM_WORKSPACE:-}" = "file" ] || [ "${USE_DEB:-true}" != true ]; then
   ROSINSTALL_FILENAME="${ROSINSTALL_FILENAME:-.travis.rosinstall}"
   if [ -f  "$TARGET_REPO_PATH/$ROSINSTALL_FILENAME.${ROS_DISTRO:?ROS_DISTRO not set}" ]; then
     ROSINSTALL_FILENAME="$ROSINSTALL_FILENAME.$ROS_DISTRO"

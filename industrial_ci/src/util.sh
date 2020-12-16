@@ -25,6 +25,11 @@ ANSI_GREEN=32
 ANSI_YELLOW=33
 ANSI_BLUE=34
 
+export _FOLDING_TYPE=${_FOLDING_TYPE:-none}
+export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
+export ICI_START_TIME=${ICI_START_TIME:-}
+export ICI_TIME_ID=${ICI_TIME_ID:-}
+
 function ici_color_output {
   local c=$1
   shift
@@ -68,9 +73,7 @@ function ici_with_ws() {
 }
 
 function _sub_shell() (
-  set -u
   eval "$@"
-  set +u
 )
 
 function ici_hook() {
@@ -78,8 +81,8 @@ function ici_hook() {
   name=${name//[^A-Z0-9_]/_}
   local name_embed="${name}_EMBED"
 
-  local script=${!name}
-  local script_embed=${!name_embed}
+  local script=${!name:-}
+  local script_embed=${!name_embed:-}
 
   if [ -n "$script" ] || [ -n "$script_embed" ] ; then
     ici_time_start "$1"
@@ -159,7 +162,7 @@ function ici_time_end {
     ici_color_output "$color_wrap" "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     ici_color_output "$color_wrap" "Function '$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 
-    unset ICI_FOLD_NAME
+    ICI_FOLD_NAME=
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
     ici_hook "after_${name}"
 
@@ -193,7 +196,7 @@ function ici_exit {
         ici_time_end "$color_wrap" "$exit_code"
     fi
 
-    if [ "$exit_code" == "${EXPECT_EXIT_CODE:-0}" ]; then
+    if [ "$exit_code" == "$EXPECT_EXIT_CODE" ]; then
         exit 0
     elif [ "$exit_code" == "0" ]; then # 0 was not expected
         exit 1
@@ -207,12 +210,10 @@ function ici_warn {
 }
 
 function ici_mark_deprecated {
-  if ! [ "$IN_DOCKER" ]; then
-    local e=$1
-    shift
-    if [ "${!e}" ]; then
-      ici_warn "'$e' is deprecated. $*"
-    fi
+  local e=$1
+  shift
+  if [ "${!e:-}" ]; then
+    ici_warn "'$e' is deprecated. $*"
   fi
 }
 
@@ -245,7 +246,7 @@ function ici_error {
 function ici_enforce_deprecated {
     local e=$1
     shift
-    if [ "${!e}" ]; then
+    if [ "${!e:-}" ]; then
       ici_error "'$e' is not used anymore. $*"
     fi
 }
@@ -299,13 +300,13 @@ function ici_split_array {
 
 function ici_parse_env_array {
     # shellcheck disable=SC2034
-    eval "$1=(${!2})"
+    eval "$1=(${!2:-})"
 }
 
 function ici_parse_jobs {
   local -n _ici_parse_jobs_res=$1
   # shellcheck disable=SC2034
-  _ici_parse_jobs_res=${!2}
+  _ici_parse_jobs_res=${!2:-}
 
   case "$_ici_parse_jobs_res" in
   "")
@@ -331,21 +332,33 @@ function ici_find_nonhidden {
   find "$path" \( \! \( -path "${path}*/.*" -prune \) \) "${args[@]}"
 }
 
-function ici_run_test {
-  local file=$1
-  if ! [ -f "$file" ]; then
-    file="${ICI_SRC_PATH}/tests/$1.sh"
-  fi
-  if ! [ -f "$file" ]; then
-    ici_error "Cannot locate test '$1'"
-  fi
-  local name
-  name=$(basename "$file")
- 
-  # shellcheck source=industrial_ci/src/tests/source_tests.sh
-  source "$file"
-  "run_${name%.*}"
+function ici_resolve_component {
+  local label=$1
+  local group=$2
+  for file in "${TARGET_REPO_PATH}/${!label}" "${ICI_SRC_PATH}/$group/${!label}.sh"; do
+    if [ -f "$file" ]; then
+      echo "$file"
+      return
+    fi
+  done
+  ici_error "$label '${!label}' not found"
+}
+
+function ici_source_component {
+  local script
+  script=$(ici_resolve_component "$@")
+  # shellcheck disable=SC1090
+  source "$script"
+}
+
+function ici_check_builder {
+  ici_resolve_component BUILDER builders
+}
+
+function ici_source_builder {
+  ici_source_component BUILDER builders
 }
 
 # shellcheck disable=SC1090
-source "${ICI_SRC_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
+
+ici_source_component _FOLDING_TYPE folding

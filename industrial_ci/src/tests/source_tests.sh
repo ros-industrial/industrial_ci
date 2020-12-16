@@ -74,9 +74,9 @@ EOF
 
 function run_clang_tidy_check {
     local target_ws=$1
-    local -a errors
-    local -a warnings
-    local -a clang_tidy_args
+    local errors=()
+    local warnings=()
+    local clang_tidy_args=()
     ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
 
     ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
@@ -97,20 +97,21 @@ function run_clang_tidy_check {
     fi
 }
 
-function run_source_tests {
-    # shellcheck disable=SC1090
-    source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
+function prepare_source_tests {
+    ici_check_builder
+}
 
-    ici_require_run_in_docker # this script must be run in docker
+function run_source_tests {
     upstream_ws=~/upstream_ws
     target_ws=~/target_ws
     downstream_ws=~/downstream_ws
 
-    if [ "$CCACHE_DIR" ]; then
+    if [ -n "$CCACHE_DIR" ]; then
         ici_run "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
 
+    ici_source_builder
     ici_run "${BUILDER}_setup" ici_quiet builder_setup
 
     ici_run "setup_rosdep" ici_setup_rosdep
@@ -133,7 +134,7 @@ function run_source_tests {
 
     if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
         ici_run "install_catkin_lint" install_catkin_lint
-        local -a catkin_lint_args
+        local catkin_lint_args=()
         ici_parse_env_array catkin_lint_args CATKIN_LINT_ARGS
         if [ "$CATKIN_LINT" == "pedantic" ]; then
           catkin_lint_args+=(--strict -W2)

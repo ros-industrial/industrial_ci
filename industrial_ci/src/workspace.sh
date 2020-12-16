@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+export _DEFAULT_DEBS=${_DEFAULT_DEBS:-}
+
 function ici_resolve_scheme {
     local url=$1; shift
     if [[ $url =~ ([^:]+):([^#@]+)[#@](.+) ]]; then
@@ -93,7 +95,7 @@ function ici_init_apt {
     fi
 
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
-    local -a debs
+    local debs=()
     ici_parse_env_array debs ADDITIONAL_DEBS
     if [ -n "${debs[*]}" ]; then
         ici_apt_install "${debs[@]}" || ici_error "One or more additional deb installation is failed. Exiting."
@@ -269,7 +271,7 @@ function ici_setup_rosdep {
     fi
 
     update_opts=()
-    if [ -z "$ROSDISTRO_INDEX_URL" ]; then
+    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
         update_opts+=(--rosdistro "$ROS_DISTRO")
     fi
     if [ "$ROS_VERSION_EOL" = true ]; then
@@ -289,7 +291,7 @@ function ici_install_dependencies {
     local extend=$1; shift
     local skip_keys=$1; shift
 
-    local cmake_prefix_path
+    local cmake_prefix_path=
     if [ "$ROS_VERSION" -eq 2 ]; then
       # work-around for https://github.com/ros-infrastructure/rosdep/issues/724
       cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*'):" || true
@@ -300,7 +302,7 @@ function ici_install_dependencies {
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
     set -o pipefail # fail if rosdep install fails
-    ROS_PACKAGE_PATH="$cmake_prefix_path$ROS_PACKAGE_PATH" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
     set +o pipefail
 }
 
@@ -309,13 +311,13 @@ function ici_build_workspace {
     local extend=$1; shift
     local ws=$1; shift
 
-    local -a ws_sources
+    local ws_sources=()
     ici_parse_env_array  ws_sources "${name^^}_WORKSPACE"
     local sources=("$@" "${ws_sources[@]}")
-    local -a cmake_args ws_cmake_args
+    local cmake_args ws_cmake_args=()
     ici_parse_env_array  cmake_args CMAKE_ARGS
     ici_parse_env_array  ws_cmake_args "${name^^}_CMAKE_ARGS"
-    local -a args
+    local args=()
     if [ ${#cmake_args[@]} -gt 0 ] || [ ${#ws_cmake_args[@]} -gt 0 ]; then
         args+=(--cmake-args "${cmake_args[@]}" "${ws_cmake_args[@]}")
     fi
