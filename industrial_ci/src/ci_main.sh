@@ -46,6 +46,10 @@ elif [ -n "$ABICHECK_URL" ]; then
   # shellcheck source=industrial_ci/src/tests/abi_check.sh
   source "${ICI_SRC_PATH}/tests/abi_check.sh"
   run_abi_check
+elif [ -n "$BLACK_CHECK" ]; then
+  # shellcheck source=industrial_ci/src/tests/black_check.sh
+  source "${ICI_SRC_PATH}/tests/black_check.sh"
+  run_black_check
 elif [ -n "$CLANG_FORMAT_CHECK" ]; then
   # shellcheck source=industrial_ci/src/tests/clang_format_check.sh
   source "${ICI_SRC_PATH}/tests/clang_format_check.sh"
