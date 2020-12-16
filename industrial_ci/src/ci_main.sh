@@ -37,21 +37,18 @@ source "${ICI_SRC_PATH}/config.sh"
 
 trap ici_exit EXIT # install industrial_ci exit handler
 
-function _run_test() (
-  # shellcheck source=industrial_ci/src/tests/source_tests.sh
-  source "${ICI_SRC_PATH}/tests/$1.sh"
-  "run_$1"
-)
-
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" == true ]; then
-  _run_test ros_prerelease
+  TEST=ros_prerelease
 elif [ -n "$ABICHECK_URL" ]; then
-  _run_test abi_check
-elif [ -n "$BLACK_CHECK" ]; then
-  _run_test black_check
+  TEST=abi_check
 elif [ -n "$CLANG_FORMAT_CHECK" ]; then
-  _run_test clang_format_check
-else
-  _run_test source_tests
+  TEST=clang_format_check
+elif [ "$BLACK_CHECK" = true ]; then
+  TEST=black_check
+elif [ -z "$TEST" ]; then
+  TEST=source_tests
 fi
+
+echo "Running test '$TEST'"
+ici_run_test "$TEST"

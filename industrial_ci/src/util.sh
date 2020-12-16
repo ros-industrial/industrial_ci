@@ -331,5 +331,21 @@ function ici_find_nonhidden {
   find "$path" \( \! \( -path "${path}*/.*" -prune \) \) "${args[@]}"
 }
 
+function ici_run_test {
+  local file=$1
+  if ! [ -f "$file" ]; then
+    file="${ICI_SRC_PATH}/tests/$1.sh"
+  fi
+  if ! [ -f "$file" ]; then
+    ici_error "Cannot locate test '$1'"
+  fi
+  local name
+  name=$(basename "$file")
+ 
+  # shellcheck source=industrial_ci/src/tests/source_tests.sh
+  source "$file"
+  "run_${name%.*}"
+}
+
 # shellcheck disable=SC1090
 source "${ICI_SRC_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/folding/${_FOLDING_TYPE:-none}.sh" || ici_error "Folding type '$_FOLDING_TYPE' not supported"
