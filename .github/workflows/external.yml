@@ -1,0 +1,19 @@
+name: External-CI
+
+on: 
+  pull_request:
+
+jobs:
+  industrial_ci_external:
+    strategy:
+      matrix:
+        env:
+          - {ROS_DISTRO: kinetic, _EXTERNAL_REPO: 'github:ros-industrial/industrial_core@kinetic-devel'}
+          - {ROS_DISTRO: kinetic, _EXTERNAL_REPO: 'gh:ros-industrial/motoman_experimental#kinetic-devel', UPSTREAM_WORKSPACE: '.travis.rosinstall -ros-industrial/industrial_experimental/IRC_v2', ROS_REPO: ros}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - shell: bash
+        env: ${{matrix.env}}
+        run: |
+          ./industrial_ci/_wrap_test.sh
