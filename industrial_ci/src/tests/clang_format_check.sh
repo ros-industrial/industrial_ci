@@ -15,11 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function prepare_clang_format_check() {
+  true
+}
+
 function run_clang_format_check() {
   local err=0
   local path; path=$(mktemp -d)
-
-  ici_require_run_in_docker # this script must be run in docker
 
   # Check whether a specific version of clang-format is desired
   local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
@@ -28,7 +30,7 @@ function run_clang_format_check() {
   ici_quiet ici_apt_install git-core "$clang_format_executable"
   ici_time_end # install_clang_format
 
-  local -a sources
+  local sources=()
   ici_parse_env_array sources TARGET_WORKSPACE
   ici_run "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
 

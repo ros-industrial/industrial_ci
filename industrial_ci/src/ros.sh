@@ -16,9 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
-if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
-
 function  ros1_defaults {
     DEFAULT_OS_CODE_NAME=$1
     export ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
@@ -52,6 +49,7 @@ function use_repo_or_final_snapshot() {
     fi
 }
 function set_ros_variables {
+    export ROS_VERSION_EOL=false
     case "$ROS_DISTRO" in
     "indigo"|"jade")
         ros1_defaults "trusty"
@@ -99,8 +97,9 @@ function set_ros_variables {
       prefix=ros2
     fi
 
-    if [ ! "$ROS_REPOSITORY_PATH" ]; then
-        case "${ROS_REPO:-testing}" in
+    if [ -z "${ROS_REPOSITORY_PATH:-}" ]; then
+        export ROS_REPO=${ROS_REPO:-testing}
+        case "$ROS_REPO" in
         "building")
             use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
             ;;
@@ -146,23 +145,19 @@ function set_ros_variables {
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
-if [ -z "$OS_NAME" ]; then
+if [ -z "${OS_NAME:-}" ]; then
     export OS_NAME=ubuntu
-elif [ -z "$OS_CODE_NAME" ]; then
+elif [ -z "${OS_CODE_NAME:-}" ]; then
     ici_error "please specify OS_CODE_NAME"
 fi
 
-if [ -n "$UBUNTU_OS_CODE_NAME" ]; then # for backward-compatibility
-    export OS_CODE_NAME=$UBUNTU_OS_CODE_NAME
-fi
-
-if [ -z "$OS_CODE_NAME" ]; then
+if [ -z "${OS_CODE_NAME:-}" ]; then
+    export ROS_DISTRO=${ROS_DISTRO:-}
     case "$ROS_DISTRO" in
     "")
-        if [ -n "$DOCKER_IMAGE" ]; then
+        if [ -n "${DOCKER_IMAGE:-}" ]; then
           # try to reed ROS_DISTRO from (base) image
           ici_docker_try_pull "${DOCKER_IMAGE}"
-          export ROS_DISTRO
           ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
         fi
         if [ -z "$ROS_DISTRO" ]; then

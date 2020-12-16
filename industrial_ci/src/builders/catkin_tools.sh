@@ -33,7 +33,7 @@ function builder_setup {
 function builder_run_build {
     local extend=$1; shift
     local ws=$1; shift
-    local -a opts
+    local opts=()
     if [ "${VERBOSE_OUTPUT:-false}" != false ]; then
         opts+=("-vi")
     fi
@@ -45,7 +45,7 @@ function builder_run_build {
 function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
-    local -a opts
+    local opts=()
     _append_job_opts opts PARALLEL_TESTS 1
     ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
 }

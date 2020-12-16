@@ -45,8 +45,9 @@ function setup_ros_prerelease() {
 }
 
 function prepare_prerelease_workspaces() {
-  local -a ws_upstream ws_target
+  local ws_upstream=()
   ici_parse_env_array ws_upstream UPSTREAM_WORKSPACE
+  local ws_target=()
   ici_parse_env_array ws_target TARGET_WORKSPACE
   local workspace=$1
   local reponame=$2
@@ -57,37 +58,39 @@ function prepare_prerelease_workspaces() {
       mv "$workspace/ws/src/$targetname" "$workspace/ws/src/$reponame"
   fi
 
-  local -a overlay
+  local overlay=()
   ici_parse_env_array overlay DOWNSTREAM_WORKSPACE
   ici_with_ws "$workspace/ws_overlay" ici_prepare_sourcespace "$workspace/ws_overlay/src/" "${overlay[@]}"
   ici_asroot chown -R ci "$workspace"
 }
 
-function run_ros_prerelease() {
-    local ws; ws=$(mktemp -d)
-    export WORKSPACE
-    local -a opts
+function prepare_ros_prerelease() {
+    export WORKSPACE; WORKSPACE=$(mktemp -d)
+    local opts=()
     ici_parse_env_array opts DOCKER_RUN_OPTS
     opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL
-                 -v "$ws:$ws:rw" -e "WORKSPACE=$ws")
+                 -v "$WORKSPACE:$WORKSPACE:rw" -e "WORKSPACE=$WORKSPACE")
 
-    if [ -n "$DOCKER_PORT" ]; then
+    if [ -n "${DOCKER_PORT:-}" ]; then
         opts+=(-e "DOCKER_HOST=$DOCKER_PORT")
     elif [ -e /var/run/docker.sock ]; then
         opts+=(-v /var/run/docker.sock:/var/run/docker.sock)
     fi
-    if [ -n "$CCACHE_DIR" ]; then
+    if [ -n "${CCACHE_DIR}" ]; then
       opts+=(-v "$CCACHE_DIR:$WORKSPACE/home/.ccache")
     fi
-    DOCKER_RUN_OPTS="${opts[*]}" DOCKER_IMAGE=${DOCKER_IMAGE:-ros:melodic-ros-core} ici_require_run_in_docker
+    export DOCKER_RUN_OPTS="${opts[*]}"
+    export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:melodic-ros-core}
+}
 
+function run_ros_prerelease() {
     ici_run "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
-    if [ -z "$ROSDISTRO_INDEX_URL" ]; then
+    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
       if [ "$ROS_VERSION" -eq 2 ]; then
           ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
           ici_quiet ici_install_pkgs_for_command colcon python3-colcon-common-extensions

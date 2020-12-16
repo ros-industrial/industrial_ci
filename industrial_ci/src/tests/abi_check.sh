@@ -154,7 +154,7 @@ function abi_report() {
   fi
 }
 
-function run_abi_check() {
+ function prepare_abi_check() {
     export ABICHECK_VERSION
     export ABICHECK_URL
 
@@ -165,13 +165,12 @@ function run_abi_check() {
         ici_error "Please set ABICHECK_URL"
     fi
 
-    # shellcheck disable=SC1090
-    source "${ICI_SRC_PATH}/builders/$BUILDER.sh" || ici_error "Builder '$BUILDER' not supported"
+    ici_check_builder
 
     abi_configure # handle merge and detect version
+ }
 
-    ici_require_run_in_docker # this script must be run in docker
-
+function run_abi_check() {
     if [[ $ABICHECK_URL =~ ^[@#]([[:alnum:]_.-]+)$ ]]; then
         ABICHECK_URL="git+file://${TARGET_REPO_PATH}${ABICHECK_URL}"
     fi
@@ -182,10 +181,11 @@ function run_abi_check() {
 
     ici_with_ws "$base_ws" ici_run "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
 
+    ici_source_builder
     ici_run "${BUILDER}_setup" ici_quiet builder_setup
     ici_run "setup_rosdep" ici_setup_rosdep
 
-    if [ "$CCACHE_DIR" ]; then
+    if [ -n "$CCACHE_DIR" ]; then
         ici_run "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi

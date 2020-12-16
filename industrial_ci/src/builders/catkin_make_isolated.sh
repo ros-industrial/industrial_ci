@@ -36,13 +36,13 @@ function builder_setup {
 }
 
 function builder_run_build {
-    local -a opts
+    local opts=()
     _append_job_opts opts PARALLEL_BUILDS 0
     _run_catkin_make_isolated install "${opts[@]}" "$@"
 }
 
 function builder_run_tests {
-    local -a opts
+    local opts=()
     _append_job_opts opts PARALLEL_TESTS 1
     _run_catkin_make_isolated run_tests "$1" "$2" "${opts[@]}"
 }
