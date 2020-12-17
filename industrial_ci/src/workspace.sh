@@ -100,13 +100,6 @@ function ici_init_apt {
     fi
 }
 
-function ici_exec_for_command {
-  local command=$1; shift
-  if ! command -v "$command" > /dev/null; then
-    "$@"
-  fi
-}
-
 function ici_install_pkgs_for_command {
   local command=$1; shift
   ici_exec_for_command "$command" ici_apt_install "$@"

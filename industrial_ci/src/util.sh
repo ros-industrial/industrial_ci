@@ -285,6 +285,13 @@ function ici_asroot {
   fi
 }
 
+function ici_exec_for_command {
+  local command=$1; shift
+  if ! command -v "$command" > /dev/null; then
+    "$@"
+  fi
+}
+
 function ici_split_array {
     # shellcheck disable=SC2034
     IFS=" " read -r -a "$1" <<< "$*"
