@@ -19,5 +19,10 @@ function ici_isolate {
   if [ "$CI" != true ] ; then
     ici_error 'ISOLATION=shell needs CI=true'
   fi
+  if [ -z "${ROS_DISTRO:-}" ]; then
+    ici_error "ROS_DISTRO is not set"
+  elif [ "${ROS_DISTRO}" = "false" ]; then
+      unset ROS_DISTRO
+  fi
   "${ICI_SRC_PATH}/run.sh" "$@"
 }

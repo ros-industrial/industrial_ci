@@ -77,9 +77,8 @@ function ici_init_apt {
         ici_apt_install "${debs_default[@]}"
     fi
 
-    if ! [ -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
+    if [ -n "${ROS_REPOSITORY_PATH:-}" ] && [ ! -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
         ici_install_pkgs_for_command lsb_release lsb-release
-
         local keycmd
         if [ -n "${APTKEY_STORE_HTTPS}" ]; then
             ici_install_pkgs_for_command wget wget

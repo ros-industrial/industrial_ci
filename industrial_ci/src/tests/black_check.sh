@@ -1,7 +1,8 @@
 #!/bin/bash
 
 function prepare_black_check() {
-  DOCKER_IMAGE=${DOCKER_IMAGE:-ros:${ROS_DISTRO}-ros-base}  
+  DOCKER_IMAGE=${DOCKER_IMAGE:-python:3-buster}
+  ROS_DISTRO=${ROS_DISTRO:-false}
 }
 
 function install_black() {

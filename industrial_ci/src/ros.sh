@@ -16,125 +16,146 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function  ros1_defaults {
-    DEFAULT_OS_CODE_NAME=$1
+function  _ros1_defaults {
+    export OS_CODE_NAME=${OS_CODE_NAME:-$1}
     export ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
     export BUILDER=${BUILDER:-catkin_tools}
     export ROS_VERSION=1
+    export ROS_VERSION_EOL=false
     export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-2}
 }
-function  ros2_defaults {
-    DEFAULT_OS_CODE_NAME=$1
+
+function  _ros2_defaults {
+    export OS_CODE_NAME=${OS_CODE_NAME:-$1}
     export ROS2_DISTRO=${ROS2_DISTRO:-$ROS_DISTRO}
     export BUILDER=${BUILDER:-colcon}
     export ROS_VERSION=2
+    export ROS_VERSION_EOL=false
     export ROS_PYTHON_VERSION=3
 }
-function use_snapshot() {
-    export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO}/$1/ubuntu"
+
+function _set_ros_defaults {
+    case "$ROS_DISTRO" in
+    "indigo"|"jade")
+        _ros1_defaults "trusty"
+        export ROS_VERSION_EOL=true
+        ;;
+    "kinetic")
+        _ros1_defaults "xenial"
+        ;;
+    "lunar")
+        _ros1_defaults "xenial"
+        export ROS_VERSION_EOL=true
+        ;;
+    "melodic")
+        _ros1_defaults "bionic"
+        ;;
+    "noetic")
+        export BUILDER=${BUILDER:-colcon}
+        _ros1_defaults "focal"
+        export ROS_PYTHON_VERSION=3
+        ;;
+    "ardent")
+        _ros2_defaults "xenial"
+        export ROS_VERSION_EOL=true
+        ;;
+    "bouncy"|"crystal")
+        _ros2_defaults "bionic"
+        export ROS_VERSION_EOL=true
+        ;;
+    "dashing")
+        _ros2_defaults "bionic"
+        ;;
+    "eloquent")
+        _ros2_defaults "bionic"
+        ;;
+    "foxy")
+        _ros2_defaults "focal"
+        ;;
+    "rolling")
+        _ros2_defaults "focal"
+        ;;
+    "false")
+        unset ROS_DISTRO
+        ;;
+    *)
+        ici_error "ROS_DISTRO '$ROS_DISTRO' is not supported"
+        ;;
+    esac
+
+    if [ "$ROS_PYTHON_VERSION" = 2 ]; then
+        export PYTHON_VERSION_NAME=python
+    elif [ "$ROS_PYTHON_VERSION" = 3 ]; then
+        export PYTHON_VERSION_NAME=python3
+    fi
+
+}
+
+function _use_snapshot() {
+    export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO?ROS_DISTRO needs to be set}/$1/ubuntu"
     export HASHKEY_SKS="AD19BAB3CBF125EA"
 }
 
-function use_repo_or_final_snapshot() {
+function _use_repo_or_final_snapshot() {
     if [ "$ROS_VERSION_EOL" = true ]; then
-        use_snapshot final
-        if [ -n "$ROS_REPO" ]; then
+        _use_snapshot final
+        if [ "$ROS_REPO" != "testing" ]; then
             ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
         fi
     else
         export ROS_REPOSITORY_PATH="$1"
-        if [ "$ROS_REPO" = "ros-shadow-fixed" ]; then
+        if [ "${ROS_REPO}" = "ros-shadow-fixed" ]; then
             ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
         fi
     fi
 }
-function set_ros_variables {
-    export ROS_VERSION_EOL=false
-    case "$ROS_DISTRO" in
-    "indigo"|"jade")
-        ros1_defaults "trusty"
-        export ROS_VERSION_EOL=true
-        ;;
-    "kinetic")
-        ros1_defaults "xenial"
-        ;;
-    "lunar")
-        ros1_defaults "xenial"
-        export ROS_VERSION_EOL=true
-        ;;
-    "melodic")
-        ros1_defaults "bionic"
-        ;;
-    "noetic")
-        export BUILDER=${BUILDER:-colcon}
-        ros1_defaults "focal"
-        export ROS_PYTHON_VERSION=3
-        ;;
-    "ardent")
-        ros2_defaults "xenial"
-        export ROS_VERSION_EOL=true
-        ;;
-    "bouncy"|"crystal")
-        ros2_defaults "bionic"
-        export ROS_VERSION_EOL=true
-        ;;
-    "dashing")
-        ros2_defaults "bionic"
-        ;;
-    "eloquent")
-        ros2_defaults "bionic"
-        ;;
-    "foxy")
-        ros2_defaults "focal"
-        ;;
-    "rolling")
-        ros2_defaults "focal"
-        ;;
-    esac
 
-    local prefix=ros
+function _get_prefix() {
     if [ "$ROS_VERSION" -eq 2 ]; then
-      prefix=ros2
+        echo ros2
+    else
+        echo ros
     fi
+}
 
-    if [ -z "${ROS_REPOSITORY_PATH:-}" ]; then
-        export ROS_REPO=${ROS_REPO:-testing}
+function _set_ros_package_path {
+    if [ -z "${ROS_REPOSITORY_PATH}" ]; then
         case "$ROS_REPO" in
         "building")
-            use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
+            _use_repo_or_final_snapshot "http://repositories.ros.org/ubuntu/building/"
             ;;
         "main")
-            use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/$(_get_prefix)/ubuntu"
             ;;
         "ros")
             if [ "$ROS_VERSION" -eq 2 ]; then
                 ici_warn "ROS_REPO=ros would select the ROS1 repository, please use ROS_REPO=main"
             fi
-            use_repo_or_final_snapshot "http://packages.ros.org/$prefix/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/$(_get_prefix)/ubuntu"
             ;;
         "ros1")
-            use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/ros/ubuntu"
             ;;
         "ros2")
-            use_repo_or_final_snapshot "http://packages.ros.org/ros2/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/ros2/ubuntu"
             ;;
         "testing")
-            use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/$(_get_prefix)-testing/ubuntu"
             ;;
         "ros-shadow-fixed"|"ros-testing")
             if [ "$ROS_VERSION" -eq 2 ]; then
                 ici_warn "ROS_REPO=$ROS_REPO would select the ROS1 repository, please use ROS_REPO=testing"
             fi
-            use_repo_or_final_snapshot "http://packages.ros.org/$prefix-testing/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/$(_get_prefix)-testing/ubuntu"
             ;;
         "ros1-testing")
-            use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/ros-testing/ubuntu"
             ;;
         "ros2-testing")
-            use_repo_or_final_snapshot "http://packages.ros.org/ros2-testing/ubuntu"
+            _use_repo_or_final_snapshot "http://packages.ros.org/ros2-testing/ubuntu"
             ;;
         "final"|????-??-??)
-            use_snapshot "${ROS_REPO}"
+            _use_snapshot "${ROS_REPO}"
             ;;
         *)
             ici_error "ROS repo '$ROS_REPO' is not supported"
@@ -143,36 +164,9 @@ function set_ros_variables {
     fi
 }
 
-# exit with error if OS_NAME is set, but OS_CODE_NAME is not.
-# assume ubuntu as default
-if [ -z "${OS_NAME:-}" ]; then
-    export OS_NAME=ubuntu
-elif [ -z "${OS_CODE_NAME:-}" ]; then
-    ici_error "please specify OS_CODE_NAME"
-fi
-
-if [ -z "${OS_CODE_NAME:-}" ]; then
-    export ROS_DISTRO=${ROS_DISTRO:-}
-    case "$ROS_DISTRO" in
-    "")
-        if [ -n "${DOCKER_IMAGE:-}" ]; then
-          # try to reed ROS_DISTRO from (base) image
-          ici_docker_try_pull "${DOCKER_IMAGE}"
-          ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || true
-        fi
-        if [ -z "$ROS_DISTRO" ]; then
-            ici_error "Please specify ROS_DISTRO"
-        fi
-        set_ros_variables
-        ;;
-    *)
-        set_ros_variables
-        if [ -z "$DEFAULT_OS_CODE_NAME" ]; then
-            ici_error "ROS distro '$ROS_DISTRO' is not supported"
-        fi
-        export OS_CODE_NAME=$DEFAULT_OS_CODE_NAME
-        ;;
-    esac
-else
-    set_ros_variables
-fi
+function ici_configure_ros() {
+    if [ -n "${ROS_DISTRO}" ]; then
+        _set_ros_defaults
+        _set_ros_package_path
+    fi
+}
