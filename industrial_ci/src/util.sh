@@ -352,7 +352,7 @@ function ici_source_component {
 }
 
 function ici_check_builder {
-  ici_resolve_component BUILDER builders
+  [ -z "$BUILDER" ] || ici_resolve_component BUILDER builders > /dev/null
 }
 
 function ici_source_builder {

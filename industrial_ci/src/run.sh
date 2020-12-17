@@ -29,6 +29,9 @@ source "${ICI_SRC_PATH}/env.sh"
 # shellcheck source=industrial_ci/src/util.sh
 source "${ICI_SRC_PATH}/util.sh"
 
+# shellcheck source=industrial_ci/src/ros.sh
+source "${ICI_SRC_PATH}/ros.sh"
+
 # shellcheck source=industrial_ci/src/workspace.sh
 source "${ICI_SRC_PATH}/workspace.sh"
 
@@ -36,11 +39,7 @@ trap ici_exit EXIT # install industrial_ci exit handler
 
 if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 
-if [ "$ROS_PYTHON_VERSION" = 2 ]; then
-  export PYTHON_VERSION_NAME=python
-else
-  export PYTHON_VERSION_NAME=python3
-fi
+ici_configure_ros
 
 export TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
 

@@ -33,15 +33,16 @@ if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 # shellcheck source=industrial_ci/src/util.sh
 source "${ICI_SRC_PATH}/util.sh"
 
-trap ici_exit EXIT # install industrial_ci exit handler
-
 # shellcheck source=industrial_ci/src/deprecated.sh
 source "${ICI_SRC_PATH}/deprecated.sh"
 
 # shellcheck source=industrial_ci/src/ros.sh
 source "${ICI_SRC_PATH}/ros.sh"
 
+trap ici_exit EXIT # install industrial_ci exit handler
+
 ici_source_component ISOLATION isolation
+ici_configure_ros
 
 # Start prerelease, and once it finishs then finish this script too.
 if [ "$PRERELEASE" = true ]; then

@@ -35,9 +35,17 @@ export DOCKER_PULL=${DOCKER_PULL:-true}
 #######################################
 function ici_isolate() {
   local file=${1}; shift
-  DOCKER_IMAGE=${DOCKER_IMAGE:-$OS_NAME:$OS_CODE_NAME} # scheme works for all supported OS images
+  DOCKER_IMAGE=${DOCKER_IMAGE:-${OS_NAME:-ubuntu}:$OS_CODE_NAME} # scheme works for all supported OS images
 
-  ici_run "prepare_docker_image" ici_docker_try_pull "$DOCKER_IMAGE"
+  if [ "$DOCKER_PULL" != false ]; then
+      ici_run "pull_docker_image"  docker pull "$DOCKER_IMAGE"
+  fi
+
+  if [ -z "${ROS_DISTRO:-}" ]; then
+      ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || ici_error "ROS_DISTRO is not set"
+  elif [ "${ROS_DISTRO}" = "false" ]; then
+      unset ROS_DISTRO
+  fi
 
   local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
   local docker_ici_src_path=/root/ici
@@ -140,15 +148,4 @@ function docker_cp {
   set -o pipefail
   tar --numeric-owner --owner="${docker_uid:-root}" --group="${docker_gid:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
   set +o pipefail
-}
-
-function ici_docker_try_pull {
-    local image=$1
-    if [ -z "$image" ]; then
-      ici_error "Could not determine Docker image"
-    fi
-    if [ "$DOCKER_PULL" != false ]; then
-        echo "Pulling Docker image '$image'..."
-        ici_quiet docker pull "$image"
-    fi
 }

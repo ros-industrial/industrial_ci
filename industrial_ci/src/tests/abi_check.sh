@@ -155,9 +155,6 @@ function abi_report() {
 }
 
  function prepare_abi_check() {
-    export ABICHECK_VERSION
-    export ABICHECK_URL
-
     if [ "$ABICHECK_MERGE" = "auto" ]; then
         ici_error "ABICHECK_MERGE auto mode is available for travis only. "
     fi

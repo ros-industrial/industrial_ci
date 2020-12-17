@@ -15,6 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export ROS_DISTRO=${ROS_DISTRO:-}
+export ROS_REPOSITORY_PATH=${ROS_REPOSITORY_PATH:-}
+export ROS_REPO=${ROS_REPO:-testing}
+
 export DEBUG_BASH=${DEBUG_BASH:-false}
 export TEST=${TEST:-}
 
