@@ -61,7 +61,7 @@ function ici_pip_install {
 function ici_init_apt {
     export DEBIAN_FRONTEND=noninteractive
 
-    sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
+    ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
     ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential)
@@ -76,19 +76,19 @@ function ici_init_apt {
     fi
 
     if ! [ -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
-        ici_apt_install lsb-release
+        ici_install_pkgs_for_command lsb_release lsb-release
 
         local keycmd
         if [ -n "${APTKEY_STORE_HTTPS}" ]; then
             ici_install_pkgs_for_command wget wget
-            keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
+            keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | ici_asroot apt-key add -"
         else
-            keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
+            keycmd="ici_asroot apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
             ici_apt_install gnupg2 dirmngr
         fi
 
         ici_retry 3 eval "$keycmd"
-        echo "deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list"
+        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
         ici_asroot apt-get update -qq
     fi
 
