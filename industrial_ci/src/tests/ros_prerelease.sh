@@ -20,20 +20,28 @@
 # It is dependent on environment variables that need to be exported in advance
 # (As of version 0.4.4 most of them are defined in env.sh).
 
+function setup_ros_buildfarm() {
+    ici_quiet ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
+    ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
+}
+
 function setup_ros_prerelease() {
-    useradd -m -d "$WORKSPACE/home" ci
+    ici_asroot useradd -m -d "$WORKSPACE/home" ci
 
     if ! [ -d "$WORKSPACE/home/.ccache" ]; then
-      mkdir -p "$WORKSPACE/home/.ccache"
+      ici_asroot mkdir -p "$WORKSPACE/home/.ccache"
     fi
 
     if [ -e /var/run/docker.sock ]; then
-        groupadd -o -g "$(stat -c%g /var/run/docker.sock)" host_docker
-        usermod -a -G host_docker ci
+        ici_asroot groupadd -o -g "$(stat -c%g /var/run/docker.sock)" host_docker
+        ici_asroot usermod -a -G host_docker ci
     fi
 
-    ici_quiet ici_apt_install docker.io python3-pip python3-setuptools python3-wheel python3-yaml sudo git-core
-    ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
+    ici_setup_git_client
+    ici_install_pkgs_for_command docker docker.io
+    ici_install_pkgs_for_command sudo sudo
+    ici_install_pkgs_for_command lsb_release lsb-release
+    ici_exec_for_command generate_prerelease_script.py setup_ros_buildfarm
 }
 
 function prepare_prerelease_workspaces() {
@@ -52,7 +60,7 @@ function prepare_prerelease_workspaces() {
   local -a overlay
   ici_parse_env_array overlay DOWNSTREAM_WORKSPACE
   ici_with_ws "$workspace/ws_overlay" ici_prepare_sourcespace "$workspace/ws_overlay/src/" "${overlay[@]}"
-  chown -R ci "$workspace"
+  ici_asroot chown -R ci "$workspace"
 }
 
 function run_ros_prerelease() {
