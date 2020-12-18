@@ -16,7 +16,7 @@
 # limitations under the License.
 
 function ici_isolate {
-  if [ "$CI" != true ] ; then
+  if [ "${CI:-}" != true ] ; then
     ici_error 'ISOLATION=shell needs CI=true'
   fi
   if [ -z "${ROS_DISTRO:-}" ]; then
