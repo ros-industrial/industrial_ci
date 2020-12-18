@@ -24,7 +24,6 @@ set -e # exit script on errors
 [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
 
 export ICI_SRC_PATH; ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
-export ISOLATION=${ISOLATION:-docker}
 
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"
@@ -41,7 +40,15 @@ source "${ICI_SRC_PATH}/ros.sh"
 
 trap ici_exit EXIT # install industrial_ci exit handler
 
+export ISOLATION=${ISOLATION:-docker}
+if [ "${CI:-}" != true ] ; then
+  if [ "${ISOLATION}" = "shell" ]; then
+    ici_warn 'ISOLATION=shell needs CI=true, falling back to ISOLATION=docker'
+  fi
+  ISOLATION=docker
+fi
 ici_source_component ISOLATION isolation
+
 ici_configure_ros
 
 # Start prerelease, and once it finishs then finish this script too.
