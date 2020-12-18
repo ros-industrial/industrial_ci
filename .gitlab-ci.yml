@@ -40,6 +40,14 @@ melodic:
     ROS_DISTRO: "melodic"
     PRERELEASE: "true"
 
+noetic:
+  image: ros:noetic
+  script: ./gitlab.sh
+  before_script: []
+  services: []
+  variables:
+    ISOLATION: shell
+
 dashing:
   script: .industrial_ci/gitlab.sh ROS_DISTRO=dashing
 

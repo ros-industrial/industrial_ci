@@ -111,6 +111,23 @@ jobs:
       - uses: './.industrial_ci/'
         env: ${{matrix.env}}
 
+  isolated:
+    env:
+      ISOLATION: shell
+    strategy:
+      matrix:
+        env:
+          - {ROS_DISTRO: kinetic, UBUNTU: 16.04}
+          - {ROS_DISTRO: melodic, UBUNTU: 18.04}
+          - {ROS_DISTRO: noetic, UBUNTU: 20.04}
+          - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
+          - {ROS_DISTRO: foxy, UBUNTU: 20.04}
+    runs-on: ubuntu-${{matrix.env.UBUNTU}}
+    steps:
+      - uses: actions/checkout@v1
+      - uses: './'
+        env: ${{matrix.env}}
+
   test_arm:
     runs-on: ubuntu-latest
     steps:
