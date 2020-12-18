@@ -65,10 +65,22 @@ function prepare_prerelease_workspaces() {
 }
 
 function prepare_ros_prerelease() {
+    if [ "$BUILDER" != "colcon" ]; then
+        export BUILDER=catkin_make_isolated
+    fi
     export WORKSPACE; WORKSPACE=$(mktemp -d)
     local opts=()
+    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
+      if [ "$ROS_VERSION" -eq 2 ]; then
+          export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
+      else
+          export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml"
+      fi
+    fi
+    export PRERELEASE_DISTRO="$ROS_DISTRO"
+
     ici_parse_env_array opts DOCKER_RUN_OPTS
-    opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL
+    opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL -e PRERELEASE_DISTRO
                  -v "$WORKSPACE:$WORKSPACE:rw" -e "WORKSPACE=$WORKSPACE")
 
     if [ -n "${DOCKER_PORT:-}" ]; then
@@ -80,28 +92,28 @@ function prepare_ros_prerelease() {
       opts+=(-v "$CCACHE_DIR:$WORKSPACE/home/.ccache")
     fi
     export DOCKER_RUN_OPTS="${opts[*]}"
-    export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:melodic-ros-core}
+    export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
+    export ROS_DISTRO=noetic
 }
 
 function run_ros_prerelease() {
+    ici_source_builder
+    ici_run "${BUILDER}_setup" ici_quiet builder_setup
+
     ici_run "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
-    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
-      if [ "$ROS_VERSION" -eq 2 ]; then
-          ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
-          ici_quiet ici_install_pkgs_for_command colcon python3-colcon-common-extensions
-      else
-          ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml"
-      fi
-    fi
-
     ici_run "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$ROS_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
-    ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c ". /opt/ros/*/setup.sh && cd '$WORKSPACE' && exec ./prerelease.sh -y"
+    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+
+    local setup_sh=
+    if [ -f "/opt/ros/$ROS_DISTRO/setup.sh" ]; then
+        setup_sh=". /opt/ros/$ROS_DISTRO/setup.sh && "
+    fi
+    ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
     echo 'ROS Prerelease Test went successful.'
 }
