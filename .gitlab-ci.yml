@@ -69,3 +69,27 @@ test_arm:
   script:
     - docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
     - .industrial_ci/gitlab.sh DOCKER_IMAGE='arm32v7/ros:melodic-ros-core' BEFORE_INIT='[[ $(uname -p) == armv7l ]] && exit 42' EXPECT_EXIT_CODE=42
+
+test_junit_docker:
+  script: .industrial_ci/gitlab.sh TARGET_WORKSPACE="gh:ros/filters.git#HEAD"
+  variables:
+    ROS_DISTRO: noetic
+    BASEDIR: ${CI_PROJECT_DIR}/.workspaces
+  artifacts:
+    when: always
+    reports:
+      junit: ${BASEDIR}/target_ws/**/test_results/**/*.xml
+
+test_junit_shell:
+  image: ros:noetic
+  script: ./gitlab.sh TARGET_WORKSPACE="gh:ros/filters.git#HEAD"
+  before_script: []
+  services: []
+  variables:
+    ISOLATION: shell
+    BASEDIR: ${CI_PROJECT_DIR}/.workspaces
+  artifacts:
+    when: always
+    reports:
+      junit: ${BASEDIR}/target_ws/**/test_results/**/*.xml
+
