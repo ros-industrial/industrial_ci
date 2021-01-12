@@ -91,6 +91,11 @@ function ici_run_cmd_in_docker() {
      run_opts+=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
   fi
 
+  if [ -n "${BASEDIR-}" ]; then
+    mkdir -p "$BASEDIR"
+    run_opts+=(-v "$BASEDIR:$BASEDIR" -e "BASEDIR=$BASEDIR")
+  fi
+
   if [ -n "${CCACHE_DIR}" ]; then
      run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
   fi

@@ -24,5 +24,8 @@ function ici_isolate {
   elif [ "${ROS_DISTRO}" = "false" ]; then
       unset ROS_DISTRO
   fi
+  if [ -n "${BASEDIR-}" ]; then
+    mkdir -p "$BASEDIR"
+  fi
   "${ICI_SRC_PATH}/run.sh" "$@"
 }

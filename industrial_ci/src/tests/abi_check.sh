@@ -172,9 +172,9 @@ function run_abi_check() {
         ABICHECK_URL="git+file://${TARGET_REPO_PATH}${ABICHECK_URL}"
     fi
 
-    base_ws="/abicheck/old/$ABICHECK_VERSION"
-    upstream_ws=~/upstream_ws
-    target_ws="/abicheck/target"
+    base_ws=$BASEDIR/base_ws
+    upstream_ws=$BASEDIR/upstream_ws
+    target_ws=$BASEDIR/target_ws
 
     ici_with_ws "$base_ws" ici_run "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
 
@@ -203,5 +203,5 @@ function run_abi_check() {
     ici_with_ws "$target_ws" abi_process_workspace "$extend" "$target_ws" target
     ici_with_ws "$base_ws" abi_process_workspace "$extend" "$base_ws" base "$ABICHECK_VERSION"
 
-    abi_report "$base_ws/abi_dumps" "$target_ws/abi_dumps" "/abicheck/reports/$ABICHECK_VERSION"
+    abi_report "$base_ws/abi_dumps" "$target_ws/abi_dumps" "$BASEDIR/abicheck/$ABICHECK_VERSION"
 }
