@@ -34,11 +34,11 @@ jobs:
           
           - repo: 'ros-controls/control_msgs'
             ref: 'crystal-devel'
-            env: {ROS_DISTRO: eloquent}
+            env: {ROS_DISTRO: dashing, PRERELEASE: true}
           
           - repo: 'ros-controls/control_msgs'
             ref: 'crystal-devel'
-            env: {ROS_DISTRO: eloquent, PRERELEASE: true}
+            env: {ROS_DISTRO: eloquent}
     
     runs-on: ubuntu-latest
     steps:
