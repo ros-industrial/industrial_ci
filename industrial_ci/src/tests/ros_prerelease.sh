@@ -97,7 +97,13 @@ function run_ros_prerelease() {
     fi
 
     ici_run "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$ROS_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+
+    local gen_args=("${ROSDISTRO_INDEX_URL}" "$ROS_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::")
+    if [ "$ROS_VERSION_EOL" = true ]; then
+      gen_args+=(--custom-rosdep-update-options=--include-eol-distros)
+    fi
+    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${gen_args[@]}"
+
     ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c ". /opt/ros/*/setup.sh && cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
     echo 'ROS Prerelease Test went successful.'
