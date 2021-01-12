@@ -42,6 +42,7 @@ if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 ici_configure_ros
 
 export TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
+export BASEDIR=${BASEDIR:-$HOME}
 
 export LANG=${LANG:-C.UTF-8}
 export LC_ALL=${LC_ALL:-C.UTF-8}

@@ -53,7 +53,7 @@ function ici_source_setup {
 
 function rosenv() {
   # if current_ws not set, use an invalid path to skip it
-  for e in ${current_ws:-/dev/null}/install ~/downstream_ws/install ~/target_ws/install ~/base_ws/install ~/upstream_ws/install "/opt/ros/$ROS_DISTRO"; do
+  for e in ${current_ws:-/dev/null}/install "$BASEDIR/downstream_ws/install" "$BASEDIR/target_ws/install" "$BASEDIR/base_ws/install" "$BASEDIR/upstream_ws/install" "/opt/ros/$ROS_DISTRO"; do
    if [ -f "$e/setup.bash" ]; then
      ici_source_setup "$e"
      if [ -n "$*" ]; then
