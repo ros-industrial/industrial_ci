@@ -581,7 +581,7 @@ If a dependency needs to extend the build environment, the `*_EMBED` script can 
     - AFTER_INIT='./your_custom_PREprocess.sh'
     - AFTER_INIT_EMBED='source /opt/dependency/prepare_environment.sh'
 
-**rosenv must not be used in \*_EMBED hooks!**
+**rosenv cannot be used in \*_EMBED hooks!**
 
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++

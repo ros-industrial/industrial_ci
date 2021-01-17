@@ -51,20 +51,6 @@ function ici_source_setup {
   fi
 }
 
-function rosenv() {
-  # if current_ws not set, use an invalid path to skip it
-  for e in ${current_ws:-/dev/null}/install "$BASEDIR/downstream_ws/install" "$BASEDIR/target_ws/install" "$BASEDIR/base_ws/install" "$BASEDIR/upstream_ws/install" "/opt/ros/$ROS_DISTRO"; do
-   if [ -f "$e/setup.bash" ]; then
-     ici_source_setup "$e"
-     if [ -n "$*" ]; then
-       (exec "$@")
-     fi
-     return 0
-   fi
-  done
-  return 1
-}
-
 function ici_with_ws() {
   # shellcheck disable=SC2034
   current_ws=$1; shift
@@ -73,6 +59,19 @@ function ici_with_ws() {
 }
 
 function _sub_shell() (
+  function rosenv() {
+    # if current_ws not set, use an invalid path to skip it
+    for e in ${current_ws:-/dev/null}/install "$BASEDIR/downstream_ws/install" "$BASEDIR/target_ws/install" "$BASEDIR/base_ws/install" "$BASEDIR/upstream_ws/install" "/opt/ros/$ROS_DISTRO"; do
+    if [ -f "$e/setup.bash" ]; then
+      ici_source_setup "$e"
+      if [ -n "$*" ]; then
+        (exec "$@")
+      fi
+      return 0
+    fi
+    done
+    return 1
+  }
   eval "$@"
 )
 
