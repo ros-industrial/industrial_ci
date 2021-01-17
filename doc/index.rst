@@ -583,6 +583,9 @@ If a dependency needs to extend the build environment, the `*_EMBED` script can 
 
 **rosenv cannot be used in \*_EMBED hooks!**
 
+Per default all scripts are run with unset variables disabled in bash.
+It is possible to opt-out for an individual command by prefixing it with `ici_with_unset_variables`.
+
 Customize outside of the CI process
 +++++++++++++++++++++++++++++++++++
 

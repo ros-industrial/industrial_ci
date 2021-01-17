@@ -40,15 +40,17 @@ function ici_ansi_cleared_line {
   echo -en "$*\r\e[0K"
 }
 
-function ici_source_setup {
-  local u_set=1
-  [[ $- =~ u ]] || u_set=0
+function ici_set_u {
+  [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
+}
+function ici_with_unset_variables {
   set +u
-  # shellcheck disable=SC1090,SC1091
-  source "$1/setup.bash"
-  if [ $u_set ]; then
-    set -u
-  fi
+  "$@"
+  ici_set_u
+}
+
+function ici_source_setup {
+  ici_with_unset_variables source "$1/setup.bash"
 }
 
 function ici_with_ws() {
@@ -92,6 +94,7 @@ function ici_hook() {
 
     if [ -n "$script_embed" ]; then
       eval "$script_embed"
+      ici_set_u
     fi
 
     ici_time_end
