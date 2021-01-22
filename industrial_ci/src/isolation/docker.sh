@@ -20,6 +20,18 @@ export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
 export DOCKER_COMMIT_CREDENTIALS=${DOCKER_COMMIT_CREDENTIALS:-}
 export DOCKER_PULL=${DOCKER_PULL:-true}
 
+# ici_docker_forward_mount options VARNAME rw/ro [PATH]
+function ici_docker_forward_mount() {
+  local -n _ici_parse_mount_dir_res=$1
+  local p=${!2:-}
+  if [ -n "$p" ]; then
+    local p_abs
+    p_abs=$(readlink -m "$p")
+    local p_inner=${4:-$p_abs}
+    _ici_parse_mount_dir_res+=(-v "$p_abs:$p_inner:$3" -e "$2=$p_inner")
+  fi
+}
+
 #######################################
 # rerun the CI script in docker container end exit the outer script
 #
@@ -52,17 +64,17 @@ function ici_isolate() {
   file="${file/#$TARGET_REPO_PATH/$docker_target_repo_path}"
   file="${file/#$ICI_SRC_PATH/$docker_ici_src_path}"
 
-  ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
-                        -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
-                        -e "ICI_SRC_PATH=$docker_ici_src_path" \
-                        -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
+  local opts=()
+  ici_docker_forward_mount opts TARGET_REPO_PATH ro "$docker_target_repo_path"
+  ici_docker_forward_mount opts ICI_SRC_PATH ro "$docker_ici_src_path"
+
+  ici_run_cmd_in_docker "${opts[@]}" \
                         -t \
                         --entrypoint '' \
                         -w "$docker_target_repo_path" \
                         "$DOCKER_IMAGE" \
                         /bin/bash $docker_ici_src_path/run.sh "$file" "$@"
 }
-
 #######################################
 # wrapper for running a command in docker
 #
@@ -84,21 +96,9 @@ function ici_run_cmd_in_docker() {
   local commit_image=$DOCKER_COMMIT
   DOCKER_COMMIT=
 
-  #forward ssh agent into docker container
-  if [ -n "${SSH_AUTH_SOCK:-}" ]; then
-     local auth_dir
-     auth_dir=$(dirname "$SSH_AUTH_SOCK")
-     run_opts+=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
-  fi
-
-  if [ -n "${BASEDIR-}" ]; then
-    mkdir -p "$BASEDIR"
-    run_opts+=(-v "$BASEDIR:$BASEDIR" -e "BASEDIR=$BASEDIR")
-  fi
-
-  if [ -n "${CCACHE_DIR}" ]; then
-     run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
-  fi
+  ici_docker_forward_mount run_opts SSH_AUTH_SOCK rw # forward ssh agent into docker container
+  ici_docker_forward_mount run_opts BASEDIR rw
+  ici_docker_forward_mount run_opts CCACHE_DIR rw
 
   local hooks=()
   for hook in $(env | grep -o '^\(BEFORE\|AFTER\)_[^=]*'); do

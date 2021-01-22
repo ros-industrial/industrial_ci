@@ -80,8 +80,9 @@ function prepare_ros_prerelease() {
     export PRERELEASE_DISTRO="$ROS_DISTRO"
 
     ici_parse_env_array opts DOCKER_RUN_OPTS
-    opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL -e PRERELEASE_DISTRO
-                 -v "$WORKSPACE:$WORKSPACE:rw" -e "WORKSPACE=$WORKSPACE")
+    opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL -e PRERELEASE_DISTRO)
+    
+    ici_docker_forward_mount opts WORKSPACE rw
 
     if [ -n "${DOCKER_PORT:-}" ]; then
         opts+=(-e "DOCKER_HOST=$DOCKER_PORT")
@@ -89,7 +90,8 @@ function prepare_ros_prerelease() {
         opts+=(-v /var/run/docker.sock:/var/run/docker.sock)
     fi
     if [ -n "${CCACHE_DIR}" ]; then
-      opts+=(-v "$CCACHE_DIR:$WORKSPACE/home/.ccache")
+      ici_docker_forward_mount opts CCACHE_DIR rw "$WORKSPACE/home/.ccache"
+      CCACHE_DIR= # prevent cachedir from beeing added twice
     fi
     export DOCKER_RUN_OPTS="${opts[*]}"
     export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
