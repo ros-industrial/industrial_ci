@@ -46,6 +46,12 @@ function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
     local opts=()
+    if [ "${VERBOSE_TESTS:-false}" != false ]; then
+        opts+=(-v)	
+    fi	
+    if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then	
+        opts+=(-i)	
+    fi
     _append_job_opts opts PARALLEL_TESTS 1
     ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
 }
