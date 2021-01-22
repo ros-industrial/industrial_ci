@@ -15,6 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ici_forward_mount VARNAME/FILE rw/ro [PATH]
+function ici_forward_mount() {
+  true
+}
+
+# ici_forward_variable VARNAME [VALUE]
+function ici_forward_variable() {
+  if [ -n "${2-}" ]; then
+    export "$1"="$2"
+  fi
+}
+
 function ici_isolate {
   if [ "${CI:-}" != true ] ; then
     ici_error 'ISOLATION=shell needs CI=true'

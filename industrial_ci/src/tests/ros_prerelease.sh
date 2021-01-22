@@ -69,7 +69,6 @@ function prepare_ros_prerelease() {
         export BUILDER=catkin_make_isolated
     fi
     export WORKSPACE; WORKSPACE=$(mktemp -d)
-    local opts=()
     if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
       if [ "$ROS_VERSION" -eq 2 ]; then
           export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
@@ -80,20 +79,21 @@ function prepare_ros_prerelease() {
     export PRERELEASE_DISTRO="$ROS_DISTRO"
 
     ici_parse_env_array opts DOCKER_RUN_OPTS
-    opts+=(-e TRAVIS -e OS_NAME -e OS_CODE_NAME -e OS_ARCH -e PRERELEASE_DOWNSTREAM_DEPTH -e PRERELEASE_REPONAME -e ROSDISTRO_INDEX_URL -e PRERELEASE_DISTRO)
+    for e in TRAVIS OS_NAME OS_CODE_NAME OS_ARCH PRERELEASE_DOWNSTREAM_DEPTH PRERELEASE_REPONAME ROSDISTRO_INDEX_URL PRERELEASE_DISTRO; do
+        ici_forward_variable "$e"
+    done
     
-    ici_docker_forward_mount opts WORKSPACE rw
+    ici_forward_mount WORKSPACE rw
 
     if [ -n "${DOCKER_PORT:-}" ]; then
-        opts+=(-e "DOCKER_HOST=$DOCKER_PORT")
+        ici_forward_variable DOCKER_HOST "$DOCKER_PORT"
     elif [ -e /var/run/docker.sock ]; then
-        opts+=(-v /var/run/docker.sock:/var/run/docker.sock)
+        ici_forward_mount /var/run/docker.sock rw
     fi
     if [ -n "${CCACHE_DIR}" ]; then
-      ici_docker_forward_mount opts CCACHE_DIR rw "$WORKSPACE/home/.ccache"
+      ici_forward_mount CCACHE_DIR rw "$WORKSPACE/home/.ccache"
       CCACHE_DIR= # prevent cachedir from beeing added twice
     fi
-    export DOCKER_RUN_OPTS="${opts[*]}"
     export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
     export ROS_DISTRO=noetic
 }
