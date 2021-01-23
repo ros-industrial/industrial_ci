@@ -24,4 +24,10 @@ export TARGET_REPO_PATH=$GITHUB_WORKSPACE
 export TARGET_REPO_NAME=${GITHUB_REPOSITORY##*/}
 export _FOLDING_TYPE=github_actions
 
+if [ -n "$INPUT_CONFIG" ]; then
+    vars=$(jq -r 'keys[] as $k | "export \($k)=\(.[$k]|tojson)" | gsub("\\$\\$";"\\$")' <<< "$INPUT_CONFIG"  | grep "^export [A-Z][A-Z_]*=")
+    echo "$vars"
+    eval "$vars"
+fi
+
 env "$@" bash "$DIR_THIS/../industrial_ci/src/ci_main.sh"

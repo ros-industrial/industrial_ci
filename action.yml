@@ -1,6 +1,12 @@
 name: 'ROS industrial_ci'
+inputs:
+  config:
+    description: 'Configuration in JSON format, e.g. from matrix'
+    required: false
 runs:
   using: "composite"
   steps:
     - run: ${{ github.action_path }}/.github/action.sh
       shell: bash
+      env:
+        INPUT_CONFIG: ${{ inputs.config }}
