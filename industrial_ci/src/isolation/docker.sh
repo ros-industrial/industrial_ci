@@ -20,13 +20,40 @@ export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
 export DOCKER_COMMIT_CREDENTIALS=${DOCKER_COMMIT_CREDENTIALS:-}
 export DOCKER_PULL=${DOCKER_PULL:-true}
 
+# ici_forward_mount VARNAME/FILE rw/ro [PATH]
+function ici_forward_mount() {
+  local p=$1
+  local v=
+  if ! [ -e "$1" ]; then
+    v=$1
+    p=${!1:-}
+  fi
+  if [ -n "$p" ]; then
+    local p_abs
+    p_abs=$(readlink -m "$p")
+    local p_inner=${3:-$p_abs}
+    _docker_run_opts+=(-v "$p_abs:$p_inner:$2")
+    if [ -n "$v" ]; then
+      ici_forward_variable "$v" "$p_inner"
+    fi
+  fi
+}
+
+# ici_forward_variable VARNAME [VALUE]
+function ici_forward_variable() {
+  if [ -n "${2-}" ]; then
+    _docker_run_opts+=(-e "$1=$2")
+  else
+    _docker_run_opts+=(-e "$1")
+  fi
+}
+
 #######################################
 # rerun the CI script in docker container end exit the outer script
 #
 # Globals:
 #   DOCKER_IMAGE (read-only)
 #   ICI_SRC_PATH (read-only)
-#   IN_DOCKER (read-only)
 #   TARGET_REPO_PATH (read-only)
 # Arguments:
 #   (None)
@@ -47,22 +74,26 @@ function ici_isolate() {
       unset ROS_DISTRO
   fi
 
-  local docker_target_repo_path=/root/src/$TARGET_REPO_NAME
-  local docker_ici_src_path=/root/ici
-  file="${file/#$TARGET_REPO_PATH/$docker_target_repo_path}"
-  file="${file/#$ICI_SRC_PATH/$docker_ici_src_path}"
+  ici_forward_mount TARGET_REPO_PATH ro
+  ici_forward_mount ICI_SRC_PATH ro
+  ici_forward_mount BASEDIR rw
+  ici_forward_mount CCACHE_DIR rw
+  ici_forward_mount SSH_AUTH_SOCK rw # forward ssh agent into docker container
 
-  ici_run_cmd_in_docker -e "TARGET_REPO_PATH=$docker_target_repo_path" \
-                        -v "$TARGET_REPO_PATH/:$docker_target_repo_path:ro" \
-                        -e "ICI_SRC_PATH=$docker_ici_src_path" \
-                        -v "$ICI_SRC_PATH/:$docker_ici_src_path:ro" \
+  local run_opts
+  ici_parse_env_array run_opts DOCKER_RUN_OPTS
+
+  for hook in $(env | grep -o '^\(BEFORE\|AFTER\)_[^=]*'); do
+      ici_forward_variable "$hook"
+  done
+
+  ici_run_cmd_in_docker "${_docker_run_opts[@]}" "${run_opts[@]}" \
                         -t \
                         --entrypoint '' \
-                        -w "$docker_target_repo_path" \
+                        -w "$TARGET_REPO_PATH" \
                         "$DOCKER_IMAGE" \
-                        /bin/bash $docker_ici_src_path/run.sh "$file" "$@"
+                        /bin/bash "$ICI_SRC_PATH/run.sh" "$file" "$@"
 }
-
 #######################################
 # wrapper for running a command in docker
 #
@@ -79,43 +110,18 @@ function ici_isolate() {
 #   (None)
 #######################################
 function ici_run_cmd_in_docker() {
-  local run_opts=()
-  ici_parse_env_array run_opts DOCKER_RUN_OPTS
   local commit_image=$DOCKER_COMMIT
   DOCKER_COMMIT=
 
-  #forward ssh agent into docker container
-  if [ -n "${SSH_AUTH_SOCK:-}" ]; then
-     local auth_dir
-     auth_dir=$(dirname "$SSH_AUTH_SOCK")
-     run_opts+=(-v "$auth_dir:$auth_dir" -e "SSH_AUTH_SOCK=$SSH_AUTH_SOCK")
-  fi
 
-  if [ -n "${BASEDIR-}" ]; then
-    mkdir -p "$BASEDIR"
-    run_opts+=(-v "$BASEDIR:$BASEDIR" -e "BASEDIR=$BASEDIR")
-  fi
-
-  if [ -n "${CCACHE_DIR}" ]; then
-     run_opts+=(-v "$CCACHE_DIR:/root/.ccache" -e "CCACHE_DIR=/root/.ccache")
-  fi
-
-  local hooks=()
-  for hook in $(env | grep -o '^\(BEFORE\|AFTER\)_[^=]*'); do
-      hooks+=(-e "$hook")
-  done
   local cid
-  cid=$(docker create \
-      --env-file "${ICI_SRC_PATH}/isolation/docker.env" \
-      "${hooks[@]}" \
-      "${run_opts[@]}" \
-      "$@")
+  cid=$(docker create --env-file "${ICI_SRC_PATH}/isolation/docker.env" "$@")
 
   # detect user inside container
   local image
   image=$(docker inspect --format='{{.Config.Image}}' "$cid")
-  docker_uid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$image" id -u)
-  docker_gid=$(docker run --rm "${run_opts[@]}" --entrypoint '' "$image" id -g)
+  docker_uid=$(docker run --rm --entrypoint '' "$image" id -u)
+  docker_gid=$(docker run --rm --entrypoint '' "$image" id -g)
 
   # pass common credentials to container
   if [ "$DOCKER_COMMIT_CREDENTIALS" != false ]; then
