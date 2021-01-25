@@ -122,7 +122,7 @@ function ici_setup_git_client {
   if [ -d ~/.ssh ]; then
     ici_install_pkgs_for_command ssh ssh-client
   fi
-  if [ -n "${CI_SERVER_URL}" ] && [ -n "${CI_JOB_TOKEN}" ]; then
+  if [ -n "${CI_SERVER_URL:-}" ] && [ -n "${CI_JOB_TOKEN:-}" ]; then
     ici_setup_git_credential_helper "${CI_SERVER_URL}" "gitlab-credential-helper"
   fi
 }
