@@ -111,10 +111,19 @@ function ici_install_pypi_pkgs_for_command {
   ici_exec_for_command "$command" ici_pip_install "$@"
 }
 
+function ici_setup_git_credential_helper {
+  local url=$1; shift
+  local helper=$1; shift
+  git config --global "credential.${url}.helper" "${ICI_SRC_PATH}/credential-helpers/${helper}"
+}
+
 function ici_setup_git_client {
   ici_install_pkgs_for_command git git-core
   if [ -d ~/.ssh ]; then
     ici_install_pkgs_for_command ssh ssh-client
+  fi
+  if [ -n "${CI_SERVER_URL}" -a -n "${CI_JOB_TOKEN}" ]; then
+    ici_setup_git_credential_helper "${CI_SERVER_URL}" "gitlab-credential-helper"
   fi
 }
 
