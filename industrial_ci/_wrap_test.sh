@@ -22,7 +22,7 @@ set -e # exit script on errors
 if [ -n "$_EXTERNAL_REPO" ]; then
     export TRAVIS_BUILD_DIR; TRAVIS_BUILD_DIR=$(mktemp -d)
     source ./industrial_ci/src/workspace.sh
-    IFS=" " read -r -a parts <<< "$(ici_resolve_scheme "$_EXTERNAL_REPO")" # name, type, url, version
+    IFS=" " read -r -a parts <<< "$(ici_parse_repository_url "$_EXTERNAL_REPO")" # name, type, url, version
     echo "Cloning '${parts[2]}'...'"
     git clone -q "${parts[2]}" "$TRAVIS_BUILD_DIR"
     git -C "$TRAVIS_BUILD_DIR" checkout "${parts[3]}"

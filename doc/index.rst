@@ -249,7 +249,6 @@ Each workspace can be composed as a sequence of the following items:
   * ``bitbucket`` for Bitbucket repositories
   * ``git``/``git+*``: for any other git repository
 
-  For convenience ``@`` (pip-style) can be used as a separator as well.
   Please note that a version is mandatory. If you really want to use the default branch, which is error-prone and therefore not recommended, you can set it to ``HEAD``.
 
 * URL (=starts with http or https) of a ``*.repos`` or ``*.rosinstall`` file
