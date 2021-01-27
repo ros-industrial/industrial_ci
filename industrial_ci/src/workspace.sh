@@ -18,9 +18,9 @@
 
 export _DEFAULT_DEBS=${_DEFAULT_DEBS:-}
 
-function ici_resolve_scheme {
+function ici_parse_repository_url {
     local url=$1; shift
-    if [[ $url =~ ([^:]+):([^#@]+)[#@](.+) ]]; then
+    if [[ $url =~ ([^:]+):([^#]+)#(.+) ]]; then
         local fragment="${BASH_REMATCH[3]}"
         local repo=${BASH_REMATCH[2]}
         local name=${repo##*/}
@@ -49,7 +49,6 @@ function ici_resolve_scheme {
     else
         ici_error "Could not parse URL '$url'. It does not match the expected pattern: <scheme>:<resource>#<version>."
     fi
-
 }
 
 function ici_apt_install {
@@ -128,8 +127,8 @@ function ici_import_repository {
 
     ici_install_pkgs_for_command vcs python3-vcstool
 
-    local resolved; resolved=$(ici_resolve_scheme "$url")
-    IFS=" " read -r -a parts <<< "$resolved" # name, type, url, version
+    local parsed; parsed=$(ici_parse_repository_url "$url")
+    IFS=" " read -r -a parts <<< "$parsed" # name, type, url, version
     echo "${parts[*]}"
 
     case "${parts[1]}" in
