@@ -80,7 +80,8 @@ function ici_isolate() {
       local tmp_src
       tmp_src=$(mktemp -d)
       cp -a "$TARGET_REPO_PATH" "$tmp_src/"
-      export TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
+      export TARGET_REPO_PATH;
+      TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
   fi
 
   ici_forward_mount TARGET_REPO_PATH ro
