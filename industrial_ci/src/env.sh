@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export PYTHONUNBUFFERED=${PYTHONUNBUFFERED-1}
+
 export ROS_DISTRO=${ROS_DISTRO:-}
 export ROS_REPOSITORY_PATH=${ROS_REPOSITORY_PATH:-}
 export ROS_REPO=${ROS_REPO:-testing}

@@ -22,7 +22,6 @@ DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export TARGET_REPO_PATH=$GITHUB_WORKSPACE
 export TARGET_REPO_NAME=${GITHUB_REPOSITORY##*/}
-export PYTHONUNBUFFERED=${PYTHONUNBUFFERED:1}
 export _FOLDING_TYPE=github_actions
 
 env "$@" bash "$DIR_THIS/../industrial_ci/src/ci_main.sh"
