@@ -1,8 +1,8 @@
 ================
 Industrial CI
 ================
-.. image:: https://travis-ci.com/ros-industrial/industrial_ci.svg?branch=master
-    :target: https://travis-ci.com/ros-industrial/industrial_ci
+.. image:: https://travis-ci.com/ipa320/industrial_ci_mirror.svg?branch=mirror-master
+    :target: https://travis-ci.com/ipa320/industrial_ci_mirror/branches
     :alt: Travis CI status
 .. image:: https://github.com/ros-industrial/industrial_ci/workflows/CI/badge.svg?branch=master
     :target: https://github.com/ros-industrial/industrial_ci/actions
