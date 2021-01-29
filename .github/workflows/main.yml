@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: docker://koalaman/shellcheck-alpine
         with:
-          args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh industrial_ci/*.sh"
+          args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
   industrial_ci:
     strategy:
       matrix:
