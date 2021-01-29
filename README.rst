@@ -1,8 +1,8 @@
 ================================
 Industrial CI *(legacy version)*
 ================================
-.. image:: https://travis-ci.com/ros-industrial/industrial_ci.svg?branch=legacy
-    :target: https://travis-ci.com/ros-industrial/industrial_ci
+.. image:: https://travis-ci.com/ipa320/industrial_ci_mirror/branches.svg?branch=mirror-legacy
+    :target: https://travis-ci.com/ipa320/industrial_ci_mirror/branches
     :alt: Travis CI status
 .. image:: https://gitlab.com/ipa-mdl/industrial_ci/badges/legacy/pipeline.svg
     :target: https://gitlab.com/ipa-mdl/industrial_ci/commits/legacy
