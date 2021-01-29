@@ -13,20 +13,8 @@ git:
 
 env:
   matrix:
-    - ROS_DISTRO=kinetic PRERELEASE=true
-    - ROS_DISTRO=melodic PRERELEASE=true
-    - ROS_DISTRO=kinetic ROS_REPO=ros
-    - ROS_DISTRO=melodic ROS_REPO=ros
-    - ROS_DISTRO=hydro
-    - ROS_DISTRO=indigo
-    - ROS_DISTRO=jade
-    - ROS_DISTRO=kinetic
-    - ROS_DISTRO=lunar
     - ROS_DISTRO=melodic
-matrix:
-  include:
-    - script: shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh
-      env: [shellcheck]
+    - ROS_DISTRO=melodic PRERELEASE=true
 
 script:
   - ./travis.sh
