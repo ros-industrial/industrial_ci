@@ -55,14 +55,14 @@ dashing:
 
 docker_pull:
   script:
-    - docker pull rosindustrial/ci:kinetic-xenial-shadow-fixed
-    - docker tag rosindustrial/ci:kinetic-xenial-shadow-fixed industrial-ci/ubuntu:xenial
+    - docker pull ros:kinetic
+    - docker tag ros:kinetic industrial-ci/ubuntu:xenial
     - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" EXPECT_EXIT_CODE=1
 
 docker_no_pull:
   script:
-    - docker pull rosindustrial/ci:kinetic-xenial-shadow-fixed
-    - docker tag rosindustrial/ci:kinetic-xenial-shadow-fixed industrial-ci/ubuntu:xenial
+    - docker pull ros:kinetic
+    - docker tag ros:kinetic industrial-ci/ubuntu:xenial
     - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
 
 test_arm:
