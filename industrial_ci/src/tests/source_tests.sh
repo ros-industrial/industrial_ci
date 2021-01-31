@@ -27,15 +27,15 @@ ici_require_run_in_docker # this script must be run in docker
 #Define some verbose env vars
 #verbose build
 if [ "$VERBOSE_OUTPUT" ] && [ "$VERBOSE_OUTPUT" == true ]; then
-    OPT_VI="-vi"
+    OPT_VI=(-vi)
 else
-    OPT_VI=""
+    OPT_VI=()
 fi
 #verbose run tests
 if [ "$VERBOSE_TESTS" == false ]; then
-    OPT_RUN_V=""
+    OPT_RUN_V=()
 else
-    OPT_RUN_V="-v"
+    OPT_RUN_V=(-v)
 fi
 
 ici_time_start init_ici_environment
@@ -214,26 +214,26 @@ ici_parse_env_array ros_parallel_jobs ROS_PARALLEL_JOBS
 ici_parse_env_array catkin_parallel_test_jobs CATKIN_PARALLEL_TEST_JOBS
 ici_parse_env_array ros_parallel_test_jobs ROS_PARALLEL_TEST_JOBS
 
-if [ "$BUILDER" == catkin ]; then catkin build $OPT_VI --summarize  --no-status "${pkgs_whitelist[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" ; fi
+if [ "$BUILDER" == catkin ]; then catkin build "${OPT_VI[@]}" --summarize  --no-status "${pkgs_whitelist[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" ; fi
 
 ici_time_end  # catkin_build
 
 if [ "$NOT_TEST_BUILD" != "true" ]; then
     ici_time_start catkin_build_downstream_pkgs
     if [ "$BUILDER" == catkin ]; then
-        catkin build $OPT_VI --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}"
+        catkin build "${OPT_VI[@]}" --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}"
     fi
     ici_time_end  # catkin_build_downstream_pkgs
 
     ici_time_start catkin_build_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin build --no-deps --catkin-make-args tests -- $OPT_VI --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" --
+        catkin build --no-deps --catkin-make-args tests -- "${OPT_VI[@]}" --summarize  --no-status "${pkgs_downstream[@]}" "${catkin_parallel_jobs[@]}" --make-args "${ros_parallel_jobs[@]}" --
     fi
     ici_time_end  # catkin_build_tests
 
     ici_time_start catkin_run_tests
     if [ "$BUILDER" == catkin ]; then
-        catkin build --no-deps --catkin-make-args run_tests -- $OPT_RUN_V --no-status "${pkgs_downstream[@]}" "${catkin_parallel_test_jobs[@]}" --make-args "${ros_parallel_test_jobs[@]}" --
+        catkin build --no-deps --catkin-make-args run_tests -- "${OPT_RUN_V[@]}" --no-status "${pkgs_downstream[@]}" "${catkin_parallel_test_jobs[@]}" --make-args "${ros_parallel_test_jobs[@]}" --
         if [ "${ROS_DISTRO}" == "hydro" ]; then
             PATH=/usr/local/bin:$PATH  # for installed catkin_test_results
             PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
