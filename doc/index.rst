@@ -202,6 +202,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ROSINSTALL_FILENAME** (*deprecated*, default: ``.travis.rosinstall``): Only used when ``UPSTREAM_WORKSPACE`` is set to ``file``. See ``UPSTREAM_WORKSPACE`` description.
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
+* **UNDERLAY** (default: ``/opt/ros/$ROS_DISTRO``): Path to a workspace to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image
 * **UPSTREAM_CMAKE_ARGS** (default: not set): Addtional CMake arguments for upstream `workspace <#workspace-management>`__.
 * **UPSTREAM_WORKSPACE** (default: not set): Definition of upstream `workspace <#workspace-management>`__.
 * **VERBOSE_OUTPUT** (default: ``false``): If ``true``, build tool (e.g. Catkin) output prints in verbose mode.
@@ -220,13 +221,13 @@ A. Upstream workspace: Source packages that are needed for building or testing t
 
    1. Fetch source code (``UPSTREAM_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/upstream_ws``, chained to /opt/ros
+   3. Build workspace ``~/upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
 
 B. Target workspace: Packages in your target repository that should get build and tested
 
    1. Fetch source code (``TARGET_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/target_ws``, chained to upstream workspace or /opt/ros
+   3. Build workspace ``~/target_ws``, chained to upstream workspace or /opt/ros (or ``UNDERLAY``)
    4. run tests (opt-out with ``NOT_TEST_BUILD``)
 
 C. Downstream workspace: Packages that should get tested against your target repository

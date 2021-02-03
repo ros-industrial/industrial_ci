@@ -116,7 +116,7 @@ function run_source_tests {
 
     ici_run "setup_rosdep" ici_setup_rosdep
 
-    extend="/opt/ros/$ROS_DISTRO"
+    extend=${UNDERLAY:?}
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"

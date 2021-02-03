@@ -42,6 +42,10 @@ if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 
 ici_configure_ros
 
+if [ -n "${ROS_DISTRO:-}" ]; then
+    export UNDERLAY=${UNDERLAY:-/opt/ros/$ROS_DISTRO}
+fi
+
 export TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
 export BASEDIR=${BASEDIR:-$HOME}
 
