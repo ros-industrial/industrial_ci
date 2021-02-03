@@ -134,7 +134,7 @@ function run_pylint {
 
     local -a pylint_find_pattern
     # shellcheck disable=SC2016,SC2034
-    for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path '*$p*'); done
+    for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path "*$p*"); done
     pylint_find_pattern+=(-type f -iname '*.py')
 
     local path; path="$target_ws/src"
