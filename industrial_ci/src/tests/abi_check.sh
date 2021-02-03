@@ -187,7 +187,7 @@ function run_abi_check() {
         export PATH="/usr/lib/ccache:$PATH"
     fi
 
-    extend="/opt/ros/$ROS_DISTRO"
+    extend=${UNDERLAY:?}
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"

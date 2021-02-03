@@ -112,8 +112,8 @@ function run_ros_prerelease() {
     ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
     local setup_sh=
-    if [ -f "/opt/ros/$ROS_DISTRO/setup.sh" ]; then
-        setup_sh=". /opt/ros/$ROS_DISTRO/setup.sh && "
+    if [ -f "${UNDERLAY:?}/setup.sh" ]; then
+        setup_sh=". $UNDERLAY/setup.sh && "
     fi
     ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
