@@ -84,3 +84,9 @@ if [ "${UPSTREAM_WORKSPACE:-}" = "file" ] || [ "${USE_DEB:-true}" != true ]; the
   fi
   export UPSTREAM_WORKSPACE="$ROSINSTALL_FILENAME"
 fi
+
+if [ "${DOCKER_PULL:-true}" = true ]; then
+  ici_migrate_hook prepare_docker_image pull_docker_image
+else
+  ici_removed_hook prepare_docker_image "Hook 'prepare_docker_image' got removed."
+fi
