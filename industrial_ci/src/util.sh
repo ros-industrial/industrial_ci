@@ -253,6 +253,33 @@ function ici_enforce_deprecated {
     fi
 }
 
+function ici_migrate_hook() {
+  local oldname=${1^^}
+  oldname=${oldname//[^A-Z0-9_]/_}
+  local newname=${2^^}
+  newname=${newname//[^A-Z0-9_]/_}
+
+  mapfile -t envs < <(env | grep -oE "(BEFORE_|AFTER_)+$oldname(_EMBED)?")
+
+  for oldhook in "${envs[@]}"; do
+    local newhook=${oldhook/$oldname/$newname}
+    ici_warn "hook '$oldhook' was renamed to '$newhook'."
+    eval "export $newhook=\$$oldhook"
+  done
+}
+
+function ici_removed_hook() {
+  local oldname=${1^^}
+  shift
+  oldname=${oldname//[^A-Z0-9_]/_}
+
+  mapfile -t envs < <(env | grep -oE "(BEFORE_|AFTER_)+$oldname(_EMBED)?")
+
+  for oldhook in "${envs[@]}"; do
+    ici_enforce_deprecated "$oldhook" "$@"
+  done
+}
+
 function ici_retry {
   local tries=$1; shift
   local ret=0
