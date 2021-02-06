@@ -151,9 +151,9 @@ function run_pylint {
 
 function run_pylint_check {
     local target_ws=$1
-    local -a errors
-    local -a cmd
-    local -a pylint_args
+    local errors=()
+    local cmd=()
+    local pylint_args=()
     failure=false
     if [ "$PYLINT2_CHECK" == true ]; then
         cmd="pylint"
