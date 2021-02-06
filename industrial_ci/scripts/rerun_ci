@@ -71,7 +71,7 @@ if docker image inspect "$DOCKER_COMMIT" &> /dev/null; then
   force_env+=("DOCKER_IMAGE=$DOCKER_COMMIT"  "DOCKER_PULL=false")
 fi
 
-env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" DOCKER_COMMIT_CREDENTIALS=false "$@" "${force_env[@]}" || ret=$?
+env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" "$@" "${force_env[@]}" || ret=$?
 
 echo "Please do not forget to clean-up: docker rmi $DOCKER_COMMIT"
 

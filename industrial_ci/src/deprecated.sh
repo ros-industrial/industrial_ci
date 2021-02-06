@@ -90,3 +90,5 @@ if [ "${DOCKER_PULL:-true}" = true ]; then
 else
   ici_removed_hook prepare_docker_image "Hook 'prepare_docker_image' got removed."
 fi
+
+ici_mark_deprecated DOCKER_COMMIT_CREDENTIALS "Credentials will be copied, but never committed!"

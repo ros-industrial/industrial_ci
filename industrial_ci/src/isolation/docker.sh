@@ -17,7 +17,7 @@
 
 export DOCKER_COMMIT=${DOCKER_COMMIT:-}
 export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
-export DOCKER_COMMIT_CREDENTIALS=${DOCKER_COMMIT_CREDENTIALS:-}
+export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .ssh .subversion}
 export DOCKER_PULL=${DOCKER_PULL:-true}
 
 # ici_forward_mount VARNAME/FILE rw/ro [PATH]
@@ -78,7 +78,7 @@ function ici_isolate() {
       # $BASEDIR is most-likely contained in $TARGET_REPO_PATH
       # copy target repo to temporary folder first
       local tmp_src
-      tmp_src=$(mktemp -d)
+      ici_make_temp_dir tmp_src
       cp -a "$TARGET_REPO_PATH" "$tmp_src/"
       export TARGET_REPO_PATH;
       TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
@@ -120,46 +120,56 @@ function ici_isolate() {
 #   (None)
 #######################################
 function ici_run_cmd_in_docker() {
-  local commit_image=$DOCKER_COMMIT
-  DOCKER_COMMIT=
+  local credentials=()
+  ici_parse_env_array credentials DOCKER_CREDENTIALS
+  local to_copy=()
+  local cleanup=""
 
+  for d in "${credentials[@]}"; do
+    if [ -d "$HOME/$d" ]; then
+      to_copy+=(~/"$d")
+      # shellcheck disable=SC2088
+      cleanup=$(ici_join_array : "$cleanup" "~/$d")
+    fi
+  done
+
+  local opts=(--env-file "${ICI_SRC_PATH}/isolation/docker.env")
+  if [ -z "$DOCKER_COMMIT" ]; then
+    opts+=(--rm)
+  else
+    opts+=(-e "_CLEANUP=$cleanup")
+  fi
 
   local cid
-  cid=$(docker create --env-file "${ICI_SRC_PATH}/isolation/docker.env" "$@")
+  cid=$(docker create "${opts[@]}" "$@")
 
   # detect user inside container
   local image
   image=$(docker inspect --format='{{.Config.Image}}' "$cid")
-  docker_uid=$(docker run --rm --entrypoint '' "$image" id -u)
-  docker_gid=$(docker run --rm --entrypoint '' "$image" id -g)
+  local docker_query=()
+  # shellcheck disable=SC2016
+  IFS=" " read -r -a docker_query <<< "$(docker run --rm --entrypoint '/bin/sh' "$image" -c 'echo "$(id -u) $(id -g) $HOME"')"
 
   # pass common credentials to container
-  if [ "$DOCKER_COMMIT_CREDENTIALS" != false ]; then
-    for d in .docker .ssh .subversion; do
-      if [ -d "$HOME/$d" ]; then
-        if [ -z "$commit_image" ] || [ "$DOCKER_COMMIT_CREDENTIALS" = true ]; then
-          docker_cp "$HOME/$d" "$cid:/root/"
-        else
-          ici_warn "Will not bundle'$d' unless 'DOCKER_COMMIT_CREDENTIALS=true'"
-        fi
-      fi
-    done
-  fi
+  for d in "${to_copy[@]}"; do
+    ici_warn "Copy credentials: $d"
+    docker_cp "$d" "$cid:${docker_query[*]:2}/" "${docker_query[0]}" "${docker_query[1]}"
+  done
 
   docker start -a "$cid" &
-  trap 'docker kill $cid' INT
+  trap 'docker kill --signal=SIGTERM $cid' INT
   local ret=0
   wait %% || ret=$?
   trap - INT
-  if [ -n "$commit_image" ]; then
-    echo "Committing container to tag: '$commit_image'"
+  if [ -n "$DOCKER_COMMIT" ]; then
+    echo "Committing container to tag: '$DOCKER_COMMIT'"
     local msg=()
     if [ -n "$DOCKER_COMMIT_MSG" ]; then
       msg=(-m "$DOCKER_COMMIT_MSG")
     fi
-    ici_quiet docker commit "${msg[@]}" "$cid" "$commit_image"
+    ici_quiet docker commit "${msg[@]}" "$cid" "$DOCKER_COMMIT"
+    ici_quiet docker rm "$cid"
   fi
-  ici_quiet docker rm "$cid"
   return $ret
 }
 
@@ -167,6 +177,6 @@ function ici_run_cmd_in_docker() {
 # ensures that copied files are owned by the target user
 function docker_cp {
   set -o pipefail
-  tar --numeric-owner --owner="${docker_uid:-root}" --group="${docker_gid:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
+  tar --numeric-owner --owner="${3:-root}" --group="${4:-root}" -c -f - -C "$(dirname "$1")" "$(basename "$1")" | docker cp - "$2"
   set +o pipefail
 }

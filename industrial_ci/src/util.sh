@@ -192,8 +192,17 @@ function ici_exit {
     local exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
     trap - EXIT # Reset signal handler since the shell is about to exit.
 
+    local cleanup=()
+    # shellcheck disable=SC2016
+    IFS=: command eval 'cleanup=(${_CLEANUP})'
+    for c in "${cleanup[@]}"; do
+      ici_warn Cleaning up "${c/#\~/$HOME}"
+      rm -rf "${c/#\~/$HOME}"
+    done
+
     # end fold if needed
     if [ -n "$ICI_FOLD_NAME" ]; then
+        local color_wrap=${ANSI_GREEN}
         if [ "$exit_code" -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
         ici_time_end "$color_wrap" "$exit_code"
     fi
@@ -386,6 +395,28 @@ function ici_check_builder {
 
 function ici_source_builder {
   ici_source_component BUILDER builders
+}
+
+function ici_join_array {
+  local sep=$1
+  shift
+  local res=""
+  for elem in "$@"; do
+    if [ -n "$elem" ]; then
+      res+="$sep$elem"
+    fi
+  done
+  echo "${res#$sep}"
+}
+
+function ici_cleanup_later {
+  _CLEANUP=$(ici_join_array : "$_CLEANUP" "$@")
+}
+
+function ici_make_temp_dir {
+  local -n ici_make_temp_dir_res=$1;
+  ici_make_temp_dir_res=$(mktemp -d)
+  ici_cleanup_later "$ici_make_temp_dir_res"
 }
 
 # shellcheck disable=SC1090
