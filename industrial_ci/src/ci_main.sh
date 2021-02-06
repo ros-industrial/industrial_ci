@@ -24,6 +24,7 @@ set -e # exit script on errors
 [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
 
 export ICI_SRC_PATH; ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # The path on CI service (e.g. Travis CI) to industrial_ci src dir.
+ _CLEANUP=""
 
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"

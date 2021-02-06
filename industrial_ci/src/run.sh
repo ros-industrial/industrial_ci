@@ -22,6 +22,7 @@
 
 set -e # exit script on errors
 [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
+_CLEANUP=${_CLEANUP-}
 
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"
