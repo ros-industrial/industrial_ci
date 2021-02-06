@@ -97,18 +97,9 @@ function run_clang_tidy_check {
     fi
 }
 
-function install_pylint {
-    local cmd=$1
-
-    ici_time_start "install_$cmd"
-    ici_quiet ici_install_pkgs_for_command "$cmd" "$cmd"
-    ici_time_end # install_$cmd
-}
-
 function run_pylint_file {
     local _run_pylint_file_exit_code=$1; shift
     local target_ws=$1; shift
-    local cmd=$1; shift
     local file=$1; shift
     local name=$1; shift
     local pylint_args=("$@")
@@ -116,7 +107,7 @@ function run_pylint_file {
 
     ici_time_start "pylint_file_check_$name"
 
-    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "$cmd" "${pylint_args[@]}" "$file"; then
+    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" "$file"; then
         ici_time_end
     else
         status=$?
@@ -129,7 +120,6 @@ function run_pylint_file {
 function run_pylint {
     local -n _run_pylint_errors=$1; shift
     local target_ws=$1; shift
-    local cmd=$1; shift
     local pylint_args=("$@")
 
     local -a pylint_find_pattern
@@ -142,7 +132,7 @@ function run_pylint {
     while read -r file; do
         local name=${file#$path/}
         local exit_code=0
-        run_pylint_file exit_code "$target_ws" "$cmd" "$file" "$name" "${pylint_args[@]}"
+        run_pylint_file exit_code "$target_ws" "$file" "$name" "${pylint_args[@]}"
         if [ "$exit_code" -gt "0" ]; then
             _run_pylint_errors+=("$name")
         fi
@@ -152,37 +142,17 @@ function run_pylint {
 function run_pylint_check {
     local target_ws=$1
     local errors=()
-    local cmd=()
     local pylint_args=()
-    failure=false
-    if [ "$PYLINT2_CHECK" == true ]; then
-        cmd="pylint"
-        ici_parse_env_array pylint_args PYLINT2_ARGS
-        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
+    if [ "$PYLINT_CHECK" == true ]; then
+        ici_parse_env_array pylint_args PYLINT_ARGS
 
-        install_pylint "$cmd"
-        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
+        ici_time_start "install_pylint"
+        ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
+        ici_time_end # install_pylint
+        run_pylint errors "$target_ws" "${pylint_args[@]}"
     fi
     if [ "${#errors[@]}" -gt "0" ]; then
-        ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
-        failure=true
-    fi
-    unset errors
-    unset cmd
-    unset pylint_args
-    if [ "$PYLINT3_CHECK" == true ]; then
-        cmd="pylint3"
-        ici_parse_env_array pylint_args PYLINT3_ARGS
-        if [[ -z ${pylint_args} ]]; then ici_parse_env_array pylint_args PYLINT_ARGS; fi
-
-        install_pylint "$cmd"
-        run_pylint errors "$target_ws" "$cmd" "${pylint_args[@]}"
-    fi
-    if [ "${#errors[@]}" -gt "0" ]; then
-        ici_color_output "${ANSI_RED}" "$cmd check failed: ${errors[*]}"
-        failure=true
-    fi
-    if [ "$failure" = true ] ; then
+        ici_color_output "${ANSI_RED}" "pylint check failed: ${errors[*]}"
         ici_error
     fi
 }
@@ -235,7 +205,7 @@ function run_source_tests {
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
     fi
-    if [ "$PYLINT2_CHECK" == "true" ] || [ "$PYLINT3_CHECK" == "true" ]; then
+    if [ "$PYLINT_CHECK" == "true" ]; then
         run_pylint_check "$target_ws"
     fi
 
