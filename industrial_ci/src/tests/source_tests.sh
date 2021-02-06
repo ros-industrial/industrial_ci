@@ -97,62 +97,26 @@ function run_clang_tidy_check {
     fi
 }
 
-function run_pylint_file {
-    local _run_pylint_file_exit_code=$1; shift
-    local target_ws=$1; shift
-    local file=$1; shift
-    local name=$1; shift
-    local pylint_args=("$@")
-    local status=0
+function run_pylint_check {
+    local target_ws=$1
+    local pylint_args=()
 
-    ici_time_start "pylint_file_check_$name"
+    ici_parse_env_array pylint_args PYLINT_ARGS
 
-    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" "$file"; then
-        ici_time_end
-    else
-        status=$?
-        # shellcheck disable=SC2140
-        eval "$_run_pylint_file_exit_code"="'$status'"
-        ici_time_end "${ANSI_YELLOW}" "$status"
-    fi
-}
-
-function run_pylint {
-    local -n _run_pylint_errors=$1; shift
-    local target_ws=$1; shift
-    local pylint_args=("$@")
-
-    local -a pylint_find_pattern
+    local pylint_find_pattern=()
     # shellcheck disable=SC2016,SC2034
     for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path "*$p*"); done
     pylint_find_pattern+=(-type f -iname '*.py')
 
-    local path; path="$target_ws/src"
+    ici_time_start "install_pylint"
+    ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
+    ici_time_end # install_pylint
 
-    while read -r file; do
-        local name=${file#$path/}
-        local exit_code=0
-        run_pylint_file exit_code "$target_ws" "$file" "$name" "${pylint_args[@]}"
-        if [ "$exit_code" -gt "0" ]; then
-            _run_pylint_errors+=("$name")
-        fi
-    done < <(ici_find_nonhidden "$path" "${pylint_find_pattern[@]}")
-}
-
-function run_pylint_check {
-    local target_ws=$1
-    local errors=()
-    local pylint_args=()
-    if [ "$PYLINT_CHECK" == true ]; then
-        ici_parse_env_array pylint_args PYLINT_ARGS
-
-        ici_time_start "install_pylint"
-        ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-        ici_time_end # install_pylint
-        run_pylint errors "$target_ws" "${pylint_args[@]}"
-    fi
-    if [ "${#errors[@]}" -gt "0" ]; then
-        ici_color_output "${ANSI_RED}" "pylint check failed: ${errors[*]}"
+    ici_time_start "run_pylint"
+    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" $(ici_find_nonhidden "$target_ws/src" "${pylint_find_pattern[@]}"); then
+        ici_time_end # run_pylint
+    else
+        ici_time_end "${ANSI_RED}" # run_pylint
         ici_error
     fi
 }
