@@ -26,38 +26,44 @@ function _append_job_opts() {
     fi
 }
 
-function builder_setup {
-  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin"
+function builder_setup() {
+    ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin"
 }
 
-function builder_run_build {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_build() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local opts=()
     if [ "${VERBOSE_OUTPUT:-false}" != false ]; then
         opts+=("-vi")
     fi
     _append_job_opts opts PARALLEL_BUILDS 0
     ici_exec_in_workspace "$extend" "$ws" catkin config --install
-    ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize  --no-status "$@"
+    ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize --no-status "$@"
 }
 
-function builder_run_tests {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_tests() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local opts=()
     if [ "${VERBOSE_TESTS:-false}" != false ]; then
-        opts+=(-v)	
-    fi	
-    if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then	
-        opts+=(-i)	
+        opts+=(-v)
+    fi
+    if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
+        opts+=(-i)
     fi
     _append_job_opts opts PARALLEL_TESTS 1
     ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
 }
 
-function builder_test_results {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_test_results() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     ici_exec_in_workspace "$extend" "$ws" catkin_test_results --verbose
 }

@@ -14,6 +14,14 @@ jobs:
       - uses: docker://koalaman/shellcheck-alpine
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
+  shfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: docker://mvdan/shfmt
+        with:
+          args: -d -i 4 .
+      - run: "! grep -rEo 'function +[a-zA-Z_]+ +\\{' *"
   industrial_ci:
     strategy:
       matrix:

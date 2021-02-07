@@ -24,28 +24,34 @@ function _append_job_opts() {
     fi
 }
 
-function builder_setup {
+function builder_setup() {
     ici_install_pkgs_for_command catkin_make "ros-${ROS_DISTRO}-catkin"
 }
 
-function builder_run_build {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_build() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local opts=()
     _append_job_opts opts PARALLEL_BUILDS 0
     ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args install "${opts[@]}" "$@"
 }
 
-function builder_run_tests {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_tests() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local opts=()
     _append_job_opts opts PARALLEL_TESTS 1
     ici_exec_in_workspace "$extend" "$ws" catkin_make --make-args run_tests "${opts[@]}" "$@"
 }
 
-function builder_test_results {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_test_results() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     ici_exec_in_workspace "$extend" "$ws" catkin_test_results --verbose
 }

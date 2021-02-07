@@ -59,7 +59,8 @@ if [ -z "${CPPFLAGS:-}" ]; then unset CPPFLAGS; fi
 if [ -z "${CXX:-}" ]; then unset CXX; fi
 if [ -z "${CXXFLAGS:-}" ]; then unset CXXLAGS; fi
 
-TEST=$1; shift
+TEST=$1
+shift
 ici_source_component TEST tests
 
 ici_run "init" ici_init_apt

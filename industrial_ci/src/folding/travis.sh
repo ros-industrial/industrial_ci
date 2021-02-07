@@ -15,20 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function  ici_start_fold() {
-    local tag=$1; shift
-    local name=$1; shift
-    local start=$1; shift
+function ici_start_fold() {
+    local tag=$1
+    shift
+    local name=$1
+    shift
+    local start=$1
+    shift
     ici_ansi_cleared_line "travis_fold:start:$name"
     ici_ansi_cleared_line "travis_time:start:$tag"
 
 }
 
-function  ici_end_fold() {
-    local tag=$1; shift
-    local name=$1; shift
-    local start=$1; shift
-    local end=$1; shift
+function ici_end_fold() {
+    local tag=$1
+    shift
+    local name=$1
+    shift
+    local start=$1
+    shift
+    local end=$1
+    shift
     ici_ansi_cleared_line "travis_time:end:$tag:start=$start,finish=$end,duration=$((end - start))"
     ici_ansi_cleared_line "travis_fold:end:$name"
 }

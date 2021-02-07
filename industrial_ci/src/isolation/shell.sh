@@ -17,27 +17,27 @@
 
 # ici_forward_mount VARNAME/FILE rw/ro [PATH]
 function ici_forward_mount() {
-  true
+    true
 }
 
 # ici_forward_variable VARNAME [VALUE]
 function ici_forward_variable() {
-  if [ -n "${2-}" ]; then
-    export "$1"="$2"
-  fi
+    if [ -n "${2-}" ]; then
+        export "$1"="$2"
+    fi
 }
 
-function ici_isolate {
-  if [ "${CI:-}" != true ] ; then
-    ici_error 'ISOLATION=shell needs CI=true'
-  fi
-  if [ -z "${ROS_DISTRO:-}" ]; then
-    ici_error "ROS_DISTRO is not set"
-  elif [ "${ROS_DISTRO}" = "false" ]; then
-      unset ROS_DISTRO
-  fi
-  if [ -n "${BASEDIR-}" ]; then
-    mkdir -p "$BASEDIR"
-  fi
-  "${ICI_SRC_PATH}/run.sh" "$@"
+function ici_isolate() {
+    if [ "${CI:-}" != true ]; then
+        ici_error 'ISOLATION=shell needs CI=true'
+    fi
+    if [ -z "${ROS_DISTRO:-}" ]; then
+        ici_error "ROS_DISTRO is not set"
+    elif [ "${ROS_DISTRO}" = "false" ]; then
+        unset ROS_DISTRO
+    fi
+    if [ -n "${BASEDIR-}" ]; then
+        mkdir -p "$BASEDIR"
+    fi
+    "${ICI_SRC_PATH}/run.sh" "$@"
 }

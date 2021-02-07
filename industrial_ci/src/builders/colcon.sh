@@ -17,7 +17,7 @@
 
 _colcon_event_handlers=(desktop_notification- status- terminal_title-)
 
-function builder_setup {
+function builder_setup() {
     ici_install_pkgs_for_command colcon python3-colcon-common-extensions
     if [ "$ROS_DISTRO" = "kinetic" ] || [ "$ROS_DISTRO" = "ardent" ]; then
         ici_install_pkgs_for_command pip3 python3-pip
@@ -25,9 +25,11 @@ function builder_setup {
     fi
 }
 
-function builder_run_build {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_build() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local opts=(--event-handlers "${_colcon_event_handlers[@]}")
     local jobs
     ici_parse_jobs jobs PARALLEL_BUILDS 0
@@ -39,9 +41,11 @@ function builder_run_build {
     ici_exec_in_workspace "$extend" "$ws" colcon build "${opts[@]}" "$@"
 }
 
-function builder_run_tests {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_run_tests() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     local output_handler
     if [ "$IMMEDIATE_TEST_OUTPUT" == true ]; then
         output_handler="console_direct+"
@@ -56,11 +60,13 @@ function builder_run_tests {
     elif [ "$jobs" -gt 1 ]; then
         opts+=(--executor parallel --parallel-workers "$jobs")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
+    ici_exec_in_workspace "$extend" "$ws" colcon test "${opts[@]}"
 }
 
-function builder_test_results {
-    local extend=$1; shift
-    local ws=$1; shift
+function builder_test_results() {
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     ici_exec_in_workspace "$extend" "$ws" colcon test-result --verbose
 }

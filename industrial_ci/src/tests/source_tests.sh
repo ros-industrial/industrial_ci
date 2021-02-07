@@ -22,11 +22,11 @@
 # It is dependent on environment variables that need to be exported in advance
 # (As of version 0.4.4 most of them are defined in env.sh).
 
-function install_catkin_lint {
+function install_catkin_lint() {
     ici_install_pypi_pkgs_for_command catkin_lint "catkin-lint"
 }
 
-function run_clang_tidy {
+function run_clang_tidy() {
     local regex="$1/.*"
     local -n _run_clang_tidy_warnings=$2
     local -n _run_clang_tidy_errors=$3
@@ -38,8 +38,10 @@ function run_clang_tidy {
         return 0
     fi
 
-    local build; build="$(dirname "$db")"
-    local name; name="$(basename "$build")"
+    local build
+    build="$(dirname "$db")"
+    local name
+    name="$(basename "$build")"
 
     local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
     if ! [ "$max_jobs" -ge 1 ]; then
@@ -47,7 +49,7 @@ function run_clang_tidy {
     fi
 
     rm -rf "$db".{command,warn,error}
-    cat > "$db.command" << EOF
+    cat >"$db.command" <<EOF
 #!/bin/bash
 fixes=\$(mktemp)
 clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" || { touch "$db.error"; echo "Errored for '\$*'"; }
@@ -62,8 +64,8 @@ EOF
     printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" "$db.command" "$@"
 
     if [ -f "$db.error" ]; then
-       _run_clang_tidy_errors+=("$name")
-       ici_time_end "${ANSI_RED}"
+        _run_clang_tidy_errors+=("$name")
+        ici_time_end "${ANSI_RED}"
     elif [ -f "$db.warn" ]; then
         _run_clang_tidy_warnings+=("$name")
         ici_time_end "${ANSI_YELLOW}"
@@ -72,14 +74,14 @@ EOF
     fi
 }
 
-function run_clang_tidy_check {
+function run_clang_tidy_check() {
     local target_ws=$1
     local errors=()
     local warnings=()
     local clang_tidy_args=()
     ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
 
-    ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
+    ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang | grep "^libclang-common-.*")"
 
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
@@ -88,7 +90,7 @@ function run_clang_tidy_check {
     if [ "${#warnings[@]}" -gt "0" ]; then
         ici_warn "Clang tidy warning(s) in: ${warnings[*]}"
         if [ "$CLANG_TIDY" == "pedantic" ]; then
-            errors=( "${warnings[@]}" "${errors[@]}" )
+            errors=("${warnings[@]}" "${errors[@]}")
         fi
     fi
 
@@ -97,7 +99,7 @@ function run_clang_tidy_check {
     fi
 }
 
-function run_pylint_check {
+function run_pylint_check() {
     local target_ws=$1
 
     local args=()
@@ -107,7 +109,7 @@ function run_pylint_check {
     local excludes=()
     ici_parse_env_array excludes PYLINT_EXCLUDE
     for p in "${excludes[@]}"; do
-      find_pattern+=(-not -path "*$p*");
+        find_pattern+=(-not -path "*$p*")
     done
 
     local files=()
@@ -117,11 +119,11 @@ function run_pylint_check {
     ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
 }
 
-function prepare_source_tests {
+function prepare_source_tests() {
     ici_check_builder
 }
 
-function run_source_tests {
+function run_source_tests() {
     upstream_ws=$BASEDIR/upstream_ws
     target_ws=$BASEDIR/target_ws
     downstream_ws=$BASEDIR/downstream_ws
@@ -157,9 +159,9 @@ function run_source_tests {
         local catkin_lint_args=()
         ici_parse_env_array catkin_lint_args CATKIN_LINT_ARGS
         if [ "$CATKIN_LINT" == "pedantic" ]; then
-          catkin_lint_args+=(--strict -W2)
+            catkin_lint_args+=(--strict -W2)
         fi
-        ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
+        ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws" catkin_lint --explain "${catkin_lint_args[@]}" src
 
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then

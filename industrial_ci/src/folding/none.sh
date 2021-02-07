@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function  ici_start_fold() {
+function ici_start_fold() {
     shift 3
 }
 
-function  ici_end_fold() {
+function ici_end_fold() {
     shift 4
 }
