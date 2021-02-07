@@ -19,7 +19,8 @@
 export _DEFAULT_DEBS=${_DEFAULT_DEBS:-}
 
 function ici_parse_repository_url {
-    local url=$1; shift
+    local url=$1
+    shift
     if [[ $url =~ ([^:]+):([^#]+)#(.+) ]]; then
         local fragment="${BASH_REMATCH[3]}"
         local repo=${BASH_REMATCH[2]}
@@ -27,24 +28,24 @@ function ici_parse_repository_url {
         local scheme=${BASH_REMATCH[1]}
 
         case "$scheme" in
-            bitbucket | bb)
-                echo "${name%.git}" "git" "https://bitbucket.org/$repo" "$fragment"
-                ;;
-            github | gh)
-                echo "${name%.git}" "git" "https://github.com/$repo" "$fragment"
-                ;;
-            gitlab | gl)
-                echo "${name%.git}" "git" "https://gitlab.com/$repo" "$fragment"
-                ;;
-            'git+file'*|'git+http'*)
-                echo "${name%.git}" "git" "${scheme#git+}:$repo" "$fragment"
-                ;;
-            git+*)
-                echo "${name%.git}" "git" "$scheme:$repo" "$fragment"
-                ;;
-            *)
-                echo "$name" "$scheme" "$scheme:$repo" "$fragment"
-                ;;
+        bitbucket | bb)
+            echo "${name%.git}" "git" "https://bitbucket.org/$repo" "$fragment"
+            ;;
+        github | gh)
+            echo "${name%.git}" "git" "https://github.com/$repo" "$fragment"
+            ;;
+        gitlab | gl)
+            echo "${name%.git}" "git" "https://gitlab.com/$repo" "$fragment"
+            ;;
+        'git+file'* | 'git+http'*)
+            echo "${name%.git}" "git" "${scheme#git+}:$repo" "$fragment"
+            ;;
+        git+*)
+            echo "${name%.git}" "git" "$scheme:$repo" "$fragment"
+            ;;
+        *)
+            echo "$name" "$scheme" "$scheme:$repo" "$fragment"
+            ;;
         esac
     else
         ici_error "Could not parse URL '$url'. It does not match the expected pattern: <scheme>:<resource>#<version>."
@@ -66,7 +67,7 @@ function ici_init_apt {
     ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential)
-    if ! ls /etc/ssl/certs/* 2&> /dev/null; then
+    if ! ls /etc/ssl/certs/* 2 &>/dev/null; then
         debs_default+=(ca-certificates)
     fi
     if [ -n "$_DEFAULT_DEBS" ]; then
@@ -88,7 +89,7 @@ function ici_init_apt {
         fi
 
         ici_retry 3 eval "$keycmd"
-        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
+        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<<"deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" >/dev/null
         ici_asroot apt-get update -qq
     fi
 
@@ -101,20 +102,22 @@ function ici_init_apt {
 }
 
 function ici_install_pkgs_for_command {
-  local command=$1; shift
-  ici_exec_for_command "$command" ici_apt_install "$@"
+    local command=$1
+    shift
+    ici_exec_for_command "$command" ici_apt_install "$@"
 }
 
 function ici_install_pypi_pkgs_for_command {
-  local command=$1; shift
-  ici_exec_for_command "$command" ici_pip_install "$@"
+    local command=$1
+    shift
+    ici_exec_for_command "$command" ici_pip_install "$@"
 }
 
 function ici_setup_git_client {
-  ici_install_pkgs_for_command git git-core
-  if [ -d ~/.ssh ]; then
-    ici_install_pkgs_for_command ssh ssh-client
-  fi
+    ici_install_pkgs_for_command git git-core
+    if [ -d ~/.ssh ]; then
+        ici_install_pkgs_for_command ssh ssh-client
+    fi
 }
 
 function ici_vcs_import {
@@ -122,56 +125,63 @@ function ici_vcs_import {
 }
 
 function ici_import_repository {
-    local sourcespace=$1; shift
-    local url=$1; shift
+    local sourcespace=$1
+    shift
+    local url=$1
+    shift
 
     ici_install_pkgs_for_command vcs python3-vcstool
 
-    local parsed; parsed=$(ici_parse_repository_url "$url")
-    IFS=" " read -r -a parts <<< "$parsed" # name, type, url, version
+    local parsed
+    parsed=$(ici_parse_repository_url "$url")
+    IFS=" " read -r -a parts <<<"$parsed" # name, type, url, version
     echo "${parts[*]}"
 
     case "${parts[1]}" in
-        git)
-          ici_setup_git_client
-            ;;
-        *)
-            ;;
+    git)
+        ici_setup_git_client
+        ;;
+    *) ;;
+
     esac
     if [ "${parts[3]}" = "HEAD" ]; then
-        ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}'}}}"
+        ici_vcs_import "$sourcespace" <<<"{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}'}}}"
     else
-        ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
+        ici_vcs_import "$sourcespace" <<<"{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
     fi
 }
 
 function ici_import_file {
-    local sourcespace=$1; shift
-    local file=$1; shift
+    local sourcespace=$1
+    shift
+    local file=$1
+    shift
 
     case "$file" in
-    *.zip|*.tar|*.tar.*|*.tgz|*.tbz2)
+    *.zip | *.tar | *.tar.* | *.tgz | *.tbz2)
         ici_install_pkgs_for_command bsdtar bsdtar
         bsdtar -C "$sourcespace" -xf "$file"
         ;;
     *)
         ici_install_pkgs_for_command vcs python3-vcstool
         ici_setup_git_client
-        ici_vcs_import "$sourcespace" < "$file"
-    ;;
+        ici_vcs_import "$sourcespace" <"$file"
+        ;;
     esac
 
 }
 
 function ici_import_url {
-    local sourcespace=$1; shift
-    local url=$1; shift
+    local sourcespace=$1
+    shift
+    local url=$1
+    shift
     local processor
 
     ici_install_pkgs_for_command wget wget
 
     case "$url" in
-    *.zip|*.tar|*.tar.*|*.tgz|*.tbz2)
+    *.zip | *.tar | *.tar.* | *.tgz | *.tbz2)
         ici_install_pkgs_for_command bsdtar bsdtar
         processor=(bsdtar -C "$sourcespace" -xf-)
         ;;
@@ -179,7 +189,7 @@ function ici_import_url {
         ici_install_pkgs_for_command vcs python3-vcstool
         ici_setup_git_client
         processor=(ici_vcs_import "$sourcespace")
-    ;;
+        ;;
     esac
 
     set -o pipefail
@@ -187,15 +197,18 @@ function ici_import_url {
     set +o pipefail
 }
 
-function  ici_import_directory {
-    local sourcespace=$1; shift
-    local dir=$1; shift
+function ici_import_directory {
+    local sourcespace=$1
+    shift
+    local dir=$1
+    shift
     rm -rf "$sourcespace:?/$(basename "$dir")"
     cp -a "$dir" "$sourcespace"
 }
 
 function ici_prepare_sourcespace {
-    local sourcespace=$1; shift
+    local sourcespace=$1
+    shift
     local basepath=$TARGET_REPO_PATH
 
     mkdir -p "$sourcespace"
@@ -209,14 +222,15 @@ function ici_prepare_sourcespace {
             ici_import_url "$sourcespace" "$source"
             ;;
         -.)
-            local file; file=$(basename "$basepath")
+            local file
+            file=$(basename "$basepath")
             echo "Removing '${sourcespace:?}/$file'"
             rm -r "${sourcespace:?}/$file"
             ;;
         -*)
             local file="${source:1}"
             if [ ! -e "${sourcespace:?}/$file" ]; then
-              file="$(basename "$basepath")/$file"
+                file="$(basename "$basepath")/$file"
             fi
             echo "Removing '${sourcespace:?}/$file'"
             rm -r "${sourcespace:?}/$file"
@@ -228,7 +242,7 @@ function ici_prepare_sourcespace {
         /*)
             if [ -d "$source" ]; then
                 echo "Copying '$source'"
-                ici_import_directory  "$sourcespace" "$source"
+                ici_import_directory "$sourcespace" "$source"
             elif [ -f "$source" ]; then
                 ici_import_file "$sourcespace" "$source"
             else
@@ -280,24 +294,28 @@ function ici_setup_rosdep {
 }
 
 function ici_exec_in_workspace {
-    local extend=$1; shift
-    local path=$1; shift
-    ( { [ ! -e "$extend/setup.bash" ] || ici_source_setup "$extend"; } && cd "$path" && exec "$@")
+    local extend=$1
+    shift
+    local path=$1
+    shift
+    ({ [ ! -e "$extend/setup.bash" ] || ici_source_setup "$extend"; } && cd "$path" && exec "$@")
 }
 
 function ici_install_dependencies {
-    local extend=$1; shift
-    local skip_keys=$1; shift
+    local extend=$1
+    shift
+    local skip_keys=$1
+    shift
 
     local cmake_prefix_path=
     if [ "$ROS_VERSION" -eq 2 ]; then
-      # work-around for https://github.com/ros-infrastructure/rosdep/issues/724
-      cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*'):" || true
+        # work-around for https://github.com/ros-infrastructure/rosdep/issues/724
+        cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*'):" || true
     fi
 
     rosdep_opts=(-q --from-paths "$@" --ignore-src -y)
     if [ -n "$skip_keys" ]; then
-      rosdep_opts+=(--skip-keys "$skip_keys")
+        rosdep_opts+=(--skip-keys "$skip_keys")
     fi
     set -o pipefail # fail if rosdep install fails
     ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
@@ -305,16 +323,19 @@ function ici_install_dependencies {
 }
 
 function ici_build_workspace {
-    local name=$1; shift
-    local extend=$1; shift
-    local ws=$1; shift
+    local name=$1
+    shift
+    local extend=$1
+    shift
+    local ws=$1
+    shift
 
     local ws_sources=()
-    ici_parse_env_array  ws_sources "${name^^}_WORKSPACE"
+    ici_parse_env_array ws_sources "${name^^}_WORKSPACE"
     local sources=("$@" "${ws_sources[@]}")
     local cmake_args ws_cmake_args=()
-    ici_parse_env_array  cmake_args CMAKE_ARGS
-    ici_parse_env_array  ws_cmake_args "${name^^}_CMAKE_ARGS"
+    ici_parse_env_array cmake_args CMAKE_ARGS
+    ici_parse_env_array ws_cmake_args "${name^^}_CMAKE_ARGS"
     local args=()
     if [ ${#cmake_args[@]} -gt 0 ] || [ ${#ws_cmake_args[@]} -gt 0 ]; then
         args+=(--cmake-args "${cmake_args[@]}" "${ws_cmake_args[@]}")
@@ -326,9 +347,12 @@ function ici_build_workspace {
 }
 
 function ici_test_workspace {
-    local name=$1; shift
-    local extend=$1; shift
-    local ws=$1; shift
+    local name=$1
+    shift
+    local extend=$1
+    shift
+    local ws=$1
+    shift
 
     ici_run "run_${name}_test" builder_run_tests "$extend" "$ws"
     builder_test_results "$extend" "$ws"

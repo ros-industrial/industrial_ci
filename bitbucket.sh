@@ -20,7 +20,7 @@
 # This is the entrypoint for BitBucket Pipelines only.
 
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR_THIS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export TARGET_REPO_PATH=$BITBUCKET_CLONE_DIR
 export TARGET_REPO_NAME=${BITBUCKET_REPO_SLUG##*/}

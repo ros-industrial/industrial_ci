@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function show_help {
-  cat - <<'EOF'
+    cat - <<'EOF'
 Usage:
   rerun_ci --list
   rerun_ci [--clean] TARGET_PATH [PARAM=VALUE>]...
@@ -28,47 +28,46 @@ EOF
 
 case "$1" in
 "--list")
-  mapfile -t images < <(docker images -q "industrial-ci/rerun_ci/*")
-  exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' "${images[@]}" 2> /dev/null
+    mapfile -t images < <(docker images -q "industrial-ci/rerun_ci/*")
+    exec docker image inspect --format '{{index .RepoTags 0}} - {{.Comment}}' "${images[@]}" 2>/dev/null
     ;;
 "--rm")
-  remove=true
-  shift
+    remove=true
+    shift
     ;;
 "--clean")
-  clean=true
-  shift
+    clean=true
+    shift
     ;;
 "-h" | "--help" | "")
-  show_help
-  exit 0
+    show_help
+    exit 0
     ;;
 esac
 
 if [ ! -d "$1" ]; then
-  show_help
-  exit 1
+    show_help
+    exit 1
 fi
 
 repo_dir=$(cd "$1" && pwd)
 shift
 
 DOCKER_COMMIT_MSG="$repo_dir $*"
-env_hash=$(sha256sum <<< "$DOCKER_COMMIT_MSG")
+env_hash=$(sha256sum <<<"$DOCKER_COMMIT_MSG")
 DOCKER_COMMIT="industrial-ci/rerun_ci/$(basename "$repo_dir"):${env_hash:0:12}"
 
 if [ "$remove" ]; then
-  exec docker rmi "$DOCKER_COMMIT"
+    exec docker rmi "$DOCKER_COMMIT"
 elif [ "$clean" ]; then
-  docker rmi "$DOCKER_COMMIT"
+    docker rmi "$DOCKER_COMMIT"
 fi
-
 
 force_env=("DOCKER_COMMIT=$DOCKER_COMMIT" "DOCKER_COMMIT_MSG=$DOCKER_COMMIT_MSG")
 keep_env=("DOCKER_PORT=$DOCKER_PORT" "HOME=$HOME" "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" "TERM=$TERM")
 
-if docker image inspect "$DOCKER_COMMIT" &> /dev/null; then
-  force_env+=("DOCKER_IMAGE=$DOCKER_COMMIT"  "DOCKER_PULL=false")
+if docker image inspect "$DOCKER_COMMIT" &>/dev/null; then
+    force_env+=("DOCKER_IMAGE=$DOCKER_COMMIT" "DOCKER_PULL=false")
 fi
 
 env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" "$@" "${force_env[@]}" || ret=$?

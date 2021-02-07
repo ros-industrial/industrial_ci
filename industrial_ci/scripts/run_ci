@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ -n "$1" ] && [[ ! "$1" =~ "=" ]]; then
     if [ -d "$1" ]; then
@@ -39,7 +39,10 @@ if [ -f "$script_dir/../src/ci_main.sh" ]; then # devel space
 elif [ -f "$script_dir/../../share/industrial_ci/src/ci_main.sh" ]; then # install space
     ci_dir="$script_dir/../../share/industrial_ci/"
 else
-    ci_dir=$(python2 -c "import rospkg; print rospkg.RosPack().get_path('industrial_ci')" 2>/dev/null) || { echo "could not find ci_main.sh"; exit 1; }
+    ci_dir=$(python2 -c "import rospkg; print rospkg.RosPack().get_path('industrial_ci')" 2>/dev/null) || {
+        echo "could not find ci_main.sh"
+        exit 1
+    }
 fi
 
 env "$@" /bin/bash "$ci_dir/src/ci_main.sh"

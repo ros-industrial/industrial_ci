@@ -19,7 +19,7 @@
 # This is the generic entrypoint for CI services.
 
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR_THIS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 export TARGET_REPO_PATH=${TARGET_REPO_PATH:-$(pwd)}
 export TARGET_REPO_NAME=${TARGET_REPO_NAME:-${TARGET_REPO_PATH##*/}}

@@ -24,11 +24,14 @@ function _append_job_opts() {
     fi
 }
 
-function _run_catkin_make_isolated () {
-  local target=$1; shift
-  local extend=$1; shift
-  local ws=$1; shift
-  ici_exec_in_workspace "$extend" "$ws" catkin_make_isolated --build-space "$ws/build" --install-space "$ws/install" --make-args "$target" "$@"
+function _run_catkin_make_isolated() {
+    local target=$1
+    shift
+    local extend=$1
+    shift
+    local ws=$1
+    shift
+    ici_exec_in_workspace "$extend" "$ws" catkin_make_isolated --build-space "$ws/build" --install-space "$ws/install" --make-args "$target" "$@"
 }
 
 function builder_setup {
@@ -48,7 +51,9 @@ function builder_run_tests {
 }
 
 function builder_test_results {
-    local extend=$1; shift
-    local ws=$1; shift
+    local extend=$1
+    shift
+    local ws=$1
+    shift
     ici_exec_in_workspace "$extend" "$ws" catkin_test_results --verbose
 }

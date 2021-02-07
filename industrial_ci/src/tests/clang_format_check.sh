@@ -16,38 +16,38 @@
 # limitations under the License.
 
 function prepare_clang_format_check() {
-  true
+    true
 }
 
 function run_clang_format_check() {
-  local err=0
-  local path
-  ici_make_temp_dir path
+    local err=0
+    local path
+    ici_make_temp_dir path
 
-  # Check whether a specific version of clang-format is desired
-  local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
+    # Check whether a specific version of clang-format is desired
+    local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
 
-  ici_time_start install_clang_format
-  ici_quiet ici_apt_install git-core "$clang_format_executable"
-  ici_time_end # install_clang_format
+    ici_time_start install_clang_format
+    ici_quiet ici_apt_install git-core "$clang_format_executable"
+    ici_time_end # install_clang_format
 
-  local sources=()
-  ici_parse_env_array sources TARGET_WORKSPACE
-  ici_run "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
+    local sources=()
+    ici_parse_env_array sources TARGET_WORKSPACE
+    ici_run "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
 
-  ici_time_start run_clang_format_check
-  while read -r file; do
-    echo "Checking '${file#$path/}'"
-    if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
-      err=$((err +1))
+    ici_time_start run_clang_format_check
+    while read -r file; do
+        echo "Checking '${file#$path/}'"
+        if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" -; then
+            err=$((err + 1))
+        fi
+    done < <(ici_find_nonhidden "$path" -iname '*.h' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.cc' -or -iname '*.cpp' -or -iname '*.cxx')
+
+    if [ "$err" -ne "0" ]; then
+        ici_error "Clang format check failed for $err file(s)."
+        echo "Changes required to comply to formatting rules. See diff above."
+        exit 1
     fi
-  done < <(ici_find_nonhidden "$path" -iname '*.h' -or -iname '*.hpp' -or -iname '*.c' -or -iname '*.cc' -or -iname '*.cpp' -or -iname '*.cxx')
-
-  if [ "$err" -ne "0" ]; then
-      ici_error "Clang format check failed for $err file(s)."
-      echo "Changes required to comply to formatting rules. See diff above."
-      exit 1
-  fi
-  echo 'Clang format check went successful.'
-  ici_time_end # run_clang_format_check
+    echo 'Clang format check went successful.'
+    ici_time_end # run_clang_format_check
 }

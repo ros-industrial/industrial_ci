@@ -29,7 +29,7 @@ function setup_ros_prerelease() {
     ici_asroot useradd -m -d "$WORKSPACE/home" ci
 
     if ! [ -d "$WORKSPACE/home/.ccache" ]; then
-      ici_asroot mkdir -p "$WORKSPACE/home/.ccache"
+        ici_asroot mkdir -p "$WORKSPACE/home/.ccache"
     fi
 
     if [ -e /var/run/docker.sock ]; then
@@ -45,36 +45,37 @@ function setup_ros_prerelease() {
 }
 
 function prepare_prerelease_workspaces() {
-  local ws_upstream=()
-  ici_parse_env_array ws_upstream UPSTREAM_WORKSPACE
-  local ws_target=()
-  ici_parse_env_array ws_target TARGET_WORKSPACE
-  local workspace=$1
-  local reponame=$2
-  local targetname=$3
-  ici_with_ws "$workspace/ws" ici_prepare_sourcespace "$workspace/ws/src/" "${ws_upstream[@]}" "${ws_target[@]}"
+    local ws_upstream=()
+    ici_parse_env_array ws_upstream UPSTREAM_WORKSPACE
+    local ws_target=()
+    ici_parse_env_array ws_target TARGET_WORKSPACE
+    local workspace=$1
+    local reponame=$2
+    local targetname=$3
+    ici_with_ws "$workspace/ws" ici_prepare_sourcespace "$workspace/ws/src/" "${ws_upstream[@]}" "${ws_target[@]}"
 
-  if ! [ -d "$workspace/ws/src/$reponame" ]; then
-      mv "$workspace/ws/src/$targetname" "$workspace/ws/src/$reponame"
-  fi
+    if ! [ -d "$workspace/ws/src/$reponame" ]; then
+        mv "$workspace/ws/src/$targetname" "$workspace/ws/src/$reponame"
+    fi
 
-  local overlay=()
-  ici_parse_env_array overlay DOWNSTREAM_WORKSPACE
-  ici_with_ws "$workspace/ws_overlay" ici_prepare_sourcespace "$workspace/ws_overlay/src/" "${overlay[@]}"
-  ici_asroot chown -R ci "$workspace"
+    local overlay=()
+    ici_parse_env_array overlay DOWNSTREAM_WORKSPACE
+    ici_with_ws "$workspace/ws_overlay" ici_prepare_sourcespace "$workspace/ws_overlay/src/" "${overlay[@]}"
+    ici_asroot chown -R ci "$workspace"
 }
 
 function prepare_ros_prerelease() {
     if [ "$BUILDER" != "colcon" ]; then
         export BUILDER=catkin_make_isolated
     fi
-    export WORKSPACE; WORKSPACE=$(mktemp -d)
+    export WORKSPACE
+    WORKSPACE=$(mktemp -d)
     if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
-      if [ "$ROS_VERSION" -eq 2 ]; then
-          export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
-      else
-          export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml"
-      fi
+        if [ "$ROS_VERSION" -eq 2 ]; then
+            export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
+        else
+            export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros-infrastructure/ros_buildfarm_config/production/index.yaml"
+        fi
     fi
     export PRERELEASE_DISTRO="$ROS_DISTRO"
 
@@ -82,7 +83,7 @@ function prepare_ros_prerelease() {
     for e in TRAVIS OS_NAME OS_CODE_NAME OS_ARCH PRERELEASE_DOWNSTREAM_DEPTH PRERELEASE_REPONAME ROSDISTRO_INDEX_URL PRERELEASE_DISTRO; do
         ici_forward_variable "$e"
     done
-    
+
     ici_forward_mount WORKSPACE rw
 
     if [ -n "${DOCKER_PORT:-}" ]; then
@@ -91,8 +92,8 @@ function prepare_ros_prerelease() {
         ici_forward_mount /var/run/docker.sock rw
     fi
     if [ -n "${CCACHE_DIR}" ]; then
-      ici_forward_mount CCACHE_DIR rw "$WORKSPACE/home/.ccache"
-      CCACHE_DIR= # prevent cachedir from beeing added twice
+        ici_forward_mount CCACHE_DIR rw "$WORKSPACE/home/.ccache"
+        CCACHE_DIR= # prevent cachedir from beeing added twice
     fi
     export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
     export ROS_DISTRO=noetic
