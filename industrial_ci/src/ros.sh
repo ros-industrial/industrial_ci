@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function _ros1_defaults {
+function _ros1_defaults() {
     export OS_CODE_NAME=${OS_CODE_NAME:-$1}
     export ROS1_DISTRO=${ROS1_DISTRO:-$ROS_DISTRO}
     export BUILDER=${BUILDER:-catkin_tools}
@@ -25,7 +25,7 @@ function _ros1_defaults {
     export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-2}
 }
 
-function _ros2_defaults {
+function _ros2_defaults() {
     export OS_CODE_NAME=${OS_CODE_NAME:-$1}
     export ROS2_DISTRO=${ROS2_DISTRO:-$ROS_DISTRO}
     export BUILDER=${BUILDER:-colcon}
@@ -34,7 +34,7 @@ function _ros2_defaults {
     export ROS_PYTHON_VERSION=3
 }
 
-function _set_ros_defaults {
+function _set_ros_defaults() {
     case "$ROS_DISTRO" in
     "indigo" | "jade")
         _ros1_defaults "trusty"
@@ -118,7 +118,7 @@ function _get_prefix() {
     fi
 }
 
-function _set_ros_package_path {
+function _set_ros_package_path() {
     if [ -z "${ROS_REPOSITORY_PATH}" ]; then
         case "$ROS_REPO" in
         "building")

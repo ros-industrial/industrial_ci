@@ -17,7 +17,7 @@
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-function show_help {
+function show_help() {
     cat - <<'EOF'
 Usage:
   rerun_ci --list

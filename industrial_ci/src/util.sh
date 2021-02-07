@@ -30,26 +30,26 @@ export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
 export ICI_START_TIME=${ICI_START_TIME:-}
 export ICI_TIME_ID=${ICI_TIME_ID:-}
 
-function ici_color_output {
+function ici_color_output() {
     local c=$1
     shift
     echo -e "\e[${c}m$*\e[0m"
 }
 
-function ici_ansi_cleared_line {
+function ici_ansi_cleared_line() {
     echo -en "$*\r\e[0K"
 }
 
-function ici_set_u {
+function ici_set_u() {
     [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
 }
-function ici_with_unset_variables {
+function ici_with_unset_variables() {
     set +u
     "$@"
     ici_set_u
 }
 
-function ici_source_setup {
+function ici_source_setup() {
     ici_with_unset_variables source "$1/setup.bash"
 }
 
@@ -119,7 +119,7 @@ function ici_hook() {
 #   (None)
 #######################################
 
-function ici_time_start {
+function ici_time_start() {
     ici_hook "before_${1}"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     ICI_START_TIME=$(date -u +%s%N)
@@ -150,7 +150,7 @@ function ici_time_start {
 # Returns:
 #   (None)
 #######################################
-function ici_time_end {
+function ici_time_end() {
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     local color_wrap=${1:-${ANSI_GREEN}}
     local exit_code=${2:-$?}
@@ -175,7 +175,7 @@ function ici_time_end {
     ici_hook "after_${name}"
 }
 
-function ici_run {
+function ici_run() {
     local name=$1
     shift
     ici_time_start "$name"
@@ -194,7 +194,7 @@ function ici_run {
 # Returns:
 #   (None)
 #######################################
-function ici_exit {
+function ici_exit() {
     local exit_code=${1:-$?} # If 1st arg is not passed, set last error code.
     trap - EXIT              # Reset signal handler since the shell is about to exit.
 
@@ -222,11 +222,11 @@ function ici_exit {
     exit "$exit_code"
 }
 
-function ici_warn {
+function ici_warn() {
     ici_color_output ${ANSI_YELLOW} "$*"
 }
 
-function ici_mark_deprecated {
+function ici_mark_deprecated() {
     local e=$1
     shift
     if [ "${!e:-}" ]; then
@@ -249,7 +249,7 @@ function ici_mark_deprecated {
 # Returns:
 #   (None)
 #######################################
-function ici_error {
+function ici_error() {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
         ici_color_output >&2 ${ANSI_RED} "$1"
@@ -260,7 +260,7 @@ function ici_error {
     ici_exit "$exit_code"
 }
 
-function ici_enforce_deprecated {
+function ici_enforce_deprecated() {
     local e=$1
     shift
     if [ "${!e:-}" ]; then
@@ -295,7 +295,7 @@ function ici_removed_hook() {
     done
 }
 
-function ici_retry {
+function ici_retry() {
     local tries=$1
     shift
     local ret=0
@@ -310,7 +310,7 @@ function ici_retry {
     return $ret
 }
 
-function ici_quiet {
+function ici_quiet() {
     local out
     out=$(mktemp)
     # shellcheck disable=SC2216
@@ -324,7 +324,7 @@ function ici_quiet {
     return "$err"
 }
 
-function ici_asroot {
+function ici_asroot() {
     if command -v sudo >/dev/null; then
         sudo "$@"
     else
@@ -332,7 +332,7 @@ function ici_asroot {
     fi
 }
 
-function ici_exec_for_command {
+function ici_exec_for_command() {
     local command=$1
     shift
     if ! command -v "$command" >/dev/null; then
@@ -340,17 +340,17 @@ function ici_exec_for_command {
     fi
 }
 
-function ici_split_array {
+function ici_split_array() {
     # shellcheck disable=SC2034
     IFS=" " read -r -a "$1" <<<"$*"
 }
 
-function ici_parse_env_array {
+function ici_parse_env_array() {
     # shellcheck disable=SC2034
     eval "$1=(${!2:-})"
 }
 
-function ici_parse_jobs {
+function ici_parse_jobs() {
     local -n _ici_parse_jobs_res=$1
     # shellcheck disable=SC2034
     _ici_parse_jobs_res=${!2:-}
@@ -373,7 +373,7 @@ function ici_parse_jobs {
     esac
 }
 
-function ici_find_nonhidden {
+function ici_find_nonhidden() {
     local path=$1
     shift
     local args=()
@@ -383,7 +383,7 @@ function ici_find_nonhidden {
     find "$path" \( \! \( -path "${path}*/.*" -prune \) \) "${args[@]}"
 }
 
-function ici_resolve_component {
+function ici_resolve_component() {
     local label=$1
     local group=$2
     for file in "${TARGET_REPO_PATH}/${!label}" "${ICI_SRC_PATH}/$group/${!label}.sh"; do
@@ -395,22 +395,22 @@ function ici_resolve_component {
     ici_error "$label '${!label}' not found"
 }
 
-function ici_source_component {
+function ici_source_component() {
     local script
     script=$(ici_resolve_component "$@")
     # shellcheck disable=SC1090
     source "$script"
 }
 
-function ici_check_builder {
+function ici_check_builder() {
     [ -z "$BUILDER" ] || ici_resolve_component BUILDER builders >/dev/null
 }
 
-function ici_source_builder {
+function ici_source_builder() {
     ici_source_component BUILDER builders
 }
 
-function ici_join_array {
+function ici_join_array() {
     local sep=$1
     shift
     local res=""
@@ -422,11 +422,11 @@ function ici_join_array {
     echo "${res#$sep}"
 }
 
-function ici_cleanup_later {
+function ici_cleanup_later() {
     _CLEANUP=$(ici_join_array : "$_CLEANUP" "$@")
 }
 
-function ici_make_temp_dir {
+function ici_make_temp_dir() {
     local -n ici_make_temp_dir_res=$1
     ici_make_temp_dir_res=$(mktemp -d)
     ici_cleanup_later "$ici_make_temp_dir_res"

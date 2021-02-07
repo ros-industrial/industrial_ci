@@ -27,7 +27,7 @@ function ici_forward_variable() {
     fi
 }
 
-function ici_isolate {
+function ici_isolate() {
     if [ "${CI:-}" != true ]; then
         ici_error 'ISOLATION=shell needs CI=true'
     fi

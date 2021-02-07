@@ -26,11 +26,11 @@ function _append_job_opts() {
     fi
 }
 
-function builder_setup {
+function builder_setup() {
     ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin"
 }
 
-function builder_run_build {
+function builder_run_build() {
     local extend=$1
     shift
     local ws=$1
@@ -44,7 +44,7 @@ function builder_run_build {
     ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize --no-status "$@"
 }
 
-function builder_run_tests {
+function builder_run_tests() {
     local extend=$1
     shift
     local ws=$1
@@ -60,7 +60,7 @@ function builder_run_tests {
     ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
 }
 
-function builder_test_results {
+function builder_test_results() {
     local extend=$1
     shift
     local ws=$1

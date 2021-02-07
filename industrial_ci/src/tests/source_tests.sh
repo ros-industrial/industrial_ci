@@ -22,11 +22,11 @@
 # It is dependent on environment variables that need to be exported in advance
 # (As of version 0.4.4 most of them are defined in env.sh).
 
-function install_catkin_lint {
+function install_catkin_lint() {
     ici_install_pypi_pkgs_for_command catkin_lint "catkin-lint"
 }
 
-function run_clang_tidy {
+function run_clang_tidy() {
     local regex="$1/.*"
     local -n _run_clang_tidy_warnings=$2
     local -n _run_clang_tidy_errors=$3
@@ -74,7 +74,7 @@ EOF
     fi
 }
 
-function run_clang_tidy_check {
+function run_clang_tidy_check() {
     local target_ws=$1
     local errors=()
     local warnings=()
@@ -99,7 +99,7 @@ function run_clang_tidy_check {
     fi
 }
 
-function run_pylint_check {
+function run_pylint_check() {
     local target_ws=$1
 
     local args=()
@@ -119,11 +119,11 @@ function run_pylint_check {
     ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
 }
 
-function prepare_source_tests {
+function prepare_source_tests() {
     ici_check_builder
 }
 
-function run_source_tests {
+function run_source_tests() {
     upstream_ws=$BASEDIR/upstream_ws
     target_ws=$BASEDIR/target_ws
     downstream_ws=$BASEDIR/downstream_ws

@@ -17,7 +17,7 @@
 
 _colcon_event_handlers=(desktop_notification- status- terminal_title-)
 
-function builder_setup {
+function builder_setup() {
     ici_install_pkgs_for_command colcon python3-colcon-common-extensions
     if [ "$ROS_DISTRO" = "kinetic" ] || [ "$ROS_DISTRO" = "ardent" ]; then
         ici_install_pkgs_for_command pip3 python3-pip
@@ -25,7 +25,7 @@ function builder_setup {
     fi
 }
 
-function builder_run_build {
+function builder_run_build() {
     local extend=$1
     shift
     local ws=$1
@@ -41,7 +41,7 @@ function builder_run_build {
     ici_exec_in_workspace "$extend" "$ws" colcon build "${opts[@]}" "$@"
 }
 
-function builder_run_tests {
+function builder_run_tests() {
     local extend=$1
     shift
     local ws=$1
@@ -63,7 +63,7 @@ function builder_run_tests {
     ici_exec_in_workspace "$extend" "$ws" colcon test "${opts[@]}"
 }
 
-function builder_test_results {
+function builder_test_results() {
     local extend=$1
     shift
     local ws=$1

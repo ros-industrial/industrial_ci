@@ -18,7 +18,7 @@
 
 export _DEFAULT_DEBS=${_DEFAULT_DEBS:-}
 
-function ici_parse_repository_url {
+function ici_parse_repository_url() {
     local url=$1
     shift
     if [[ $url =~ ([^:]+):([^#]+)#(.+) ]]; then
@@ -52,15 +52,15 @@ function ici_parse_repository_url {
     fi
 }
 
-function ici_apt_install {
+function ici_apt_install() {
     ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
 }
 
-function ici_pip_install {
+function ici_pip_install() {
     ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
 }
 
-function ici_init_apt {
+function ici_init_apt() {
     export DEBIAN_FRONTEND=noninteractive
 
     ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
@@ -101,30 +101,30 @@ function ici_init_apt {
     fi
 }
 
-function ici_install_pkgs_for_command {
+function ici_install_pkgs_for_command() {
     local command=$1
     shift
     ici_exec_for_command "$command" ici_apt_install "$@"
 }
 
-function ici_install_pypi_pkgs_for_command {
+function ici_install_pypi_pkgs_for_command() {
     local command=$1
     shift
     ici_exec_for_command "$command" ici_pip_install "$@"
 }
 
-function ici_setup_git_client {
+function ici_setup_git_client() {
     ici_install_pkgs_for_command git git-core
     if [ -d ~/.ssh ]; then
         ici_install_pkgs_for_command ssh ssh-client
     fi
 }
 
-function ici_vcs_import {
+function ici_vcs_import() {
     vcs import --recursive --force "$@"
 }
 
-function ici_import_repository {
+function ici_import_repository() {
     local sourcespace=$1
     shift
     local url=$1
@@ -151,7 +151,7 @@ function ici_import_repository {
     fi
 }
 
-function ici_import_file {
+function ici_import_file() {
     local sourcespace=$1
     shift
     local file=$1
@@ -171,7 +171,7 @@ function ici_import_file {
 
 }
 
-function ici_import_url {
+function ici_import_url() {
     local sourcespace=$1
     shift
     local url=$1
@@ -197,7 +197,7 @@ function ici_import_url {
     set +o pipefail
 }
 
-function ici_import_directory {
+function ici_import_directory() {
     local sourcespace=$1
     shift
     local dir=$1
@@ -206,7 +206,7 @@ function ici_import_directory {
     cp -a "$dir" "$sourcespace"
 }
 
-function ici_prepare_sourcespace {
+function ici_prepare_sourcespace() {
     local sourcespace=$1
     shift
     local basepath=$TARGET_REPO_PATH
@@ -266,7 +266,7 @@ function ici_prepare_sourcespace {
     done
 }
 
-function ici_setup_rosdep {
+function ici_setup_rosdep() {
     ici_install_pkgs_for_command rosdep "${PYTHON_VERSION_NAME}-rosdep"
     ici_install_pkgs_for_command "pip${ROS_PYTHON_VERSION}" "${PYTHON_VERSION_NAME}-pip"
 
@@ -293,7 +293,7 @@ function ici_setup_rosdep {
     ici_retry 2 rosdep update "${update_opts[@]}"
 }
 
-function ici_exec_in_workspace {
+function ici_exec_in_workspace() {
     local extend=$1
     shift
     local path=$1
@@ -301,7 +301,7 @@ function ici_exec_in_workspace {
     ({ [ ! -e "$extend/setup.bash" ] || ici_source_setup "$extend"; } && cd "$path" && exec "$@")
 }
 
-function ici_install_dependencies {
+function ici_install_dependencies() {
     local extend=$1
     shift
     local skip_keys=$1
@@ -322,7 +322,7 @@ function ici_install_dependencies {
     set +o pipefail
 }
 
-function ici_build_workspace {
+function ici_build_workspace() {
     local name=$1
     shift
     local extend=$1
@@ -346,7 +346,7 @@ function ici_build_workspace {
     ici_run "build_${name}_workspace" builder_run_build "$extend" "$ws" "${args[@]}"
 }
 
-function ici_test_workspace {
+function ici_test_workspace() {
     local name=$1
     shift
     local extend=$1
