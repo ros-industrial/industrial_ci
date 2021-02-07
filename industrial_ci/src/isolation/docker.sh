@@ -62,7 +62,16 @@ function ici_forward_variable() {
 #######################################
 function ici_isolate() {
   local file=${1}; shift
-  DOCKER_IMAGE=${DOCKER_IMAGE:-${OS_NAME:-ubuntu}:$OS_CODE_NAME} # scheme works for all supported OS images
+
+  if [ "${DOCKER_IMAGE-x}" = "" ]; then
+      ici_error "Empty string passed to DOCKER_IMAGE. Specify a valid docker image or unset the environment variable to use the default image."
+  fi
+
+  if [ -n "${OS_CODE_NAME-}" ]; then
+      DOCKER_IMAGE=${DOCKER_IMAGE:-${OS_NAME}:$OS_CODE_NAME} # scheme works for all supported OS images
+  elif [ -z "${DOCKER_IMAGE-}" ]; then
+      ici_error "Please set ROS_DISTRO, OS_CODE_NAME or DOCKER_IMAGE."
+  fi
 
   if [ "$DOCKER_PULL" != false ]; then
       ici_run "pull_docker_image"  docker pull "$DOCKER_IMAGE"
