@@ -108,17 +108,9 @@ function run_pylint_check {
     for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path "*$p*"); done
     pylint_find_pattern+=(-type f -iname '*.py')
 
-    ici_time_start "install_pylint"
-    ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-    ici_time_end # install_pylint
+    ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
 
-    ici_time_start "run_pylint"
-    if ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" $(ici_find_nonhidden "$target_ws/src" "${pylint_find_pattern[@]}"); then
-        ici_time_end # run_pylint
-    else
-        ici_time_end "${ANSI_RED}" # run_pylint
-        ici_error
-    fi
+    ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" $(ici_find_nonhidden "$target_ws/src" "${pylint_find_pattern[@]}")
 }
 
 function prepare_source_tests {
