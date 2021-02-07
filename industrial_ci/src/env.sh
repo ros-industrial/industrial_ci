@@ -60,7 +60,16 @@ export PARALLEL_BUILDS=${PARALLEL_BUILDS:-0}
 export PARALLEL_TESTS=${PARALLEL_TESTS:-1}
 
 export PRERELEASE=${PRERELEASE:-false}
-export OS_NAME=${OS_NAME:-ubuntu}
+
+case "${OS_CODE_NAME-}" in
+# https://wiki.debian.org/DebianReleases#Production_Releases
+"jessie"|"stretch"|"buster"|"bullseye"|"bookwork"|"trixie")
+    export OS_NAME=debian
+    ;;
+*)
+    export OS_NAME=${OS_NAME:-ubuntu}
+    ;;
+esac
 
 export ROSDEP_SKIP_KEYS=${ROSDEP_SKIP_KEYS:-}
 

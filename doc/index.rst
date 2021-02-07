@@ -190,7 +190,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **NOT_TEST_BUILD** (default: not set): If true, tests in ``build`` space won't be run.
 * **NOT_TEST_DOWNSTREAM** (default: not set): If true, tests in the downstream workspace won't be run.
 * **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
-* **OS_NAME** (default: ubuntu): Possible options: {``ubuntu``, ``debian``}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
+* **OS_NAME** (default: derived from OS_CODE_NAME): Possible options: {``ubuntu``, ``debian``}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
 * **PARALLEL_BUILDS** (default: 0): Sets the number of parallel build jobs among all packages. ``0`` or ``true`` unsets the limit.
 * **PARALLEL_TESTS** (default: 1): Sets the number of parallel test jobs. ``0`` or ``true`` unsets the limit.
 * **PRERELEASE** (default: ``false``): If ``true``, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`__. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-ros-prerelease-test>`__.
@@ -625,8 +625,8 @@ Use Debian
 
 E.g.:
 
-* ``OS_NAME=debian OS_CODE_NAME=jessie``
-* ``OS_NAME=debian OS_CODE_NAME=stretch``
+* ``OS_CODE_NAME=jessie``
+* ``OS_CODE_NAME=stretch``
 
 All combinations available of OS and distros
 ++++++++++++++++++++++++++++++++++++++++++++++
