@@ -21,6 +21,7 @@ jobs:
       - uses: docker://mvdan/shfmt
         with:
           args: -d -i 4 .
+      - run: "! grep -rEo 'function +[a-zA-Z_]+ +\\{' *"
   industrial_ci:
     strategy:
       matrix:
