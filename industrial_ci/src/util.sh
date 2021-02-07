@@ -167,7 +167,6 @@ function ici_time_end {
     ICI_FOLD_NAME=
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
     ici_hook "after_${name}"
-
 }
 
 function ici_run {

@@ -97,6 +97,26 @@ function run_clang_tidy_check {
     fi
 }
 
+function run_pylint_check {
+    local target_ws=$1
+
+    local args=()
+    ici_parse_env_array args PYLINT_ARGS
+
+    local find_pattern=(-type f -iname '*.py')
+    local excludes=()
+    ici_parse_env_array excludes PYLINT_EXCLUDE
+    for p in "${excludes[@]}"; do
+      find_pattern+=(-not -path "*$p*");
+    done
+
+    local files=()
+    mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${find_pattern[@]}")
+
+    ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
+    ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+}
+
 function prepare_source_tests {
     ici_check_builder
 }
@@ -144,6 +164,9 @@ function run_source_tests {
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then
         run_clang_tidy_check "$target_ws"
+    fi
+    if [ "$PYLINT_CHECK" == "true" ]; then
+        run_pylint_check "$target_ws"
     fi
 
     extend="$target_ws/install"
