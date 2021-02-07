@@ -99,19 +99,22 @@ function run_clang_tidy_check {
 
 function run_pylint_check {
     local target_ws=$1
-    local pylint_args=()
 
-    ici_parse_env_array pylint_args PYLINT_ARGS
+    local args=()
+    ici_parse_env_array args PYLINT_ARGS
 
-    local pylint_find_pattern=()
-    # shellcheck disable=SC2016,SC2034
-    for p in $PYLINT_EXCLUDE; do pylint_find_pattern+=(-not -path "*$p*"); done
-    pylint_find_pattern+=(-type f -iname '*.py')
+    local find_pattern=(-type f -iname '*.py')
+    local excludes=()
+    ici_parse_env_array excludes PYLINT_EXCLUDE
+    for p in "${excludes[@]}"; do
+      find_pattern+=(-not -path "*$p*");
+    done
+
     local files=()
-    mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${pylint_find_pattern[@]}")
+    mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${find_pattern[@]}")
 
     ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-    ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${pylint_args[@]}" "${files[@]}"
+    ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
 }
 
 function prepare_source_tests {
