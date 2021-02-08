@@ -1,0 +1,38 @@
+# Cron job for https://github.com/ros-industrial/industrial_ci/blob/legacy/.github/workflows/legacy.yml
+name: Cron Legacy
+on:
+  schedule:
+    - cron: "0 0 * * *" # every day at midnight
+
+# https://stackoverflow.com/questions/58798886/github-actions-schedule-operation-on-branch
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          ref: legacy
+      - uses: docker://koalaman/shellcheck-alpine
+        with:
+          args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
+  industrial_ci:
+    strategy:
+      matrix:
+        env:
+          - {ROS_DISTRO: kinetic, PRERELEASE: true}
+          - {ROS_DISTRO: melodic, PRERELEASE: true}
+          - {ROS_DISTRO: kinetic, ROS_REPO: ros}
+          - {ROS_DISTRO: melodic, ROS_REPO: ros}
+          - {ROS_DISTRO: hydro}
+          - {ROS_DISTRO: indigo}
+          - {ROS_DISTRO: jade}
+          - {ROS_DISTRO: kinetic}
+          - {ROS_DISTRO: lunar}
+          - {ROS_DISTRO: melodic}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          ref: legacy
+      - run: ./ci.sh
+        env: ${{matrix.env}}
