@@ -3,8 +3,7 @@ name: Legacy
 on:
   push:
   pull_request:
-  schedule:
-    - cron: "0 0 * * *" # every day at midnight
+  # schedule: https://github.com/ros-industrial/industrial_ci/blob/master/.github/workflows/legacy.yml
 
 jobs:
   shellcheck:
