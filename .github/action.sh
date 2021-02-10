@@ -18,13 +18,20 @@
 # This is the entrypoint for GitHub Actions only.
 
 # 2016/05/18 http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+
+set -euo pipefail
+
 DIR_THIS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export TARGET_REPO_PATH=$GITHUB_WORKSPACE
 export TARGET_REPO_NAME=${GITHUB_REPOSITORY##*/}
 export _FOLDING_TYPE=github_actions
 
+ICI_SRC_PATH="$DIR_THIS/../industrial_ci/src"
+source "$ICI_SRC_PATH/util.sh"
+
 if [ -n "$INPUT_CONFIG" ]; then
+    ici_exec_for_command jq ici_error "In order to use the config parameter, please install jq"
     vars=$(jq -r 'keys[] as $k | "export \($k)=\(.[$k]|tojson)" | gsub("\\$\\$";"\\$")' <<< "$INPUT_CONFIG"  | grep "^export [A-Z][A-Z_]*=")
     echo "$vars"
     eval "$vars"
