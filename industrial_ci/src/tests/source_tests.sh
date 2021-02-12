@@ -107,14 +107,18 @@ function run_pylint_check {
     local excludes=()
     ici_parse_env_array excludes PYLINT_EXCLUDE
     for p in "${excludes[@]}"; do
-      find_pattern+=(-not -path "*$p*");
+        find_pattern+=(-not -path "*$p*");
     done
 
     local files=()
     mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${find_pattern[@]}")
 
-    ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-    ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+    if [ "${#files[@]}" -ne 0 ]; then
+        ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
+        ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+    else
+        ici_warn "No python files found, skipping pylint"
+    fi
 }
 
 function prepare_source_tests {
