@@ -27,7 +27,7 @@ function _append_job_opts() {
 }
 
 function builder_setup {
-  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin"
+  ici_install_pkgs_for_command catkin "${PYTHON_VERSION_NAME}-catkin-tools" "ros-$ROS_DISTRO-catkin" "${PYTHON_VERSION_NAME}-osrf-pycommon"
 }
 
 function builder_run_build {
