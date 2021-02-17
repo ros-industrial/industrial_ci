@@ -41,6 +41,12 @@ source "${ICI_SRC_PATH}/ros.sh"
 
 trap ici_exit EXIT # install industrial_ci exit handler
 
+if [ -n "${BASEDIR:-}" ]; then
+  if [[ $(readlink -m "$BASEDIR")/ ==  $(readlink -m "$TARGET_REPO_PATH")/* ]]; then
+    ici_relocate_target_path
+  fi
+fi
+
 export ISOLATION=${ISOLATION:-docker}
 if [ "${CI:-}" != true ] ; then
   if [ "${ISOLATION}" = "shell" ]; then
