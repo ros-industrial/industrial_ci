@@ -82,7 +82,7 @@ test_junit_docker:
 
 test_junit_shell:
   image: ros:noetic
-  script: ./gitlab.sh TARGET_WORKSPACE="gh:ros/filters.git#HEAD"
+  script: ./gitlab.sh TARGET_WORKSPACE=". gh:ros/filters.git#HEAD"
   before_script: []
   services: []
   variables:
