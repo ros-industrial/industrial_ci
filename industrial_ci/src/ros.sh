@@ -51,7 +51,6 @@ function _set_ros_defaults {
         _ros1_defaults "bionic"
         ;;
     "noetic")
-        export BUILDER=${BUILDER:-colcon}
         _ros1_defaults "focal"
         export ROS_PYTHON_VERSION=3
         ;;
