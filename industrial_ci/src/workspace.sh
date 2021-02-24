@@ -333,3 +333,19 @@ function ici_test_workspace {
     ici_run "run_${name}_test" builder_run_tests "$extend" "$ws"
     builder_test_results "$extend" "$ws"
 }
+
+function ici_source_setup {
+  echo ici_with_unset_variables source "$1/setup.bash"
+  if [ "$ROS_VERSION" -eq 1 ] && [ -f "$1/.colcon_install_layout" ]; then
+    # Fix for https://github.com/ros-industrial/industrial_ci/issues/624
+    # (Re)populate ROS_PACKAGE_PATH from all underlays
+    source "/opt/ros/$ROS_DISTRO/etc/catkin/profile.d/1.ros_package_path.sh"
+  fi
+}
+
+function ici_with_ws() {
+  # shellcheck disable=SC2034
+  current_ws=$1; shift
+  "$@"
+  unset current_ws
+}

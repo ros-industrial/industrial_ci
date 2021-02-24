@@ -49,17 +49,6 @@ function ici_with_unset_variables {
   ici_set_u
 }
 
-function ici_source_setup {
-  ici_with_unset_variables source "$1/setup.bash"
-}
-
-function ici_with_ws() {
-  # shellcheck disable=SC2034
-  current_ws=$1; shift
-  "$@"
-  unset current_ws
-}
-
 function _sub_shell() (
   function rosenv() {
     # if current_ws not set, use an invalid path to skip it
