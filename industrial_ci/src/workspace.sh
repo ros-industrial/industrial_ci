@@ -335,7 +335,7 @@ function ici_test_workspace {
 }
 
 function ici_source_setup {
-  echo ici_with_unset_variables source "$1/setup.bash"
+  ici_with_unset_variables source "$1/setup.bash"
   if [ "$ROS_VERSION" -eq 1 ] && [ -f "$1/.colcon_install_layout" ]; then
     # Fix for https://github.com/ros-industrial/industrial_ci/issues/624
     # (Re)populate ROS_PACKAGE_PATH from all underlays
