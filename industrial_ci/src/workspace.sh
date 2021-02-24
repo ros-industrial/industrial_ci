@@ -339,6 +339,7 @@ function ici_source_setup {
   if [ "$ROS_VERSION" -eq 1 ] && [ -f "$1/.colcon_install_layout" ]; then
     # Fix for https://github.com/ros-industrial/industrial_ci/issues/624
     # (Re)populate ROS_PACKAGE_PATH from all underlays
+    # shellcheck disable=SC1090
     source "/opt/ros/$ROS_DISTRO/etc/catkin/profile.d/1.ros_package_path.sh"
   fi
 }
