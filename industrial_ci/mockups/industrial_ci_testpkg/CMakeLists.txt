@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(industrial_ci_testpkg)
 
 if(FAIL_CMAKE)
