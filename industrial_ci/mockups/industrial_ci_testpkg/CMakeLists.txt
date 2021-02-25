@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+endif()
+
 project(industrial_ci_testpkg)
 
 if(FAIL_CMAKE)

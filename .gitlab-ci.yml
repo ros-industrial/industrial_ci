@@ -30,6 +30,7 @@ indigo:
   script: .industrial_ci/gitlab.sh
   variables:
     ROS_DISTRO: "indigo"
+    TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'
 
 kinetic:
   script: .industrial_ci/gitlab.sh ROS_DISTRO=kinetic  # alternate syntax
