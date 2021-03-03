@@ -145,6 +145,25 @@ For GitHub Actions
          - uses: 'ros-industrial/industrial_ci@master'
            env: ${{matrix.env}}
 
+For Google Cloud Build
+----------------------
+1. Connect your source code repository to your Google Cloud Project. Please refer to the `official documentation <https://cloud.google.com/build/docs/automating-builds/create-manage-triggers#gcloud>`__ for the steps to do so.
+2. In the `cloudbuild.yaml` file in your client repo, add the following minimal configuration
+
+::
+
+  steps:
+    - name: 'ros:melodic'
+      entrypoint: 'bash'
+      args:
+        - '-c'
+        - |-
+          git clone --depth 1 https://github.com/ros-industrial/industrial_ci .industrial_ci -b master
+          .industrial_ci/ci.sh
+      env:
+        - 'ISOLATION=shell'
+        - 'CI=true'
+
 Concrete examples of config files
 -------------------------------------
 
