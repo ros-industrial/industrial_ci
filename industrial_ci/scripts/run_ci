@@ -42,7 +42,7 @@ else
     ci_dir=$(python2 -c "import rospkg; print rospkg.RosPack().get_path('industrial_ci')" 2>/dev/null) || { echo "could not find ci_main.sh"; exit 1; }
 fi
 
-env "$@" /bin/bash "$ci_dir/src/ci_main.sh"
+env "$@" /bin/bash "$(readlink -e "$ci_dir/src/ci_main.sh")"
 ret=$?
 
 if [ "$ret" == "0" ]; then
