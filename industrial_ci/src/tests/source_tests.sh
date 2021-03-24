@@ -26,6 +26,25 @@ function install_catkin_lint {
     ici_install_pypi_pkgs_for_command catkin_lint "catkin-lint"
 }
 
+function clang_tidy_filter {
+    local build=$1
+    local base_ref=$2
+    local result
+    local src_dir
+
+    src_dir=$(grep "^CMAKE_HOME_DIRECTORY:INTERNAL=" "$build/CMakeCache.txt")
+    pushd "$(realpath "${src_dir#*=}")" > /dev/null || exit
+    if [ "$(git rev-parse --abbrev-ref HEAD)" == "$base_ref" ] ; then
+        result=1  # HEAD is on par with $base_ref: always perform clang-tidy
+    else
+        git fetch -q origin "$base_ref"
+        # Count the number of C++ files changed w.r.t. base_ref
+        result=$(git diff --name-only --diff-filter=MA FETCH_HEAD..HEAD . | grep -cP '\.(c|cpp|h|hpp)$')
+    fi
+    popd > /dev/null || exit
+    return "$result"
+}
+
 function run_clang_tidy {
     local regex="$1/.*"
     local -n _run_clang_tidy_warnings=$2
@@ -40,6 +59,19 @@ function run_clang_tidy {
 
     local build; build="$(dirname "$db")"
     local name; name="$(basename "$build")"
+
+    if [ ! -f "$build/CMakeCache.txt" ]; then
+        # colcon puts a compile-commands.json in the base of the build directly
+        # We skip this one becasue we want to run per-ros-package
+        return 0
+    fi
+
+    if [ -n "$CLANG_TIDY_BASE_REF" ]; then
+        if clang_tidy_filter "$build" "$CLANG_TIDY_BASE_REF"; then
+            echo "$name has no changes, skipping clang-tidy test"
+            return 0
+        fi
+    fi
 
     local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
     if ! [ "$max_jobs" -ge 1 ]; then
