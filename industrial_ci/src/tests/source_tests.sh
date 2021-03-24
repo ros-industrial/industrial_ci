@@ -33,9 +33,21 @@ function run_clang_tidy {
     local db=$4
     shift 4
 
+    # create an array of all files listed in $db filtered by the source tree
     mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
+    if [ -n "$CLANG_TIDY_BASE_REF" ] ; then
+        # Need to run git in actual source dir:  $files[@] refer to source dir and $PWD is read-only
+        local src_dir
+        src_dir=$(grep -oP "(?<=CMAKE_HOME_DIRECTORY:INTERNAL=).*" "$build/CMakeCache.txt")
+        pushd "$src_dir" > /dev/null || true
+        if git fetch -q origin "$CLANG_TIDY_BASE_REF" 2> /dev/null; then  # git might fail, e.g. operating on catkin_tools_prebuild
+            # Filter for changed files, using sed to augment full path again (which git strips away)
+            mapfile -t files < <(git diff --name-only --diff-filter=MA FETCH_HEAD..HEAD -- "${files[@]}" | sed "s#^#$PWD/#")
+        fi
+        popd > /dev/null || true
+    fi
     if [ "${#files[@]}" -eq 0 ]; then
-        return 0
+        return 0  # no files left for checking
     fi
 
     local build; build="$(dirname "$db")"
