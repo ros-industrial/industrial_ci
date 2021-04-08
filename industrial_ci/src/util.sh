@@ -117,9 +117,7 @@ function ici_time_start {
     echo # blank line
 
     ici_start_fold "$ICI_TIME_ID" "$ICI_FOLD_NAME" "$ICI_START_TIME"
-
-    ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    ici_color_output $ANSI_BLUE "Starting function '$ICI_FOLD_NAME'"
+    ici_color_output $ANSI_BLUE "$ICI_FOLD_NAME"
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
 }
 
@@ -148,10 +146,9 @@ function ici_time_end {
     local end_time; end_time=$(date -u +%s%N)
     local elapsed_seconds; elapsed_seconds=$(( (end_time - ICI_START_TIME)/1000000000 ))
 
+    echo -en "\e[${color_wrap}m"  # just set color, no output
     ici_end_fold "$ICI_TIME_ID" "$name" "$ICI_START_TIME" "$end_time"
-
-    ici_color_output "$color_wrap" "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-    ici_color_output "$color_wrap" "Function '$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
+    ici_color_output "$color_wrap" "'$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 
     ICI_FOLD_NAME=
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
