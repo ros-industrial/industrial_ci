@@ -17,7 +17,7 @@
 
 function  ici_start_fold() {
     shift 3
-    ici_color_output $ANSI_BLUE ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    ici_color_output "$ANSI_BLUE" ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 }
 
 function  ici_end_fold() {
