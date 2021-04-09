@@ -37,4 +37,9 @@ if [ -n "$INPUT_CONFIG" ]; then
     eval "$vars"
 fi
 
+if [ "${ABICHECK_MERGE:-}" = "auto" ]; then
+  export ABICHECK_MERGE=false
+  [ "$GITHUB_EVENT_NAME" != "pull_request" ] || ABICHECK_MERGE=true
+fi
+
 env "$@" bash "$DIR_THIS/../industrial_ci/src/ci_main.sh"

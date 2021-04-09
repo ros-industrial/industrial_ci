@@ -156,7 +156,7 @@ function abi_report() {
 
  function prepare_abi_check() {
     if [ "$ABICHECK_MERGE" = "auto" ]; then
-        ici_error "ABICHECK_MERGE auto mode is available for travis only. "
+        ici_error "ABICHECK_MERGE auto mode is available for travis and github only. "
     fi
     if [ -z "$ABICHECK_URL" ]; then
         ici_error "Please set ABICHECK_URL"
