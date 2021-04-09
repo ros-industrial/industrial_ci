@@ -33,9 +33,15 @@ function run_clang_tidy {
     local db=$4
     shift 4
 
+    local build; build="$(dirname "$db")"
+    local name; name="$(basename "$build")"
+    ici_time_start "clang_tidy_check_$name"
+
     # create an array of all files listed in $db filtered by the source tree
     mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
+    local num_all_files="${#files[@]}"
     if [ -n "$CLANG_TIDY_BASE_REF" ] ; then
+        echo "Filtering for files that actually changed since $CLANG_TIDY_BASE_REF"
         # Need to run git in actual source dir:  $files[@] refer to source dir and $PWD is read-only
         local src_dir
         src_dir=$(grep -oP "(?<=CMAKE_HOME_DIRECTORY:INTERNAL=).*" "$build/CMakeCache.txt")
@@ -47,11 +53,10 @@ function run_clang_tidy {
         popd > /dev/null || true
     fi
     if [ "${#files[@]}" -eq 0 ]; then
-        return 0  # no files left for checking
+        echo "${#files[@]}/$num_all_files source files need checking"
+        ici_time_end
+        return 0
     fi
-
-    local build; build="$(dirname "$db")"
-    local name; name="$(basename "$build")"
 
     local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
     if ! [ "$max_jobs" -ge 1 ]; then
@@ -62,16 +67,17 @@ function run_clang_tidy {
     cat > "$db.command" << EOF
 #!/bin/bash
 fixes=\$(mktemp)
-clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" || { touch "$db.error"; echo "Errored for '\$*'"; }
+clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" &> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; echo "Errored for '\$*'"; }
 if [ -s "\$fixes" ]; then touch "$db.warn"; fi
 rm -rf "\$fixes"
 EOF
     chmod +x "$db.command"
 
-    ici_time_start "clang_tidy_check_$name"
     echo "run clang-tidy for ${#files[@]} file(s) in $max_jobs process(es)."
 
-    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" "$db.command" "$@"
+    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$@"
+    cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
+    rm -rf /tmp/clang_tidy_output.*
 
     if [ -f "$db.error" ]; then
        _run_clang_tidy_errors+=("$name")
