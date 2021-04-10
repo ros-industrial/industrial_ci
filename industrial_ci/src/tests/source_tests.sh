@@ -92,6 +92,9 @@ function run_clang_tidy_check {
     ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
 
     ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
+    if [ -n "$CLANG_TIDY_BASE_REF" ]; then
+        ici_setup_git_client
+    fi
 
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
