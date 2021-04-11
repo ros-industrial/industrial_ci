@@ -13,6 +13,10 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
+add_library(${PROJECT_NAME}
+  src/test_compiler.cpp
+)
+
 if (CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   add_rostest(test/example_ros.test)
