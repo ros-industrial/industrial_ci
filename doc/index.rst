@@ -87,7 +87,7 @@ FAQ
 
 - Q- How does the target package get installed?
 
-  A- *Travis CI* does this. It pulls in your package to an running instance of an operating system of your choice, and place your package under ``/home/travis``.
+  A- *Travis CI* does this. It pulls in your package to a running instance of an operating system of your choice, and place your package under ``/home/travis``.
 
 - Q- The jobs on *Travis CI* are failing. How can I fix them?
 
@@ -97,7 +97,7 @@ FAQ
 
   A- (1) There are a number of variables to customize your jobs that you can learn the usage `in this section <https://github.com/ros-industrial/industrial_ci/blob/master/README.rst#variables-you-can-configure>`__. (2) You can define pre- and post-processes, in addition to the default scripts (it's `travis.sh <https://github.com/ros-industrial/industrial_ci/blob/master/travis.sh>`__ for *Travis CI*). See `this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-pre-post-process-custom-commands>`__ for how.
 
-What are checked?
+What is checked?
 ------------------------------------
 
 List of the checked items, in the actual order to be run.
@@ -154,7 +154,7 @@ You can configure the behavior in the `CI config <#terminology>`__ in your clien
 
 Required environment variables:
 
-* ``ROS_DISTRO``: Version of ROS in all lower case. E.g.: ``indigo``. If is is set in the custom Docker (base) image, it might be omitted in the script call.
+* ``ROS_DISTRO``: Version of ROS in all lower case. E.g.: ``indigo``. If it is set in the custom Docker (base) image, it might be omitted in the script call.
 
 Optional environment variables
 ++++++++++++++++++++++++++++++++
@@ -194,15 +194,15 @@ Note that some of these currently tied only to a single option, but we still lea
 * **PARALLEL_BUILDS** (default: 0): Sets the number of parallel build jobs among all packages. ``0`` or ``true`` unsets the limit.
 * **PARALLEL_TESTS** (default: 1): Sets the number of parallel test jobs. ``0`` or ``true`` unsets the limit.
 * **PRERELEASE** (default: ``false``): If ``true``, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`__. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-ros-prerelease-test>`__.
-* **PRERELEASE_DOWNSTREAM_DEPTH** (default: ``0``): Number of the levels of the package dependecies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`__). NOTE: a job can run exponentially longer for the values greater than ``0`` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
-* **PRERELEASE_REPONAME** (default: ``$TARGET_REPO_NAME``): The  name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`__). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`__ for more usage.
+* **PRERELEASE_DOWNSTREAM_DEPTH** (default: ``0``): Number of the levels of the package dependencies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`__). NOTE: a job can run exponentially longer for the values greater than ``0`` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
+* **PRERELEASE_REPONAME** (default: ``$TARGET_REPO_NAME``): The name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`__). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`__ for more usage.
 * **ROS_REPO** (default: ``testing``): ``ROS_REPO`` can be used to set ``ROS_REPOSITORY_PATH`` based on known aliases: ``ros``/``main``, ``ros-shadow-fixed``/``testing`` or ``building``.
 * **ROS_REPOSITORY_PATH**: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (``http://packages.ros.org/ros/ubuntu``) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`__ (``http://packages.ros.org/ros-shadow-fixed/ubuntu``)). Since version 0.3.4, ``ROS_REPO`` is recommended, and ``ROS_REPOSITORY_PATH`` is for more intermediate usage only (e.g. to specify your own binary repository (non-standard / in house)). Backward compatibility is preserved.
 * **ROSDEP_SKIP_KEYS** (default: not set): space-separated list of keys that should get skipped by ``rosdep install``.
 * **ROSINSTALL_FILENAME** (*deprecated*, default: ``.travis.rosinstall``): Only used when ``UPSTREAM_WORKSPACE`` is set to ``file``. See ``UPSTREAM_WORKSPACE`` description.
-* **PYLINT_ARGS** (default: not set): pass command line arguments to `pylint` command (e.g. `--output-format=parseable --errors-only`) - can e.g. be used to `ignore_modules`
-* **PYLINT_CHECK** (default: false): If `true`, run `pylint` checks
-* **PYLINT_EXCLUDE** (default: not set): can be used to exclude files via the `-not -path` filter
+* **PYLINT_ARGS** (default: not set): pass command line arguments to ``pylint`` command (e.g. ``--output-format=parseable --errors-only``) - can e.g. be used to ``ignore_modules``
+* **PYLINT_CHECK** (default: false): If ``true``, run ``pylint`` checks
+* **PYLINT_EXCLUDE** (default: not set): can be used to exclude files via the ``-not -path`` filter
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
 * **UNDERLAY** (default: ``/opt/ros/$ROS_DISTRO``): Path to a workspace to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image
@@ -380,7 +380,7 @@ If your Gitlab CI jobs require access to private repos, additional settings are 
       # gitlab.com:22 SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.2
 
 #. Add a public key (reference for `Gitlab <https://docs.gitlab.com/ce/ssh/README.html#deploy-keys>`__ and for `GitHub <https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys>`__) to the private repos your CI jobs accesses. You may need to ask the admin of that repo.
-#. If you are using Docker-in-Docker, make sure that `TMPDIR` is set in your `.gitlab-ci.yml` file so that the SSH agent forwards properly ::
+#. If you are using Docker-in-Docker, make sure that ``TMPDIR`` is set in your ``.gitlab-ci.yml`` file so that the SSH agent forwards properly ::
 
     # The docker runner does not expose /tmp to the docker-in-docker service
     # This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
