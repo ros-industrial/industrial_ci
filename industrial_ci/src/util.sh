@@ -407,7 +407,10 @@ function ici_make_temp_dir {
 function ici_relocate_target_path {
   local tmp_src
   ici_make_temp_dir tmp_src
-  cp -a "$TARGET_REPO_PATH" "$tmp_src/"
+  mkdir -p "$tmp_src/$(basename "$TARGET_REPO_PATH")"
+  [ -d "$BASEDIR" ] && echo Signature: 8a477f597d28d172789f06886806bc55 > "${BASEDIR}/CACHEDIR.TAG"
+  [ -d "$CCACHE_DIR" ] && echo Signature: 8a477f597d28d172789f06886806bc55 > "${CCACHE_DIR}/CACHEDIR.TAG"
+  tar cf - --exclude-caches-all -C "$TARGET_REPO_PATH" . | tar xf - -C "$tmp_src/$(basename "$TARGET_REPO_PATH")"
   export TARGET_REPO_PATH
   TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
 }
