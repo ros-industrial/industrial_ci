@@ -176,6 +176,13 @@ Note that some of these currently tied only to a single option, but we still lea
 * **CLANG_FORMAT_VERSION** (default: not set): Version of clang-format to install and use (relates to both the apt package name as well as the executable), e.g., ``CLANG_FORMAT_VERSION=3.8``.
 * **CLANG_TIDY** (default: not set. Value range: [``true``|``pedantic``]): If set, run `clang.tidy <https://clang.llvm.org/extra/clang-tidy/>`__ to check the code in all packages and fail in case of errors. If ``pedantic``, warnings will be treated as errors as well.
 * **CLANG_TIDY_ARGS** (default: not set): Pass additional arguments to ``clang-tidy``, e.g. ``CLANG_TIDY_ARGS='-checks=modernize-*'``
+* **CLANG_TIDY_BASE_REF** (default: not set.): If set, clang-tidy tests will be performed on files only that changed since the given ref. If not set, clang-tidy checks are performed on all files.
+  For pull requests, you usually want to (re)test on changed files only. As all CI providers provide corresponding environment variables to recognize a PR, this can be easily configured, e.g. for github actions:
+
+  :push does not check: ``${{ github.base_ref || github.ref }}``
+  :push performs full check: ``${{ github.base_ref || '' }}``
+  :manually trigger full check: ``${{ github.event_name != 'workflow_dispatch' && (github.base_ref || github.ref) || '' }}``
+
 * **CLANG_TIDY_JOBS** (default: number of processors): Maximum number of parallel jobs that execute ``clang-tidy``. The parallel processing is restricted to per build space (=one ROS package, except for ``BUILDER=catkin_make``)
 * **DEBUG_BASH** (default: not set): If set with any value (e.g. ``true``), all executed commands that are not printed by default to reduce print space will be printed.
 * **DOCKER_COMMIT** (default: not set): If set, the docker image, which contains the build and test artifacts, will be saved in the outer-layer docker which runs the ``industrial_ci`` script and thus will become accessible for later usage (e.g. you can then push to your docker registry). If unset, the container will not be commited and is removed. The value is used to specify an image name during the ``docker commit`` command.

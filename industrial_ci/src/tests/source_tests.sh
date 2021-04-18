@@ -33,13 +33,30 @@ function run_clang_tidy {
     local db=$4
     shift 4
 
-    mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
-    if [ "${#files[@]}" -eq 0 ]; then
-        return 0
-    fi
-
     local build; build="$(dirname "$db")"
     local name; name="$(basename "$build")"
+    ici_time_start "clang_tidy_check_$name"
+
+    # create an array of all files listed in $db filtered by the source tree
+    mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
+    local num_all_files="${#files[@]}"
+    if [ -n "$CLANG_TIDY_BASE_REF" ] ; then
+        echo "Filtering for files that actually changed since $CLANG_TIDY_BASE_REF"
+        # Need to run git in actual source dir:  $files[@] refer to source dir and $PWD is read-only
+        local src_dir
+        src_dir=$(grep -oP "(?<=CMAKE_HOME_DIRECTORY:INTERNAL=).*" "$build/CMakeCache.txt")
+        pushd "$src_dir" > /dev/null || true
+        if git fetch -q origin "$CLANG_TIDY_BASE_REF" 2> /dev/null; then  # git might fail, e.g. operating on catkin_tools_prebuild
+            # Filter for changed files, using sed to augment full path again (which git strips away)
+            mapfile -t files < <(git diff --name-only --diff-filter=MA FETCH_HEAD..HEAD -- "${files[@]}" | sed "s#^#$PWD/#")
+        fi
+        popd > /dev/null || true
+    fi
+    if [ "${#files[@]}" -eq 0 ]; then
+        echo "${#files[@]}/$num_all_files source files need checking"
+        ici_time_end
+        return 0
+    fi
 
     local max_jobs="${CLANG_TIDY_JOBS:-$(nproc)}"
     if ! [ "$max_jobs" -ge 1 ]; then
@@ -50,16 +67,17 @@ function run_clang_tidy {
     cat > "$db.command" << EOF
 #!/bin/bash
 fixes=\$(mktemp)
-clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" || { touch "$db.error"; echo "Errored for '\$*'"; }
+clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" &> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; echo "Errored for '\$*'"; }
 if [ -s "\$fixes" ]; then touch "$db.warn"; fi
 rm -rf "\$fixes"
 EOF
     chmod +x "$db.command"
 
-    ici_time_start "clang_tidy_check_$name"
     echo "run clang-tidy for ${#files[@]} file(s) in $max_jobs process(es)."
 
-    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" "$db.command" "$@"
+    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$@"
+    cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
+    rm -rf /tmp/clang_tidy_output.*
 
     if [ -f "$db.error" ]; then
        _run_clang_tidy_errors+=("$name")
@@ -80,10 +98,13 @@ function run_clang_tidy_check {
     ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
 
     ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
+    if [ -n "$CLANG_TIDY_BASE_REF" ]; then
+        ici_setup_git_client
+    fi
 
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
-    done < <(find "$target_ws/build" -name compile_commands.json)
+    done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
 
     if [ "${#warnings[@]}" -gt "0" ]; then
         ici_warn "Clang tidy warning(s) in: ${warnings[*]}"
