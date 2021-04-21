@@ -190,8 +190,24 @@ function ici_import_url {
 function  ici_import_directory {
     local sourcespace=$1; shift
     local dir=$1; shift
-    rm -rf "$sourcespace:?/$(basename "$dir")"
-    cp -a "$dir" "$sourcespace"
+    local target
+    target=${sourcespace:?}/$(basename "$dir")
+
+    rm -rf "$target"
+    mkdir "$target"
+    local args=()
+    for p in "$BASEDIR" "$CCACHE_DIR" "$(readlink -m "$ICI_SRC_PATH/../..")"; do
+        if [ -n "$p" ]; then
+            args+=("(" "!" -path "$p" ")")
+        fi
+    done
+    while read -r f; do
+        local ft
+        ft=$target/$(basename "$f")
+        echo "$f -> $ft"
+        cp -a "$f" "$ft"
+    done < <(find "$dir" -maxdepth 1 -mindepth 1 "${args[@]}")
+
 }
 
 function ici_prepare_sourcespace {
