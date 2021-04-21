@@ -405,5 +405,4 @@ function ici_make_temp_dir {
 }
 
 # shellcheck disable=SC1090
-
 ici_source_component _FOLDING_TYPE folding
