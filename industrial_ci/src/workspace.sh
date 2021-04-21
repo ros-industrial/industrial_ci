@@ -197,17 +197,11 @@ function  ici_import_directory {
     mkdir "$target"
     local args=()
     for p in "$BASEDIR" "$CCACHE_DIR" "$(readlink -m "$ICI_SRC_PATH/../..")"; do
-        if [ -n "$p" ]; then
-            args+=("(" "!" -path "$p" ")")
+        if [[ $p/ ==  $dir/?* ]]; then
+            args+=("--exclude=.${p#$dir}")
         fi
     done
-    while read -r f; do
-        local ft
-        ft=$target/$(basename "$f")
-        echo "$f -> $ft"
-        cp -a "$f" "$ft"
-    done < <(find "$dir" -maxdepth 1 -mindepth 1 "${args[@]}")
-
+    tar c "${args[@]}" -C "$dir" . | tar x -C "$target"
 }
 
 function ici_prepare_sourcespace {
