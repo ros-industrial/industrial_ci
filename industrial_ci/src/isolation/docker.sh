@@ -83,16 +83,6 @@ function ici_isolate() {
       unset ROS_DISTRO
   fi
 
-  if [ -n "${BASEDIR:-}" ]; then
-      # $BASEDIR is most-likely contained in $TARGET_REPO_PATH
-      # copy target repo to temporary folder first
-      local tmp_src
-      ici_make_temp_dir tmp_src
-      cp -a "$TARGET_REPO_PATH" "$tmp_src/"
-      export TARGET_REPO_PATH;
-      TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
-  fi
-
   ici_forward_mount TARGET_REPO_PATH ro
   ici_forward_mount ICI_SRC_PATH ro
   ici_forward_mount BASEDIR rw
