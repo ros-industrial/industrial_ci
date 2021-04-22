@@ -404,13 +404,5 @@ function ici_make_temp_dir {
   ici_cleanup_later "$ici_make_temp_dir_res"
 }
 
-function ici_relocate_target_path {
-  local tmp_src
-  ici_make_temp_dir tmp_src
-  cp -a "$TARGET_REPO_PATH" "$tmp_src/"
-  export TARGET_REPO_PATH
-  TARGET_REPO_PATH="$tmp_src/$(basename "$TARGET_REPO_PATH")"
-}
-
 # shellcheck disable=SC1090
 ici_source_component _FOLDING_TYPE folding
