@@ -40,7 +40,7 @@ function run_clang_tidy {
     # create an array of all files listed in $db filtered by the source tree
     mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
     local num_all_files="${#files[@]}"
-    if [ -n "$CLANG_TIDY_BASE_REF" ] ; then
+    if [ "$num_all_files" -gt 0 ] && [ -n "$CLANG_TIDY_BASE_REF" ] ; then
         echo "Filtering for files that actually changed since $CLANG_TIDY_BASE_REF"
         # Need to run git in actual source dir:  $files[@] refer to source dir and $PWD is read-only
         local src_dir
@@ -73,7 +73,7 @@ rm -rf "\$fixes"
 EOF
     chmod +x "$db.command"
 
-    echo "run clang-tidy for ${#files[@]} file(s) in $max_jobs process(es)."
+    echo "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
 
     printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$@"
     cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
