@@ -48,7 +48,7 @@ function run_clang_tidy {
         pushd "$src_dir" > /dev/null || true
         if git fetch -q origin "$CLANG_TIDY_BASE_REF" 2> /dev/null; then  # git might fail, e.g. operating on catkin_tools_prebuild
             # Filter for changed files, using sed to augment full path again (which git strips away)
-            mapfile -t files < <(git diff --name-only --diff-filter=MA FETCH_HEAD..HEAD -- "${files[@]}" | sed "s#^#$PWD/#")
+            mapfile -t files < <(git diff --name-only --diff-filter=MA FETCH_HEAD..HEAD -- "${files[@]}" | sed "s#^#$(git rev-parse --show-toplevel)/#")
         fi
         popd > /dev/null || true
     fi
