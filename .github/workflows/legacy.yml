@@ -17,7 +17,7 @@ jobs:
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
   industrial_ci:
-    if: github.repository == ‘ros-industrial/industrial_ci’ # don't run on forks
+    if: github.repository == 'ros-industrial/industrial_ci' # don't run on forks
     strategy:
       matrix:
         env:
