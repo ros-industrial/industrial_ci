@@ -212,7 +212,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **PYLINT_EXCLUDE** (default: not set): can be used to exclude files via the ``-not -path`` filter
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
-* **UNDERLAY** (default: ``/opt/ros/$ROS_DISTRO``): Path to a workspace to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image
+* **UNDERLAY** (default: not set): Path to an install space (instead of ``/opt/ros/$ROS_DISTRO``) to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image
 * **UPSTREAM_CMAKE_ARGS** (default: not set): Addtional CMake arguments for upstream `workspace <#workspace-management>`__.
 * **UPSTREAM_WORKSPACE** (default: not set): Definition of upstream `workspace <#workspace-management>`__.
 * **VERBOSE_OUTPUT** (default: ``false``): If ``true``, build tool (e.g. Catkin) output prints in verbose mode.

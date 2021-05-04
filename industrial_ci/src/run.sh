@@ -42,10 +42,6 @@ if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 
 ici_configure_ros
 
-if [ -n "${ROS_DISTRO:-}" ]; then
-    export UNDERLAY=${UNDERLAY:-/opt/ros/$ROS_DISTRO}
-fi
-
 export TARGET_WORKSPACE=${TARGET_WORKSPACE:-$TARGET_REPO_PATH}
 export BASEDIR=${BASEDIR:-$HOME}
 
@@ -63,6 +59,16 @@ TEST=$1; shift
 ici_source_component TEST tests
 
 ici_run "init" ici_init_apt
+
+if [ -n "${UNDERLAY:-}" ]; then
+    if [ ! -f "$UNDERLAY/setup.bash" ]; then
+        ici_error "UNDERLAY '$UNDERLAY' does not contain a setup.bash"
+    fi
+else
+    if [ -n "${ROS_DISTRO:-}" ]; then
+        export UNDERLAY=${UNDERLAY:-/opt/ros/$ROS_DISTRO}
+    fi
+fi
 
 "$@"
 
