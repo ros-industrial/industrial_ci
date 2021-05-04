@@ -62,7 +62,7 @@ ici_run "init" ici_init_apt
 
 if [ -n "${UNDERLAY:-}" ]; then
     if [ ! -f "$UNDERLAY/setup.bash" ]; then
-        ici_error "UNDERLAY '$UNDERLAY'  does not contain a setup.bash"
+        ici_error "UNDERLAY '$UNDERLAY' does not contain a setup.bash"
     fi
 else
     if [ -n "${ROS_DISTRO:-}" ]; then
