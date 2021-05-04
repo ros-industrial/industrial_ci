@@ -22,7 +22,8 @@
 
 function setup_ros_buildfarm() {
     ici_quiet ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
-    ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
+    git clone https://github.com/ipa-mdl/ros_buildfarm.git -b cli-ccache "$WORKSPACE/ros_buildfarm"
+    ici_asroot pip3 install -e "$WORKSPACE/ros_buildfarm"
 }
 
 function setup_ros_prerelease() {
