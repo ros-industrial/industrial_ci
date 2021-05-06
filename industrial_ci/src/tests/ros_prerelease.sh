@@ -27,7 +27,12 @@ function setup_ros_buildfarm() {
 }
 
 function setup_ros_prerelease() {
-    ici_asroot useradd -o -u "$(stat -c%u "$WORKSPACE")" -m ci
+    local args=()
+    local w_uid; w_uid="$(stat -c%u "$WORKSPACE")"
+    if [ "$w_uid" -gt "0" ]; then
+        args+=(-o -u "$w_uid")
+    fi
+    ici_asroot useradd "${args[@]}" -m ci
 
     if [ -e /var/run/docker.sock ]; then
         ici_asroot groupadd -o -g "$(stat -c%g /var/run/docker.sock)" host_docker
