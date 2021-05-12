@@ -77,6 +77,8 @@ if [ -z "$OS_CODE_NAME" ]; then
         ;;
     "kinetic")
         OS_CODE_NAME="xenial"
+        ROS_VERSION_EOL=true
+        ROS_VERSION_FINAL=
         ;;
     "melodic")
         OS_CODE_NAME="bionic"

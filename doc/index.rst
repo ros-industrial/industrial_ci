@@ -28,7 +28,7 @@ Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`__
 * `Hydro <http://wiki.ros.org/hydro>`__ *(EOL)*
 * `Indigo <http://wiki.ros.org/indigo>`__ *(EOL)*
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
-* `Kinetic <http://wiki.ros.org/kinetic>`__
+* `Kinetic <http://wiki.ros.org/kinetic>`__ *(EOL)*
 * `Lunar <http://wiki.ros.org/lunar>`__ *(EOL)*
 * `Melodic <http://wiki.ros.org/melodic>`__
 
