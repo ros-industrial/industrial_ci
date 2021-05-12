@@ -34,7 +34,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Ardent <https://index.ros.org/doc/ros2/Releases/Release-Ardent-Apalone/>`__ *(EOL)*
 * `Bouncy <https://index.ros.org/doc/ros2/Releases/Bouncy/>`__ *(EOL)*
 * `Crystal <https://index.ros.org/doc/ros2/Releases/Release-Crystal-Clemmys/>`__ *(EOL)*
-* `Dashing <https://index.ros.org/doc/ros2/Releases/Release-Dashing-Diademata/>`__
+* `Dashing <https://index.ros.org/doc/ros2/Releases/Release-Dashing-Diademata/>`__ *(EOL)*
 * `Eloquent <https://index.ros.org/doc/ros2/Releases/Release-Eloquent-Elusor/>`__
 * `Foxy <https://index.ros.org/doc/ros2/Releases/Release-Foxy-Fitzroy/>`__
 * `Galactic <https://docs.ros.org/en/foxy/Releases/Release-Galactic-Geochelone.html>`__
