@@ -27,7 +27,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 
 * `Indigo <http://wiki.ros.org/indigo>`__ *(EOL)*
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
-* `Kinetic <http://wiki.ros.org/kinetic>`__
+* `Kinetic <http://wiki.ros.org/kinetic>`__ *(EOL)*
 * `Lunar <http://wiki.ros.org/lunar>`__ *(EOL)*
 * `Melodic <http://wiki.ros.org/melodic>`__
 * `Noetic <http://wiki.ros.org/noetic>`__
