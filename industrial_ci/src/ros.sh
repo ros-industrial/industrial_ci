@@ -44,6 +44,8 @@ function _set_ros_defaults {
         ;;
     "kinetic")
         _ros1_defaults "xenial"
+        export ROS_VERSION_EOL=true
+        export ROS_VERSION_FINAL=
         ;;
     "lunar")
         _ros1_defaults "xenial"
