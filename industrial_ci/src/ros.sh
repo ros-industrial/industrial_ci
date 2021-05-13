@@ -67,8 +67,6 @@ function _set_ros_defaults {
         ;;
     "dashing")
         _ros2_defaults "bionic"
-        export ROS_VERSION_EOL=true
-        export ROS_VERSION_FINAL=
         ;;
     "eloquent")
         _ros2_defaults "bionic"
