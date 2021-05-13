@@ -55,6 +55,7 @@ jobs:
           - {ROS_DISTRO: noetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: noetic, PRERELEASE: true}
           - {ROS_DISTRO: foxy}
+          - {ROS_DISTRO: galactic}
           - {ROS_DISTRO: rolling}
 
           # Are CXXFLAGS correctly passed? These tests should fail due to -Werror (exit code is for catkin tools: 1 and for colcon: 2)

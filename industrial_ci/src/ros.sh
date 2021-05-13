@@ -72,6 +72,9 @@ function _set_ros_defaults {
     "foxy")
         _ros2_defaults "focal"
         ;;
+    "galactic")
+        _ros2_defaults "focal"
+        ;;
     "rolling")
         _ros2_defaults "focal"
         ;;
