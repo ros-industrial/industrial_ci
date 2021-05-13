@@ -22,6 +22,7 @@ function  _ros1_defaults {
     export BUILDER=${BUILDER:-catkin_tools}
     export ROS_VERSION=1
     export ROS_VERSION_EOL=false
+    export ROS_VERSION_FINAL="final"
     export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-2}
 }
 
@@ -31,6 +32,7 @@ function  _ros2_defaults {
     export BUILDER=${BUILDER:-colcon}
     export ROS_VERSION=2
     export ROS_VERSION_EOL=false
+    export ROS_VERSION_FINAL="final"
     export ROS_PYTHON_VERSION=3
 }
 
@@ -66,10 +68,12 @@ function _set_ros_defaults {
     "dashing")
         _ros2_defaults "bionic"
         export ROS_VERSION_EOL=true
+        export ROS_VERSION_FINAL=
         ;;
     "eloquent")
         _ros2_defaults "bionic"
         export ROS_VERSION_EOL=true
+        export ROS_VERSION_FINAL=
         ;;
     "foxy")
         _ros2_defaults "focal"
@@ -103,15 +107,17 @@ function _use_snapshot() {
 
 function _use_repo_or_final_snapshot() {
     if [ "$ROS_VERSION_EOL" = true ]; then
-        _use_snapshot final
         if [ "$ROS_REPO" != "testing" ]; then
-            ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
+            ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' is superfluous"
         fi
-    else
-        export ROS_REPOSITORY_PATH="$1"
-        if [ "${ROS_REPO}" = "ros-shadow-fixed" ]; then
-            ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
+        if [ -n "$ROS_VERSION_FINAL" ]; then
+            _use_snapshot "$ROS_VERSION_FINAL"
+            return
         fi
+    fi
+    export ROS_REPOSITORY_PATH="$1"
+    if [ "${ROS_REPO}" = "ros-shadow-fixed" ]; then
+        ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
     fi
 }
 
