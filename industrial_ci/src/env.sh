@@ -47,6 +47,7 @@ export OS_NAME
 export DOCKER_BASE_IMAGE
 export ROS_DISTRO
 export ROS_VERSION_EOL
+export ROS_VERSION_FINAL="final"
 
 # exit with error if OS_NAME is set, but OS_CODE_NAME is not.
 # assume ubuntu as default
@@ -106,15 +107,17 @@ function use_snapshot() {
 
 function use_repo_or_final_snapshot() {
     if [ "$ROS_VERSION_EOL" = true ]; then
-        use_snapshot final
         if [ -n "$ROS_REPO" ]; then
-            ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' gets ignored"
+            ici_warn "'$ROS_DISTRO' is in end-of-life state, ROS_REPO='$ROS_REPO' is superfluous"
         fi
-    else
-        ROS_REPOSITORY_PATH="$1"
-        if [ "$ROS_REPO" = "ros-shadow-fixed" ]; then
-            ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
+        if [ -n "$ROS_VERSION_FINAL" ]; then
+            use_snapshot "$ROS_VERSION_FINAL"
+            return
         fi
+    fi
+    export ROS_REPOSITORY_PATH="$1"
+    if [ "${ROS_REPO}" = "ros-shadow-fixed" ]; then
+        ici_warn "ROS_REPO='ros-shadow-fixed' was renamed to ROS_REPO='testing'"
     fi
 }
 
