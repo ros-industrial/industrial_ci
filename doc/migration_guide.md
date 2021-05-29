@@ -128,6 +128,7 @@ This variable is still supported, but the [script environment has changed](#hook
 ### APTKEY_STORE_HTTPS
 
 It is not a fallback for [`APTKEY_STORE_SKS`](#aptkey_store_sks) anymore, but will disable it and download the key from the provided URL directly.
+Please migrate to `ROS_REPOSITORY_KEY`, which combines [`APTKEY_STORE_HTTPS`](#aptkey_store_https) and [`HASHKEY_SKS`](#hashkey_sks)
 
 ### APTKEY_STORE_SKS
 
@@ -198,6 +199,7 @@ This variable is still supported, but the [workspace layout has changed](#worksp
 ### HASHKEY_SKS
 
 Will only be used if [`APTKEY_STORE_HTTPS`](#aptkey_store_https) is not set.
+Please migrate to `ROS_REPOSITORY_KEY`, which combines [`APTKEY_STORE_HTTPS`](#aptkey_store_https) and [`HASHKEY_SKS`](#hashkey_sks)
 
 ### INJECT_QEMU
 

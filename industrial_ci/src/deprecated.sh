@@ -92,3 +92,6 @@ else
 fi
 
 ici_mark_deprecated DOCKER_COMMIT_CREDENTIALS "Credentials will be copied, but never committed!"
+
+ici_rename_deprecated HASHKEY_SKS ROS_REPOSITORY_KEY
+ici_rename_deprecated APTKEY_STORE_HTTPS ROS_REPOSITORY_KEY
