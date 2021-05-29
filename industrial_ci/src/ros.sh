@@ -103,7 +103,7 @@ function _set_ros_defaults {
 
 function _use_snapshot() {
     export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO?ROS_DISTRO needs to be set}/$1/ubuntu"
-    export ROS_REPOSITORY_KEY="AD19BAB3CBF125EA"
+    export ROS_REPOSITORY_KEY="$ICI_SRC_PATH/keys/snapshots.asc"
 }
 
 function _use_repo_or_final_snapshot() {
