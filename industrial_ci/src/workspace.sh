@@ -79,12 +79,12 @@ function ici_init_apt {
     if [ -n "${ROS_REPOSITORY_PATH:-}" ] && [ ! -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
         ici_install_pkgs_for_command lsb_release lsb-release
         local keycmd
-        if [ -n "${APTKEY_STORE_HTTPS}" ]; then
+        ici_apt_install gnupg2 dirmngr
+        if [ -n "${HASHKEY_SKS}" ]; then
+            keycmd="ici_asroot apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS}'"
+        elif [ -n "${APTKEY_STORE_HTTPS}" ]; then
             ici_install_pkgs_for_command wget wget
             keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | ici_asroot apt-key add -"
-        else
-            keycmd="ici_asroot apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS:-C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654}'"
-            ici_apt_install gnupg2 dirmngr
         fi
 
         ici_retry 3 eval "$keycmd"
