@@ -225,10 +225,10 @@ EOF
 function ici_generate_default_dockerfile() {
   local keycmd
 
-  if [ -n "${APTKEY_STORE_HTTPS}" ]; then
-    keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
-  else
+  if [ -n "${HASHKEY_SKS}" ]; then
     keycmd="apt-key adv --keyserver '${APTKEY_STORE_SKS}' --recv-key '${HASHKEY_SKS}'"
+  else
+    keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | apt-key add -"
   fi
 
   cat <<EOF
