@@ -23,7 +23,6 @@ jobs:
         env:
           - {ROS_DISTRO: melodic, PRERELEASE: true}
           - {ROS_DISTRO: melodic, ROS_REPO: ros}
-          - {ROS_DISTRO: hydro}
           - {ROS_DISTRO: indigo}
           - {ROS_DISTRO: jade}
           - {ROS_DISTRO: kinetic}
