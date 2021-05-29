@@ -20,7 +20,7 @@ export PYTHONUNBUFFERED=${PYTHONUNBUFFERED-1}
 export ROS_DISTRO=${ROS_DISTRO:-}
 export ROS_REPOSITORY_PATH=${ROS_REPOSITORY_PATH:-}
 export ROS_REPO=${ROS_REPO:-testing}
-export ROS_REPOSITORY_KEY=${ROS_REPOSITORY_KEY:-https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc}
+export ROS_REPOSITORY_KEY=${ROS_REPOSITORY_KEY:-"$ICI_SRC_PATH/keys/ros.asc"}
 
 export DEBUG_BASH=${DEBUG_BASH:-false}
 export TEST=${TEST:-}
