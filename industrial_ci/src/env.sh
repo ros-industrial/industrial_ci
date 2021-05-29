@@ -26,7 +26,7 @@ if [ ! "$ROS_PARALLEL_TEST_JOBS" ]; then export ROS_PARALLEL_TEST_JOBS="$ROS_PAR
 if [ ! "$ROSINSTALL_FILENAME" ]; then export ROSINSTALL_FILENAME=".travis.rosinstall"; fi
 # For apt key stores
 if [ ! "$APTKEY_STORE_SKS" ]; then export APTKEY_STORE_SKS="hkp://keyserver.ubuntu.com:80"; fi  # Export a variable for SKS URL for break-testing purpose.
-if [ ! "$HASHKEY_SKS" ]; then export APTKEY_STORE_HTTPS=${APTKEY_STORE_HTTPS:-https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc}; fi
+if [ ! "$HASHKEY_SKS" ]; then export HASHKEY_SKS="C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654"; fi
 if [ "$USE_DEB" ]; then  # USE_DEB is deprecated. See https://github.com/ros-industrial/industrial_ci/pull/47#discussion_r64882878 for the discussion.
     if [ "$USE_DEB" != "true" ]; then export UPSTREAM_WORKSPACE="file";
     else export UPSTREAM_WORKSPACE="debian";
