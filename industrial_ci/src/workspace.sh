@@ -64,7 +64,7 @@ function ici_init_apt {
 
     ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 
-    if [ -n "$(apt-key finger C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 2>/dev/null)" ]; then
+    if apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 2>/dev/null | grep -q expired; then
         ici_warn "Expired ROS repository key found, installing new one"
         ici_retry 3 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     fi
