@@ -59,6 +59,14 @@ function ici_pip_install {
     ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
 }
 
+function ici_process_url {
+    local url=$1; shift
+    ici_install_pkgs_for_command wget wget
+    set -o pipefail
+    wget -O- -q "$url" | "$@"
+    set +o pipefail
+}
+
 function ici_init_apt {
     export DEBIAN_FRONTEND=noninteractive
 
@@ -174,8 +182,6 @@ function ici_import_url {
     local url=$1; shift
     local processor
 
-    ici_install_pkgs_for_command wget wget
-
     case "$url" in
     *.zip|*.tar|*.tar.*|*.tgz|*.tbz2)
         ici_install_pkgs_for_command bsdtar bsdtar
@@ -187,10 +193,7 @@ function ici_import_url {
         processor=(ici_vcs_import "$sourcespace")
     ;;
     esac
-
-    set -o pipefail
-    wget -O- -q "$url" | "${processor[@]}"
-    set +o pipefail
+    ici_process_url "$url" "${processor[@]}"
 }
 
 function  ici_import_directory {
