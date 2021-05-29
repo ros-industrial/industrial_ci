@@ -17,6 +17,7 @@
 #
 
 export _DEFAULT_DEBS=${_DEFAULT_DEBS:-}
+export _ROS_KEYRING=/usr/share/keyrings/ros-archive-keyring.gpg
 
 function ici_parse_repository_url {
     local url=$1; shift
@@ -67,6 +68,40 @@ function ici_process_url {
     set +o pipefail
 }
 
+function ici_gpg {
+    local homedir
+    ici_make_temp_dir homedir
+    local keyring=$1
+    shift
+    ici_asroot touch "$keyring"
+    ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
+}
+
+function ici_setup_gpg_key {
+    case "$ROS_REPOSITORY_KEY}" in
+    *://*)
+        ici_process_url "${ROS_REPOSITORY_KEY}" ici_gpg "$_ROS_KEYRING" --import "-"
+        ;;
+    /*.*)
+        ici_gpg "$_ROS_KEYRING" --import "$ROS_REPOSITORY_KEY"
+        ;;
+    *.*)
+        ici_gpg "$_ROS_KEYRING" --import "$TARGET_REPO_PATH/$ROS_REPOSITORY_KEY"
+        ;;
+    *)
+        if [[ $ROS_REPOSITORY_KEY =~ ^[a-fA-F0-9]{16,40}$ ]]; then
+            local sks=()
+            if [ -n  "${APTKEY_STORE_SKS}" ]; then
+                sks=(--keyserver "${APTKEY_STORE_SKS}")
+            fi
+            ici_retry 3 ici_gpg "$_ROS_KEYRING" "${sks[@]}"  --recv-key "${ROS_REPOSITORY_KEY}"
+        else
+            ici_error "Cannot classify ROS_REPOSITORY_KEY '$ROS_REPOSITORY_KEY'"
+        fi
+        ;;
+    esac
+}
+
 function ici_init_apt {
     export DEBIAN_FRONTEND=noninteractive
 
@@ -79,7 +114,7 @@ function ici_init_apt {
 
     ici_asroot apt-get update -qq
 
-    local debs_default=(apt-utils build-essential)
+    local debs_default=(apt-utils build-essential gnupg2 dirmngr)
     if ! ls /etc/ssl/certs/* 2&> /dev/null; then
         debs_default+=(ca-certificates)
     fi
@@ -92,17 +127,10 @@ function ici_init_apt {
 
     if [ -n "${ROS_REPOSITORY_PATH:-}" ] && [ ! -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
         ici_install_pkgs_for_command lsb_release lsb-release
-        local keycmd
-        ici_apt_install gnupg2 dirmngr
-        if [ -n "${HASHKEY_SKS}" ]; then
-            keycmd="ici_asroot apt-key adv --keyserver '${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}' --recv-key '${HASHKEY_SKS}'"
-        elif [ -n "${APTKEY_STORE_HTTPS}" ]; then
-            ici_install_pkgs_for_command wget wget
-            keycmd="wget '${APTKEY_STORE_HTTPS}' -O - | ici_asroot apt-key add -"
-        fi
+        local deb_opts=(arch="$(dpkg --print-architecture)" signed-by="$_ROS_KEYRING")
+        ici_setup_gpg_key
 
-        ici_retry 3 eval "$keycmd"
-        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
+        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
         ici_asroot apt-get update -qq
     fi
 

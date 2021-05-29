@@ -20,13 +20,14 @@ export PYTHONUNBUFFERED=${PYTHONUNBUFFERED-1}
 export ROS_DISTRO=${ROS_DISTRO:-}
 export ROS_REPOSITORY_PATH=${ROS_REPOSITORY_PATH:-}
 export ROS_REPO=${ROS_REPO:-testing}
+export ROS_REPOSITORY_KEY=${ROS_REPOSITORY_KEY:-https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc}
 
 export DEBUG_BASH=${DEBUG_BASH:-false}
 export TEST=${TEST:-}
 
 export EXPECT_EXIT_CODE=${EXPECT_EXIT_CODE:-0}
 export APTKEY_STORE_SKS=${APTKEY_STORE_SKS:-hkp://keyserver.ubuntu.com:80}
-export APTKEY_STORE_HTTPS=${APTKEY_STORE_HTTPS:-https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc}
+export APTKEY_STORE_HTTPS=${APTKEY_STORE_HTTPS:-}
 export HASHKEY_SKS=${HASHKEY_SKS:-}
 export ADDITIONAL_DEBS=${ADDITIONAL_DEBS:-}
 

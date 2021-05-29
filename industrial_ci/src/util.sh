@@ -247,6 +247,18 @@ function ici_enforce_deprecated {
     fi
 }
 
+function ici_rename_deprecated() {
+  local old=$1
+  shift
+  local new=$1
+  shift
+  if [ "${!old:-}" ]; then
+      local value=${!old}
+      ici_warn "'$old' is deprecated. Use '$new=$value' instead"
+      export "$new"="$value"
+  fi
+}
+
 function ici_migrate_hook() {
   local oldname=${1^^}
   oldname=${oldname//[^A-Z0-9_]/_}

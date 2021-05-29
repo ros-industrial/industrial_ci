@@ -41,6 +41,7 @@ function _set_ros_defaults {
     "indigo"|"jade")
         _ros1_defaults "trusty"
         export ROS_VERSION_EOL=true
+        export _ROS_KEYRING=/etc/apt/trusted.gpg.d/ros-archive-keyring.gpg # signed-by is not supported
         ;;
     "kinetic")
         _ros1_defaults "xenial"
@@ -102,7 +103,7 @@ function _set_ros_defaults {
 
 function _use_snapshot() {
     export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO?ROS_DISTRO needs to be set}/$1/ubuntu"
-    export HASHKEY_SKS="AD19BAB3CBF125EA"
+    export ROS_REPOSITORY_KEY="AD19BAB3CBF125EA"
 }
 
 function _use_repo_or_final_snapshot() {
