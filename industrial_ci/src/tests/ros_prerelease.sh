@@ -22,15 +22,17 @@
 
 function setup_ros_buildfarm() {
     ici_quiet ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
-    ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
+    git clone https://github.com/ipa-mdl/ros_buildfarm.git -b cli-ccache "$WORKSPACE/ros_buildfarm"
+    ici_asroot pip3 install -e "$WORKSPACE/ros_buildfarm"
 }
 
 function setup_ros_prerelease() {
-    ici_asroot useradd -m -d "$WORKSPACE/home" ci
-
-    if ! [ -d "$WORKSPACE/home/.ccache" ]; then
-      ici_asroot mkdir -p "$WORKSPACE/home/.ccache"
+    local args=()
+    local w_uid; w_uid="$(stat -c%u "$WORKSPACE")"
+    if [ "$w_uid" -gt "0" ]; then
+        args+=(-o -u "$w_uid")
     fi
+    ici_asroot useradd "${args[@]}" -m ci
 
     if [ -e /var/run/docker.sock ]; then
         ici_asroot groupadd -o -g "$(stat -c%g /var/run/docker.sock)" host_docker
@@ -68,7 +70,15 @@ function prepare_ros_prerelease() {
     if [ "$BUILDER" != "colcon" ]; then
         export BUILDER=catkin_make_isolated
     fi
-    export WORKSPACE; WORKSPACE=$(mktemp -d)
+
+    if [ -n "${BASEDIR:-}" ]; then
+        mkdir -p "$BASEDIR"
+    fi
+    if [ -n "${CCACHE_DIR:-}" ]; then
+        mkdir -p "$CCACHE_DIR"
+    fi
+
+    export WORKSPACE; WORKSPACE=${BASEDIR:-$(mktemp -d)}
     if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
       if [ "$ROS_VERSION" -eq 2 ]; then
           export ROSDISTRO_INDEX_URL="https://raw.githubusercontent.com/ros2/ros_buildfarm_config/ros2/index.yaml"
@@ -90,10 +100,6 @@ function prepare_ros_prerelease() {
     elif [ -e /var/run/docker.sock ]; then
         ici_forward_mount /var/run/docker.sock rw
     fi
-    if [ -n "${CCACHE_DIR}" ]; then
-      ici_forward_mount CCACHE_DIR rw "$WORKSPACE/home/.ccache"
-      CCACHE_DIR= # prevent cachedir from beeing added twice
-    fi
     export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
     export ROS_DISTRO=noetic
 }
@@ -109,7 +115,18 @@ function run_ros_prerelease() {
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
     ici_run "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+
+    local generate_args=("${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}"
+                         --build-tool "$BUILDER"
+                        --level "$downstream_depth"
+                        --output-dir "$WORKSPACE"
+                        --custom-repo "$reponame::::")
+
+    if [ -n "$CCACHE_DIR" ]; then
+        generate_args+=(--shared-ccache)
+    fi
+
+    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${generate_args[@]}"
 
     local setup_sh=
     if [ -f "${UNDERLAY:?}/setup.sh" ]; then
