@@ -61,9 +61,10 @@ jobs:
 
           # Are CXXFLAGS correctly passed? These tests should fail due to -Werror (exit code is for catkin tools: 1 and for colcon: 2)
           - {ROS_DISTRO: melodic, CXXFLAGS: "-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
-          - {ROS_DISTRO: noetic, CXXFLAGS: "-Werror", EXPECT_EXIT_CODE: 2, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
+          - {ROS_DISTRO: noetic, CXXFLAGS: "-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: melodic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
-          - {ROS_DISTRO: noetic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 2, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
+          - {ROS_DISTRO: noetic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
+          - {ROS_DISTRO: noetic, BUILDER: colcon, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 2, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
 
           - {ROS_DISTRO: melodic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-melodic-rosbash"}
           - {ROS_DISTRO: melodic, ROS_REPO: main}
