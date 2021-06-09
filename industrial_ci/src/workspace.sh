@@ -53,6 +53,7 @@ function ici_parse_repository_url {
 }
 
 function ici_apt_install {
+    ici_asroot apt-get update
     ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
 }
 
