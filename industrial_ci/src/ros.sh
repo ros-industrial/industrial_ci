@@ -75,7 +75,6 @@ function _set_ros_defaults {
     "eloquent")
         _ros2_defaults "bionic"
         export ROS_VERSION_EOL=true
-        export ROS_VERSION_FINAL=
         ;;
     "foxy")
         _ros2_defaults "focal"
