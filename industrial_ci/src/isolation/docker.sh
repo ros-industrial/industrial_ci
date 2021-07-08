@@ -144,7 +144,7 @@ function ici_run_cmd_in_docker() {
 
   # detect user inside container
   local image
-  image=$(docker inspect --format='{{.Config.Image}}' "$cid")
+  image=$(ici_guard docker inspect --format='{{.Config.Image}}' "$cid")
   local docker_query=()
   # shellcheck disable=SC2016
   IFS=" " read -r -a docker_query <<< "$(docker run --rm --entrypoint '/bin/sh' "$image" -c 'echo "$(id -u) $(id -g) $HOME"')"

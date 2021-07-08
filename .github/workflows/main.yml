@@ -72,6 +72,8 @@ jobs:
           - {ROS_DISTRO: melodic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-melodic-rosbash"}
           - {ROS_DISTRO: melodic, ROS_REPO: main}
 
+          - {ROS_DISTRO: noetic, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
+
           # Format tests
           - {ROS_DISTRO: indigo, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'LLVM', CLANG_FORMAT_VERSION: 3.8}
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'LLVM'}
@@ -136,6 +138,7 @@ jobs:
           - {ROS_DISTRO: melodic, UBUNTU: 18.04}
           - {ROS_DISTRO: noetic, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
+          - {ROS_DISTRO: noetic, UBUNTU: 20.04, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
           - {ROS_DISTRO: foxy, UBUNTU: 20.04}
           - {ROS_DISTRO: galactic, PRERELEASE: true, UBUNTU: 20.04}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
