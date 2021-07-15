@@ -329,6 +329,10 @@ function ici_setup_rosdep {
     ici_retry 2 rosdep update "${update_opts[@]}"
 }
 
+function ici_extend_space {
+  echo "$1/install"
+}
+
 function ici_exec_in_workspace {
     local extend=$1; shift
     local path=$1; shift

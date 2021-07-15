@@ -52,7 +52,7 @@ function ici_with_unset_variables {
 function _sub_shell() (
   function rosenv() {
     # if current_ws not set, use an invalid path to skip it
-    for e in ${current_ws:-/dev/null}/install "$BASEDIR/downstream_ws/install" "$BASEDIR/target_ws/install" "$BASEDIR/base_ws/install" "$BASEDIR/upstream_ws/install" "$UNDERLAY"; do
+    for e in $(ici_extend_space "${current_ws:-/dev/null}") $(ici_extend_space "$BASEDIR/downstream_ws") $(ici_extend_space "$BASEDIR/target_ws") $(ici_extend_space "$BASEDIR/base_ws") $(ici_extend_space "$BASEDIR/upstream_ws") "$UNDERLAY"; do
     if [ -f "$e/setup.bash" ]; then
       ici_source_setup "$e"
       if [ -n "$*" ]; then
