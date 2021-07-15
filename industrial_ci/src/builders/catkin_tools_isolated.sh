@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # shellcheck source=industrial_ci/src/builders/catkin_tools.sh
-source "${ICI_SRC_PATH}/builders/catkin_tools"
+source "${ICI_SRC_PATH}/builders/catkin_tools.sh"
 
 function _catkin_config {
     local extend=$1; shift
