@@ -136,7 +136,7 @@ function run_pylint_check {
 
     if [ "${#files[@]}" -ne 0 ]; then
         ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-        ici_run "run_pylint" ici_exec_in_workspace "$target_ws/install" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+        ici_run "run_pylint" ici_exec_in_workspace "$(ici_extend_space "$target_ws")" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
     else
         ici_warn "No python files found, skipping pylint"
     fi
@@ -165,7 +165,7 @@ function run_source_tests {
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
-        extend="$upstream_ws/install"
+        extend="$(ici_extend_space "$upstream_ws")"
     fi
 
     if [ "${CLANG_TIDY:-false}" != false ]; then
@@ -194,10 +194,10 @@ function run_source_tests {
         run_pylint_check "$target_ws"
     fi
 
-    extend="$target_ws/install"
+    extend="$(ici_extend_space "$target_ws")"
     if [ -n "$DOWNSTREAM_WORKSPACE" ]; then
         ici_with_ws "$downstream_ws" ici_build_workspace "downstream" "$extend" "$downstream_ws"
-        #extend="$downstream_ws/install"
+        #extend="$(ici_extend_space "$downstream_ws")"
 
         if [ "$NOT_TEST_DOWNSTREAM" != "true" ]; then
             ici_with_ws "$downstream_ws" ici_test_workspace "downstream" "$extend" "$downstream_ws"

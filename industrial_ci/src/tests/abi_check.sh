@@ -85,7 +85,7 @@ function abi_process_workspace() {
 
   ici_run "install_${tag}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$workspace/src"
   ici_run "abi_build_${tag}" builder_run_build "$extend" "$workspace" "${cmake_args[@]}"
-  ici_run "abi_dump_${tag}" abi_dump_libraries  "$workspace/install" "$workspace/abi_dumps" -lver "$version"
+  ici_run "abi_dump_${tag}" abi_dump_libraries  "$(ici_extend_space "$workspace")" "$workspace/abi_dumps" -lver "$version"
 }
 
 function abi_configure() {
@@ -191,7 +191,7 @@ function run_abi_check() {
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
-        extend="$upstream_ws/install"
+        extend="$(ici_extend_space "$upstream_ws")"
     fi
 
     mkdir -p "$target_ws/src"
