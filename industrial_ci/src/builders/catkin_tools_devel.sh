@@ -20,6 +20,10 @@ source "${ICI_SRC_PATH}/builders/catkin_tools.sh"
 
 ici_warn "BUILDER=catkin_tools_devel should only be used in addition to the other builders"
 
+function ici_extend_space {
+  echo "$1/devel"
+}
+
 function _catkin_config {
     shift 2
 }
