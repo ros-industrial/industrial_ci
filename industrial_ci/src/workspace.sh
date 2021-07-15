@@ -128,7 +128,7 @@ function ici_init_apt {
         ici_apt_install "${debs_default[@]}"
     fi
 
-    if [ -n "${ROS_REPOSITORY_PATH:-}" ] && [ ! -f "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" ]; then
+    if [ -n "${ROS_REPOSITORY_PATH:-}" ] && ! grep -qF "$ROS_REPOSITORY_PATH" /etc/apt/sources.list.d/*.list; then
         ici_install_pkgs_for_command lsb_release lsb-release
         local deb_opts=(arch="$(dpkg --print-architecture)" signed-by="$_ROS_KEYRING")
         ici_setup_gpg_key
