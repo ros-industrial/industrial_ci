@@ -136,6 +136,16 @@ jobs:
       - uses: './'
         env: ${{matrix.env}}
 
+  builders:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          for BUILDER in $(ls industrial_ci/src/builders/*.sh); do
+            echo "BUILDER=$BUILDER"
+            .github/action.sh DOCKER_IMAGE=ros:noetic BUILDER="$BUILDER" TARGET_WORKSPACE=industrial_ci/mockups/industrial_ci_testpkg
+          done
+
   test_arm:
     runs-on: ubuntu-latest
     steps:
