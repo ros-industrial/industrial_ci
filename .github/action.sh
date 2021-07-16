@@ -30,7 +30,7 @@ export _FOLDING_TYPE=github_actions
 ICI_SRC_PATH="$DIR_THIS/../industrial_ci/src"
 source "$ICI_SRC_PATH/util.sh"
 
-if [ -n "$INPUT_CONFIG" ]; then
+if [ -n "${INPUT_CONFIG-}" ]; then
     ici_exec_for_command jq ici_error "In order to use the config parameter, please install jq"
     vars=$(jq -r 'keys[] as $k | "export \($k)=\(.[$k]|tojson)" | gsub("\\$\\$";"\\$")' <<< "$INPUT_CONFIG"  | grep "^export [A-Z][A-Z_]*=")
     echo "$vars"
