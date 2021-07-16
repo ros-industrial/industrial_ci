@@ -353,9 +353,16 @@ function ici_install_dependencies {
     if [ -n "$skip_keys" ]; then
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
-    set -o pipefail # fail if rosdep install fails
-    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" | { grep "executing command" || true; }
-    set +o pipefail
+
+    local out; out=$(mktemp)
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" |& tee "$out" | grep "executing command" | cat
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        cat "$out"
+    fi
+    rm -rf "$out"
+    return "$err"
+
 }
 
 function ici_build_workspace {
