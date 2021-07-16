@@ -18,10 +18,10 @@
 # shellcheck source=industrial_ci/src/builders/catkin_tools.sh
 source "${ICI_SRC_PATH}/builders/catkin_tools.sh"
 
-ici_warn "BUILDER=catkin_tools_devel should only be used in addition to the other builders"
+ici_warn "BUILDER=catkin_tools_devel should only be used in addition to the other non-devel builders"
 
 function ici_extend_space {
-  echo "$1/devel"
+    echo "$1/devel"
 }
 
 function _catkin_config {
