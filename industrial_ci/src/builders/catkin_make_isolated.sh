@@ -36,15 +36,19 @@ function builder_setup {
 }
 
 function builder_run_build {
+    local extend=$1; shift
+    local ws=$1; shift
     local opts=()
     _append_job_opts opts PARALLEL_BUILDS 0
-    _run_catkin_make_isolated install "${opts[@]}" "$@"
+    _run_catkin_make_isolated install "$extend" "$ws" "${opts[@]}" "$@"
 }
 
 function builder_run_tests {
+    local extend=$1; shift
+    local ws=$1; shift
     local opts=()
     _append_job_opts opts PARALLEL_TESTS 1
-    _run_catkin_make_isolated run_tests "$1" "$2" "${opts[@]}"
+    _run_catkin_make_isolated run_tests "$extend" "$ws" "${opts[@]}"
 }
 
 function builder_test_results {
