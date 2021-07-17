@@ -56,7 +56,7 @@ function builder_run_tests {
     elif [ "$jobs" -gt 1 ]; then
         opts+=(--executor parallel --parallel-workers "$jobs")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
+    ici_exec_in_workspace "$(ici_extend_space "$ws")" "$ws" colcon test "${opts[@]}"
 }
 
 function builder_test_results {
