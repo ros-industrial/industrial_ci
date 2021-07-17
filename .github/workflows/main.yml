@@ -75,8 +75,9 @@ jobs:
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/format_tests/cpp/LLVM', CLANG_FORMAT_CHECK: 'WebKit', EXPECT_EXIT_CODE: 1}
 
           # Tidy
-          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic}
-          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, CLANG_TIDY_ARGS: "-checks=modernize-use-nullptr", EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: noetic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: true}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, CLANG_TIDY_ARGS: "-checks=-*,modernize-use-nullptr", EXPECT_EXIT_CODE: 1}
 
 
     runs-on: ubuntu-latest
