@@ -106,7 +106,7 @@ function ici_init_apt {
     if [ -n "$APT_PROXY" ]; then
       echo "Acquire::http::Proxy \"$APT_PROXY\";" > /etc/apt/apt.conf.d/99-industrial_ci-proxy
     fi
-    export DEBIAN_FRONTEND=noninteractive
+    echo 'debconf debconf/frontend select Noninteractive' | ici_asroot debconf-set-selections
 
     ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 

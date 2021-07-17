@@ -314,7 +314,7 @@ function ici_quiet {
 }
 
 function ici_asroot {
-  if command -v sudo > /dev/null; then
+  if [ "$EUID" -ne 0 ] && command -v sudo > /dev/null; then
       sudo "$@"
   else
       "$@"
