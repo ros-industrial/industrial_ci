@@ -102,9 +102,13 @@ function run_clang_tidy_check {
         ici_setup_git_client
     fi
 
+    ici_hook "before_clang_tidy_checks"
+
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
     done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
+
+    ici_hook "after_clang_tidy_checks"
 
     if [ "${#warnings[@]}" -gt "0" ]; then
         ici_warn "Clang tidy warning(s) in: ${warnings[*]}"
