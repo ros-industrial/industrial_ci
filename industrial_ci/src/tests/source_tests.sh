@@ -67,7 +67,7 @@ function run_clang_tidy {
     cat > "$db.command" << EOF
 #!/bin/bash
 fixes=\$(mktemp)
-clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" &> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; echo "Errored for '\$*'"; }
+clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" &> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; }
 if [ -s "\$fixes" ]; then touch "$db.warn"; fi
 rm -rf "\$fixes"
 EOF
