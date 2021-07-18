@@ -28,7 +28,7 @@ function _run_catkin_make_isolated () {
     local target=$1; shift
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin_make_isolated --build-space "$ws/build" --devel-space "$ws/devel" --install-space "$ws/install" --make-args "$target" "$@"
+    ici_exec_in_workspace "$extend" "$ws" catkin_make_isolated --build-space "$ws/build" --devel-space "$ws/devel" --install-space "$ws/install" "$@" --make-args "$target"
 }
 
 function builder_setup {
@@ -46,9 +46,9 @@ function builder_run_build {
 function builder_run_tests {
     local extend=$1; shift
     local ws=$1; shift
-    local opts=()
+    local opts=(--force-cmake)
     _append_job_opts opts PARALLEL_TESTS 1
-    _run_catkin_make_isolated run_tests "$extend" "$ws" "${opts[@]}"
+    _run_catkin_make_isolated run_tests "$(ici_extend_space "$ws")" "$ws" "${opts[@]}"
 }
 
 function builder_test_results {
