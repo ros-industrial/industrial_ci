@@ -66,16 +66,22 @@ function run_clang_tidy {
     rm -rf "$db".{command,warn,error}
     cat > "$db.command" << EOF
 #!/bin/bash
+num_non_file_args=\$1; shift
+args=("\${@:1:\$num_non_file_args}")
+files=("\${@:\$((num_non_file_args+1))}")
 fixes=\$(mktemp)
-clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\$@" &> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; }
-if [ -s "\$fixes" ]; then touch "$db.warn"; fi
+rm -f /tmp/clang_tidy_output.\$\$
+for f in "\${files[@]}" ; do
+  ( cd \$(dirname \$f); clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\${args[@]}" \$f &>> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; } )
+  if [ -s "\$fixes" ]; then touch "$db.warn"; fi
+done
 rm -rf "\$fixes"
 EOF
     chmod +x "$db.command"
 
     echo "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
 
-    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$@"
+    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$#" "$@"
     cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
     rm -rf /tmp/clang_tidy_output.*
 
@@ -102,7 +108,6 @@ function run_clang_tidy_check {
         ici_setup_git_client
     fi
 
-    pushd "$TARGET_REPO_PATH" > /dev/null || exit  # Run in TARGET_REPO_PATH
     ici_hook "before_clang_tidy_checks"
 
     while read -r db; do
@@ -110,7 +115,6 @@ function run_clang_tidy_check {
     done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
 
     ici_hook "after_clang_tidy_checks"
-    popd > /dev/null || exit
 
     if [ "${#warnings[@]}" -gt "0" ]; then
         ici_warn "Clang tidy warning(s) in: ${warnings[*]}"
