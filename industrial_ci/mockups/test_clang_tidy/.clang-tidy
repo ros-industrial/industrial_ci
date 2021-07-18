@@ -1,0 +1,6 @@
+Checks:          '-*,
+                  readability-identifier-naming,
+                 '
+CheckOptions:
+  - key:             readability-identifier-naming.VariableCase
+    value:           UPPER_CASE
