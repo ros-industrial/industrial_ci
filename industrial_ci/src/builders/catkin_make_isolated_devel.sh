@@ -23,11 +23,3 @@ ici_warn "BUILDER=catkin_make_isolated_devel should only be used in addition to 
 function ici_extend_space {
     echo "$1/devel"
 }
-
-function builder_run_build {
-    local extend=$1; shift
-    local ws=$1; shift
-    local opts=()
-    _append_job_opts opts PARALLEL_BUILDS 0
-    _run_catkin_make_isolated all "$extend" "$ws" "${opts[@]}" "$@"
-}
