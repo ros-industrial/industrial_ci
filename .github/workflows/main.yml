@@ -131,6 +131,7 @@ jobs:
           - {ROS_DISTRO: noetic, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
           - {ROS_DISTRO: foxy, UBUNTU: 20.04}
+          - {ROS_DISTRO: galactic, PRERELEASE: true, UBUNTU: 20.04}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
     steps:
       - uses: actions/checkout@v1
