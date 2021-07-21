@@ -54,9 +54,10 @@ jobs:
           - {ROS_DISTRO: melodic, ROS_REPO: ros, BUILDER: colcon, AFTER_SCRIPT: 'rosenv && [ "$$CMAKE_PREFIX_PATH" = "/root/target_ws/install/industrial_ci:/opt/ros/melodic" ]'}
           - {ROS_DISTRO: noetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: noetic, PRERELEASE: true}
+          - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
           - {ROS_DISTRO: foxy}
           - {ROS_DISTRO: galactic}
-          - {ROS_DISTRO: rolling}
+          - {ROS_DISTRO: rolling, AFTER_SCRIPT: 'rosenv ros2 run industrial_ci run_travis', ADDITIONAL_DEBS: "ros-rolling-ros2run"}
 
           # Are CXXFLAGS correctly passed? These tests should fail due to -Werror (exit code is for catkin tools: 1 and for colcon: 2)
           - {ROS_DISTRO: melodic, CXXFLAGS: "-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
@@ -64,7 +65,7 @@ jobs:
           - {ROS_DISTRO: melodic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: noetic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 2, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
 
-          - {ROS_DISTRO: melodic}
+          - {ROS_DISTRO: melodic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-melodic-rosbash"}
           - {ROS_DISTRO: melodic, ROS_REPO: main}
 
           # Format tests
@@ -165,7 +166,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: |
+          sudo apt install -y python-yaml
           industrial_ci/scripts/run_travis
+          python2 industrial_ci/scripts/run_travis
           industrial_ci/scripts/run_travis 1
 
   industrial_ci_external:
