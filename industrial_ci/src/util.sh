@@ -427,6 +427,7 @@ function ici_cleanup_later {
 function ici_make_temp_dir {
   local -n ici_make_temp_dir_res=$1;
   ici_make_temp_dir_res=$(mktemp -d)
+  ici_log "ici_make_temp_dir: $1 -> $ici_make_temp_dir_res"
   ici_cleanup_later "$ici_make_temp_dir_res"
 }
 
