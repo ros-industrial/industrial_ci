@@ -61,7 +61,7 @@ ici_source_component TEST tests
 ici_run "init" ici_init_apt
 
 if [ -n "${UNDERLAY:-}" ]; then
-    if [ ! -f "$UNDERLAY/setup.bash" ]; then
+    if [ ! -f "$UNDERLAY/setup.bash" ] && [ "$UNDERLAY" != "/opt/ros/$ROS_DISTRO" ]; then
         ici_error "UNDERLAY '$UNDERLAY' does not contain a setup.bash"
     fi
 else
