@@ -82,7 +82,7 @@ function prepare_ros_prerelease() {
     for e in TRAVIS OS_NAME OS_CODE_NAME OS_ARCH PRERELEASE_DOWNSTREAM_DEPTH PRERELEASE_REPONAME ROSDISTRO_INDEX_URL PRERELEASE_DISTRO; do
         ici_forward_variable "$e"
     done
-    
+
     ici_forward_mount WORKSPACE rw
 
     if [ -n "${DOCKER_PORT:-}" ]; then
@@ -117,5 +117,5 @@ function run_ros_prerelease() {
     fi
     ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
-    echo 'ROS Prerelease Test went successful.'
+    ici_log 'ROS Prerelease Test went successful.'
 }

@@ -161,7 +161,7 @@ function ici_run_cmd_in_docker() {
   wait %% || ret=$?
   trap - INT
   if [ -n "$DOCKER_COMMIT" ]; then
-    echo "Committing container to tag: '$DOCKER_COMMIT'"
+    ici_log "Committing container to tag: '$DOCKER_COMMIT'"
     local msg=()
     if [ -n "$DOCKER_COMMIT_MSG" ]; then
       msg=(-m "$DOCKER_COMMIT_MSG")

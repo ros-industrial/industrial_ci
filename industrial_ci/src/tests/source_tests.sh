@@ -41,7 +41,7 @@ function run_clang_tidy {
     mapfile -t files < <(grep -oP "(?<=\"file\": \")($regex)(?=\")" "$db")
     local num_all_files="${#files[@]}"
     if [ "$num_all_files" -gt 0 ] && [ -n "$CLANG_TIDY_BASE_REF" ] ; then
-        echo "Filtering for files that actually changed since $CLANG_TIDY_BASE_REF"
+        ici_log "Filtering for files that actually changed since $CLANG_TIDY_BASE_REF"
         # Need to run git in actual source dir:  $files[@] refer to source dir and $PWD is read-only
         local src_dir
         src_dir=$(grep -oP "(?<=CMAKE_HOME_DIRECTORY:INTERNAL=).*" "$build/CMakeCache.txt")
@@ -53,7 +53,7 @@ function run_clang_tidy {
         popd > /dev/null || true
     fi
     if [ "${#files[@]}" -eq 0 ]; then
-        echo "${#files[@]}/$num_all_files source files need checking"
+        ici_log "${#files[@]}/$num_all_files source files need checking"
         ici_time_end
         return 0
     fi
