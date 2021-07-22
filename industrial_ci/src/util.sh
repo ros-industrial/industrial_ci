@@ -33,8 +33,12 @@ export ICI_TIME_ID=${ICI_TIME_ID:-}
 exec {__ici_log_fd}>&1
 exec {__ici_err_fd}>&2
 
+function ici_redirect {
+    1>&"$__ici_log_fd" 2>&"$__ici_err_fd" "$@"
+}
+
 function ici_log {
-    >&"$__ici_log_fd" echo "$@"
+    ici_redirect echo "$@"
 }
 
 function ici_color_output {
@@ -431,5 +435,4 @@ function ici_make_temp_dir {
   ici_cleanup_later "$ici_make_temp_dir_res"
 }
 
-# shellcheck disable=SC1090
 ici_source_component _FOLDING_TYPE folding
