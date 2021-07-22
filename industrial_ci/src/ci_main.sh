@@ -67,7 +67,7 @@ fi
 
 ici_source_component TEST tests
 
-echo "Running test '$TEST'"
+ici_log "Running test '$TEST'"
 name=$(basename "$TEST")
 name=${name%.*}
 

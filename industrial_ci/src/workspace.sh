@@ -260,7 +260,7 @@ function ici_prepare_sourcespace {
             ;;
         -.)
             local file; file=$(basename "$basepath")
-            echo "Removing '${sourcespace:?}/$file'"
+            ici_log "Removing '${sourcespace:?}/$file'"
             rm -r "${sourcespace:?}/$file"
             ;;
         -*)
@@ -268,16 +268,16 @@ function ici_prepare_sourcespace {
             if [ ! -e "${sourcespace:?}/$file" ]; then
               file="$(basename "$basepath")/$file"
             fi
-            echo "Removing '${sourcespace:?}/$file'"
+            ici_log "Removing '${sourcespace:?}/$file'"
             rm -r "${sourcespace:?}/$file"
             ;;
         .)
-            echo "Copying '$basepath'"
+            ici_log "Copying '$basepath'"
             ici_import_directory "$sourcespace" "$basepath"
             ;;
         /*)
             if [ -d "$source" ]; then
-                echo "Copying '$source'"
+                ici_log "Copying '$source'"
                 ici_import_directory  "$sourcespace" "$source"
             elif [ -f "$source" ]; then
                 ici_import_file "$sourcespace" "$source"
@@ -290,7 +290,7 @@ function ici_prepare_sourcespace {
             ;;
         *)
             if [ -d "$basepath/$source" ]; then
-                echo "Copying '$source'"
+                ici_log "Copying '$source'"
                 ici_import_directory "$sourcespace" "$basepath/$source"
             elif [ -f "$basepath/$source" ]; then
                 ici_import_file "$sourcespace" "$basepath/$source"

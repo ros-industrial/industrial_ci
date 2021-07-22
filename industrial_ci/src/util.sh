@@ -30,14 +30,21 @@ export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
 export ICI_START_TIME=${ICI_START_TIME:-}
 export ICI_TIME_ID=${ICI_TIME_ID:-}
 
+exec {__ici_log_fd}>&1
+exec {__ici_err_fd}>&2
+
+function ici_log {
+    >&"$__ici_log_fd" echo "$@"
+}
+
 function ici_color_output {
   local c=$1
   shift
-  echo -e "\e[${c}m$*\e[0m"
+  ici_log -e "\e[${c}m$*\e[0m"
 }
 
 function ici_ansi_cleared_line {
-  echo -en "$*\r\e[0K"
+  ici_log -en "$*\r\e[0K"
 }
 
 function ici_set_u {
@@ -114,7 +121,7 @@ function ici_time_start {
     ICI_TIME_ID="$(printf %08x $((RANDOM * RANDOM)))"
     ICI_FOLD_NAME=$1
 
-    echo # blank line
+    ici_log # blank line
 
     ici_start_fold "$ICI_TIME_ID" "$ICI_FOLD_NAME" "$ICI_START_TIME"
     ici_color_output $ANSI_BLUE "$ICI_FOLD_NAME"
@@ -146,7 +153,7 @@ function ici_time_end {
     local end_time; end_time=$(date -u +%s%N)
     local elapsed_seconds; elapsed_seconds=$(( (end_time - ICI_START_TIME)/1000000000 ))
 
-    echo -en "\e[${color_wrap}m"  # just set color, no output
+    ici_log -en "\e[${color_wrap}m"  # just set color, no output
     ici_end_fold "$ICI_TIME_ID" "$name" "$ICI_START_TIME" "$end_time"
     ici_color_output "$color_wrap" "'$name' returned with code '${exit_code}' after $(( elapsed_seconds / 60 )) min $(( elapsed_seconds % 60 )) sec"
 
@@ -198,6 +205,8 @@ function ici_exit {
         exit 1
     fi
 
+    exec {__ici_log_fd}>&-
+    exec {__ici_err_fd}>&-
     exit "$exit_code"
 }
 
@@ -231,7 +240,7 @@ function ici_mark_deprecated {
 function ici_error {
     local exit_code=${2:-$?} #
     if [ -n "$1" ]; then
-        >&2 ici_color_output ${ANSI_RED} "$1"
+        __ici_log_fd=$__ici_err_fd ici_color_output ${ANSI_RED} "$1"
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
         ici_exit 1
@@ -311,6 +320,11 @@ function ici_quiet {
     fi
     rm -rf "$out"
     return "$err"
+}
+
+function ici_exec {
+    ici_log "Executing '$*'"
+    ici_quiet "$@"
 }
 
 function ici_asroot {

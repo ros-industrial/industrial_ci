@@ -37,7 +37,7 @@ function run_clang_format_check() {
 
   ici_time_start run_clang_format_check
   while read -r file; do
-    echo "Checking '${file#$path/}'"
+    ici_log "Checking '${file#$path/}'"
     if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       err=$((err +1))
     fi
@@ -45,9 +45,7 @@ function run_clang_format_check() {
 
   if [ "$err" -ne "0" ]; then
       ici_error "Clang format check failed for $err file(s)."
-      echo "Changes required to comply to formatting rules. See diff above."
-      exit 1
   fi
-  echo 'Clang format check went successful.'
+  ici_log 'Clang format check went successful.'
   ici_time_end # run_clang_format_check
 }
