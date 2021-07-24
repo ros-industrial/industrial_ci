@@ -155,7 +155,7 @@ function ici_run_cmd_in_docker() {
     docker_cp "$d" "$cid:${docker_query[*]:2}/" "${docker_query[0]}" "${docker_query[1]}"
   done
 
-  docker start -a "$cid" &
+  docker start -a "$cid" > >(sed 's/\r$//') &
   trap 'docker kill --signal=SIGTERM $cid' INT
   local ret=0
   wait %% || ret=$?
@@ -169,7 +169,7 @@ function ici_run_cmd_in_docker() {
     ici_quiet docker commit "${msg[@]}" "$cid" "$DOCKER_COMMIT"
     ici_quiet docker rm "$cid"
   fi
-  return $ret
+  return "$ret"
 }
 
 # work-around for https://github.com/moby/moby/issues/34096
