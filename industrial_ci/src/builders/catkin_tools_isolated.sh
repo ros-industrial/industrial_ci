@@ -21,5 +21,5 @@ source "${ICI_SRC_PATH}/builders/catkin_tools.sh"
 function _catkin_config {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin config --install --isolate-devel
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin config --install --isolate-devel
 }

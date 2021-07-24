@@ -53,11 +53,11 @@ function ici_parse_repository_url {
 }
 
 function ici_apt_install {
-    ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
+    ici_cmd_filtered "Setting up" ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
 }
 
 function ici_pip_install {
-    ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
+    ici_cmd ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
 }
 
 function ici_process_url {
@@ -74,7 +74,7 @@ function ici_gpg {
     local keyring=$1
     shift
     ici_asroot touch "$keyring"
-    ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
+    ici_cmd ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
 }
 
 function ici_setup_gpg_key {
@@ -112,10 +112,10 @@ function ici_init_apt {
 
     if apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 2>/dev/null | grep -q expired; then
         ici_warn "Expired ROS repository key found, installing new one"
-        ici_retry 3 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+        ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     fi
 
-    ici_asroot apt-get update -qq
+    ici_cmd ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential gnupg2 dirmngr)
     if ! ls /etc/ssl/certs/* 2&> /dev/null; then
@@ -134,7 +134,7 @@ function ici_init_apt {
         ici_setup_gpg_key
 
         ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
-        ici_asroot apt-get update -qq
+        ici_cmd ici_asroot apt-get update -qq
     fi
 
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
@@ -307,15 +307,15 @@ function ici_setup_rosdep {
     ici_install_pkgs_for_command "pip${ROS_PYTHON_VERSION}" "${PYTHON_VERSION_NAME}-pip"
 
     if [ "$ROS_DISTRO" = "indigo" ] || [ "$ROS_DISTRO" = "jade" ]; then
-        ici_quiet ici_apt_install "ros-$ROS_DISTRO-roslib"
+        ici_apt_install "ros-$ROS_DISTRO-roslib"
     else
         ici_apt_install "ros-$ROS_DISTRO-ros-environment"
     fi
 
     # Setup rosdep
-    rosdep --version
+    ici_cmd rosdep --version
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
-        ici_asroot rosdep init
+        ici_cmd ici_asroot rosdep init
     fi
 
     update_opts=()
@@ -326,7 +326,7 @@ function ici_setup_rosdep {
         update_opts+=(--include-eol-distros)
     fi
 
-    ici_retry 2 rosdep update "${update_opts[@]}"
+    ici_retry 2 ici_cmd rosdep update "${update_opts[@]}"
 }
 
 function ici_extend_space {
@@ -354,15 +354,7 @@ function ici_install_dependencies {
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
 
-    local out; out=$(mktemp)
-    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" |& tee "$out" | grep "executing command" | cat
-    local err=${PIPESTATUS[0]}
-    if [ "$err" -ne 0 ]; then
-        cat "$out"
-    fi
-    rm -rf "$out"
-    return "$err"
-
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd_filtered "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}"
 }
 
 function ici_build_workspace {

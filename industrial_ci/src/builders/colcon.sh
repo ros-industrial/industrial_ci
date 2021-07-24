@@ -36,7 +36,7 @@ function builder_run_build {
     elif [ "$jobs" -gt 1 ]; then
         opts+=(--executor parallel --parallel-workers "$jobs")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon build "${opts[@]}" "$@"
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" colcon build "${opts[@]}" "$@"
 }
 
 function builder_run_tests {
@@ -56,11 +56,11 @@ function builder_run_tests {
     elif [ "$jobs" -gt 1 ]; then
         opts+=(--executor parallel --parallel-workers "$jobs")
     fi
-    ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
 }
 
 function builder_test_results {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" colcon test-result --verbose
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" colcon test-result --verbose
 }
