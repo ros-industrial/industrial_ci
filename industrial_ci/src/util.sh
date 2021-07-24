@@ -24,6 +24,7 @@ ANSI_RED=31
 ANSI_GREEN=32
 ANSI_YELLOW=33
 ANSI_BLUE=34
+ANSI_BOLD=1
 
 export _FOLDING_TYPE=${_FOLDING_TYPE:-none}
 export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
@@ -313,6 +314,29 @@ function ici_retry {
   return $ret
 }
 
+function ici_get_log_cmd {
+    while true; do
+        case "$1" in
+            ici_asroot)
+                echo -n "sudo "
+                ;;
+            ici_exec_in_workspace)
+                echo -n "source $2/setup.bash && "
+                if [ "$3" != '.' ]; then
+                  echo -n "cd $3 && "
+                fi
+                shift 2
+                ;;
+            ici_quiet)
+                ;;
+            *)
+              echo "$*"
+              return
+        esac
+        shift
+    done
+}
+
 function ici_quiet {
     local out; out=$(mktemp)
     # shellcheck disable=SC2216
@@ -320,15 +344,57 @@ function ici_quiet {
     "$@" &> "$out" | true # '|| err=$?' disables errexit
     local err=${PIPESTATUS[0]}
     if [ "$err" -ne 0 ]; then
-        cat "$out"
+        ici_redirect cat "$out"
     fi
     rm -rf "$out"
     return "$err"
 }
 
-function ici_exec {
-    ici_log "Executing '$*'"
-    ici_quiet "$@"
+function ici_cmd {
+    local cmd; cmd=$(ici_get_log_cmd "$@")
+    ici_log
+    ici_color_output ${ANSI_BOLD} "$ $cmd"
+    # shellcheck disable=SC2216
+    # shellcheck disable=SC2260
+    "$@" | cat # '|| err=$?' disables errexit
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        ici_error "'$cmd' returned with $err" "$err"
+    fi
+}
+
+function ici_cmd_quiet {
+    local cmd; cmd=$(ici_get_log_cmd "$@")
+    ici_log
+    ici_color_output ${ANSI_BOLD} "$ $cmd &> /dev/null"
+    local out; out=$(mktemp)
+    # shellcheck disable=SC2216
+    # shellcheck disable=SC2260
+    "$@" &> "$out" | true # '|| err=$?' disables errexit
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        ici_redirect cat "$out"
+        rm -rf "$out"
+        ici_error "'$cmd' returned with $err" "$err"
+    fi
+    rm -rf "$out"
+}
+
+function ici_cmd_filtered {
+    local filter=$1; shift
+    local cmd; cmd=$(ici_get_log_cmd "$@")
+    ici_log
+    ici_color_output ${ANSI_BOLD} "$ $cmd | grep -E '$filter'"
+    local out; out=$(mktemp)
+    # shellcheck disable=SC2260
+    "$@" |& tee "$out" | grep -E "$filter" | ici_redirect cat
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        ici_redirect cat "$out"
+        rm -rf "$out"
+        ici_error "'$cmd' returned with $err" "$err"
+    fi
+    rm -rf "$out"
 }
 
 function ici_asroot {
