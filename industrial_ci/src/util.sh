@@ -345,9 +345,10 @@ function ici_quiet {
     local err=${PIPESTATUS[0]}
     if [ "$err" -ne 0 ]; then
         ici_redirect cat "$out"
+        rm -rf "$out"
+        ici_error "'$(ici_get_log_cmd "$@")' returned with $err" "$err"
     fi
     rm -rf "$out"
-    return "$err"
 }
 
 function ici_cmd {
