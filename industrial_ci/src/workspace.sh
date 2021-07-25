@@ -77,16 +77,23 @@ function ici_gpg {
     ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
 }
 
+function ici_gpg_import {
+    local keyring=$1
+    shift
+    gpg --dearmor | >/dev/null ici_asroot tee "$keyring"
+    gpg --no-options --trust-model always --no-default-keyring --keyring "$keyring" --fingerprint
+}
+
 function ici_setup_gpg_key {
     case "$ROS_REPOSITORY_KEY}" in
     *://*)
-        ici_process_url "${ROS_REPOSITORY_KEY}" ici_gpg "$_ROS_KEYRING" --import "-"
+        ici_process_url "${ROS_REPOSITORY_KEY}" ici_gpg_import "$_ROS_KEYRING"
         ;;
     /*.*)
-        ici_gpg "$_ROS_KEYRING" --import "$ROS_REPOSITORY_KEY"
+        ici_gpg_import "$_ROS_KEYRING" < "$ROS_REPOSITORY_KEY"
         ;;
     *.*)
-        ici_gpg "$_ROS_KEYRING" --import "$TARGET_REPO_PATH/$ROS_REPOSITORY_KEY"
+        ici_gpg_import "$_ROS_KEYRING" < "$TARGET_REPO_PATH/$ROS_REPOSITORY_KEY"
         ;;
     *)
         if [[ $ROS_REPOSITORY_KEY =~ ^[a-fA-F0-9]{16,40}$ ]]; then
