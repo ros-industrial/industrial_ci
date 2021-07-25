@@ -103,7 +103,7 @@ function run_clang_tidy_check {
     local clang_tidy_args=()
     ici_parse_env_array clang_tidy_args CLANG_TIDY_ARGS
 
-    ici_run "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
+    ici_step "install_clang_tidy" ici_install_pkgs_for_command clang-tidy clang-tidy "$(apt-cache depends --recurse --important clang  | grep "^libclang-common-.*")"
     if [ -n "$CLANG_TIDY_BASE_REF" ]; then
         ici_setup_git_client
     fi
@@ -145,8 +145,8 @@ function run_pylint_check {
     mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${find_pattern[@]}")
 
     if [ "${#files[@]}" -ne 0 ]; then
-        ici_run "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-        ici_run "run_pylint" ici_exec_in_workspace "$(ici_extend_space "$target_ws")" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+        ici_step "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
+        ici_step "run_pylint" ici_exec_in_workspace "$(ici_extend_space "$target_ws")" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
     else
         ici_warn "No python files found, skipping pylint"
     fi
@@ -162,14 +162,14 @@ function run_source_tests {
     downstream_ws=$BASEDIR/downstream_ws
 
     if [ -n "$CCACHE_DIR" ]; then
-        ici_run "setup_ccache" ici_apt_install ccache
+        ici_step "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
 
     ici_source_builder
-    ici_run "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "${BUILDER}_setup" ici_quiet builder_setup
 
-    ici_run "setup_rosdep" ici_setup_rosdep
+    ici_step "setup_rosdep" ici_setup_rosdep
 
     extend=${UNDERLAY:?}
 
@@ -188,13 +188,13 @@ function run_source_tests {
     fi
 
     if [ "$CATKIN_LINT" == "true" ] || [ "$CATKIN_LINT" == "pedantic" ]; then
-        ici_run "install_catkin_lint" install_catkin_lint
+        ici_step "install_catkin_lint" install_catkin_lint
         local catkin_lint_args=()
         ici_parse_env_array catkin_lint_args CATKIN_LINT_ARGS
         if [ "$CATKIN_LINT" == "pedantic" ]; then
           catkin_lint_args+=(--strict -W2)
         fi
-        ici_with_ws "$target_ws" ici_run "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
+        ici_with_ws "$target_ws" ici_step "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
 
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then

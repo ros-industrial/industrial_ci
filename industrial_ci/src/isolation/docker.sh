@@ -74,7 +74,7 @@ function ici_isolate() {
   fi
 
   if [ "$DOCKER_PULL" != false ]; then
-      ici_run "pull_docker_image"  docker pull "$DOCKER_IMAGE"
+      ici_step "pull_docker_image"  docker pull "$DOCKER_IMAGE"
   fi
 
   if [ -z "${ROS_DISTRO:-}" ]; then

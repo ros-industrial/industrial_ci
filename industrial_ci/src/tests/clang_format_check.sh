@@ -33,7 +33,7 @@ function run_clang_format_check() {
 
   local sources=()
   ici_parse_env_array sources TARGET_WORKSPACE
-  ici_run "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
+  ici_step "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
 
   ici_time_start run_clang_format_check
   while read -r file; do
