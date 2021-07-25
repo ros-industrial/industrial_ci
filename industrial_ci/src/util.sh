@@ -24,9 +24,11 @@ ANSI_RED=31
 ANSI_GREEN=32
 ANSI_YELLOW=33
 ANSI_BLUE=34
+ANSI_MAGENTA=35
 ANSI_BOLD=1
 
 export _FOLDING_TYPE=${_FOLDING_TYPE:-none}
+export TRACE=${TRACE:-false}
 export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
 export ICI_START_TIME=${ICI_START_TIME:-}
 export ICI_TIME_ID=${ICI_TIME_ID:-}
@@ -52,9 +54,27 @@ function ici_ansi_cleared_line {
   ici_log -en "$*\r\e[0K"
 }
 
+function ici_backtrace {
+  if [ "$TRACE" = true ]; then
+    ici_log
+    ici_color_output ${ANSI_MAGENTA} "TRACE:${BASH_SOURCE[2]#$ICI_SRC_PATH/}:${BASH_LINENO[1]} ${FUNCNAME[1]} $*"
+    for ((i=3;i<${#BASH_SOURCE[@]};i++)); do
+        ici_color_output ${ANSI_MAGENTA} "   AT:${BASH_SOURCE[$i]#$ICI_SRC_PATH/}:${BASH_LINENO[$((i-1))]} ${FUNCNAME[$((i-1))]}"
+    done
+  fi
+}
+
+function ici_trace {
+  if [ "$TRACE" = true ]; then
+    ici_log
+    ici_color_output ${ANSI_MAGENTA} "TRACE:${BASH_SOURCE[2]#$ICI_SRC_PATH/}:${BASH_LINENO[1]} ${FUNCNAME[1]} $*"
+  fi
+}
+
 function ici_set_u {
   [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
 }
+
 function ici_with_unset_variables {
   set +u
   "$@"
@@ -85,6 +105,7 @@ function _label_hook() {
 }
 
 function ici_hook() {
+  ici_trace "$@"
   local name=${1^^}
   name=${name//[^A-Z0-9_]/_}
   local name_embed="${name}_EMBED"
@@ -196,6 +217,8 @@ function ici_step {
 function ici_exit {
     local exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
     trap - EXIT # Reset signal handler since the shell is about to exit.
+
+    ici_backtrace "$@"
 
     local cleanup=()
     # shellcheck disable=SC2016
@@ -311,6 +334,7 @@ function ici_removed_hook() {
 }
 
 function ici_retry {
+  ici_trace "$@"
   local tries=$1; shift
   local ret=0
 
@@ -381,12 +405,17 @@ function ici_filter {
 }
 
 
-function ici_guard {
+function _ici_guard {
     local err=0
     "$@" || err=$?
     if [ "$err" -ne 0 ]; then
         ici_error "'$(ici_get_log_cmd "$@")' returned with $err" "$err"
     fi
+}
+
+function ici_guard {
+    ici_trace "$@"
+    _ici_guard "$@"
 }
 
 function ici_label {
@@ -397,7 +426,7 @@ function ici_label {
 }
 
 function ici_cmd {
-    ici_label ici_guard "$@"
+     _ici_guard ici_label "$@"
 }
 
 function ici_asroot {
@@ -409,6 +438,7 @@ function ici_asroot {
 }
 
 function ici_exec_for_command {
+  ici_trace "$@"
   local command=$1; shift
   if ! command -v "$command" > /dev/null; then
     "$@"
@@ -446,6 +476,7 @@ function ici_parse_jobs {
 }
 
 function ici_find_nonhidden {
+  ici_trace "$@"
   local path=$1; shift
   local args=()
   if [ $# -gt 0 ]; then
@@ -473,6 +504,7 @@ function ici_source_component {
 }
 
 function ici_check_builder {
+  ici_trace "$@"
   [ -z "$BUILDER" ] || ici_resolve_component BUILDER builders > /dev/null
 }
 
@@ -493,10 +525,12 @@ function ici_join_array {
 }
 
 function ici_cleanup_later {
+  ici_trace "$@"
   _CLEANUP=$(ici_join_array : "$_CLEANUP" "$@")
 }
 
 function ici_make_temp_dir {
+  ici_trace "$@"
   local -n ici_make_temp_dir_res=$1;
   ici_make_temp_dir_res=$(mktemp -d)
   ici_log "ici_make_temp_dir: $1 -> $ici_make_temp_dir_res"
