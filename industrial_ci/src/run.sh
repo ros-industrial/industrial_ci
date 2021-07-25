@@ -58,7 +58,7 @@ if [ -z "${CXXFLAGS:-}" ]; then unset CXXLAGS; fi
 TEST=$1; shift
 ici_source_component TEST tests
 
-ici_run "init" ici_init_apt
+ici_step "init" ici_init_apt
 
 if [ -n "${UNDERLAY:-}" ]; then
     if [ ! -f "$UNDERLAY/setup.bash" ] && [ "$UNDERLAY" != "/opt/ros/$ROS_DISTRO" ]; then

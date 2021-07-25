@@ -100,22 +100,22 @@ function prepare_ros_prerelease() {
 
 function run_ros_prerelease() {
     ici_source_builder
-    ici_run "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "${BUILDER}_setup" ici_quiet builder_setup
 
-    ici_run "setup_ros_prerelease" setup_ros_prerelease
+    ici_step "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
-    ici_run "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_run 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+    ici_step "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
+    ici_step 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
     local setup_sh=
     if [ -f "${UNDERLAY:?}/setup.sh" ]; then
         setup_sh=". $UNDERLAY/setup.sh && "
     fi
-    ABORT_ON_TEST_FAILURE=1 ici_run "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
+    ABORT_ON_TEST_FAILURE=1 ici_step "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
     ici_log 'ROS Prerelease Test went successful.'
 }

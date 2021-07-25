@@ -11,6 +11,6 @@ function install_black() {
 }
 
 function run_black_check() {
-  ici_exec_for_command black ici_run install_black install_black
-  ici_run run_black_check black --check --color --diff --verbose --exclude "/\..*/" "$TARGET_WORKSPACE"  # Exclude hidden directories.
+  ici_exec_for_command black ici_step install_black install_black
+  ici_step run_black_check black --check --color --diff --verbose --exclude "/\..*/" "$TARGET_WORKSPACE"  # Exclude hidden directories.
 }

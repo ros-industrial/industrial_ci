@@ -83,9 +83,9 @@ function abi_process_workspace() {
   local cflags="-g -Og"
   local cmake_args=(--cmake-args "-DCMAKE_C_FLAGS=$cflags" "-DCMAKE_CXX_FLAGS=$cflags")
 
-  ici_run "install_${tag}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$workspace/src"
-  ici_run "abi_build_${tag}" builder_run_build "$extend" "$workspace" "${cmake_args[@]}"
-  ici_run "abi_dump_${tag}" abi_dump_libraries  "$(ici_extend_space "$workspace")" "$workspace/abi_dumps" -lver "$version"
+  ici_step "install_${tag}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$workspace/src"
+  ici_step "abi_build_${tag}" builder_run_build "$extend" "$workspace" "${cmake_args[@]}"
+  ici_step "abi_dump_${tag}" abi_dump_libraries  "$(ici_extend_space "$workspace")" "$workspace/abi_dumps" -lver "$version"
 }
 
 function abi_configure() {
@@ -176,14 +176,14 @@ function run_abi_check() {
     upstream_ws=$BASEDIR/upstream_ws
     target_ws=$BASEDIR/target_ws
 
-    ici_with_ws "$base_ws" ici_run "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
+    ici_with_ws "$base_ws" ici_step "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
 
     ici_source_builder
-    ici_run "${BUILDER}_setup" ici_quiet builder_setup
-    ici_run "setup_rosdep" ici_setup_rosdep
+    ici_step "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "setup_rosdep" ici_setup_rosdep
 
     if [ -n "$CCACHE_DIR" ]; then
-        ici_run "setup_ccache" ici_apt_install ccache
+        ici_step "setup_ccache" ici_apt_install ccache
         export PATH="/usr/lib/ccache:$PATH"
     fi
 
@@ -197,8 +197,8 @@ function run_abi_check() {
     mkdir -p "$target_ws/src"
     ici_import_directory "$target_ws/src" "$TARGET_REPO_PATH"
 
-    ici_run "abi_install_compliance_checker" abi_install_compliance_checker
-    ici_run "abi_install_dumper" abi_install_dumper
+    ici_step "abi_install_compliance_checker" abi_install_compliance_checker
+    ici_step "abi_install_dumper" abi_install_dumper
 
     ici_with_ws "$target_ws" abi_process_workspace "$extend" "$target_ws" target
     ici_with_ws "$base_ws" abi_process_workspace "$extend" "$base_ws" base "$ABICHECK_VERSION"

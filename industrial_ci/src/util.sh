@@ -166,7 +166,7 @@ function ici_time_end {
     ici_hook "after_${name}"
 }
 
-function ici_run {
+function ici_step {
     local name=$1; shift
     ici_time_start "$name"
     "$@"
