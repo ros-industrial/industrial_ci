@@ -15,6 +15,8 @@ jobs:
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
   industrial_ci:
+    env:
+      TRACE: true
     strategy:
       fail-fast: false
       matrix:
@@ -57,7 +59,7 @@ jobs:
           - {ROS_DISTRO: noetic, PRERELEASE: true}
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
           - {ROS_DISTRO: foxy, AFTER_SCRIPT: 'rosenv ros2 run industrial_ci run_travis', ADDITIONAL_DEBS: "ros-foxy-ros2run"}
-          - {ROS_DISTRO: galactic}
+          - {ROS_DISTRO: galactic, TRACE: true}
           - {ROS_DISTRO: rolling}
 
           # Are CXXFLAGS correctly passed? These tests should fail due to -Werror (exit code is for catkin tools: 1 and for colcon: 2)
