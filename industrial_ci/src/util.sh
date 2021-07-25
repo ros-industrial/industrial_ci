@@ -24,9 +24,11 @@ ANSI_RED=31
 ANSI_GREEN=32
 ANSI_YELLOW=33
 ANSI_BLUE=34
+ANSI_MAGENTA=35
 ANSI_BOLD=1
 
 export _FOLDING_TYPE=${_FOLDING_TYPE:-none}
+export TRACE=${TRACE:-false}
 export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
 export ICI_START_TIME=${ICI_START_TIME:-}
 export ICI_TIME_ID=${ICI_TIME_ID:-}
@@ -52,9 +54,25 @@ function ici_ansi_cleared_line {
   ici_log -en "$*\r\e[0K"
 }
 
+function ici_backtrace {
+  if [ "$TRACE" = true ]; then
+    ici_color_output ${ANSI_MAGENTA} "TRACE:${BASH_SOURCE[2]#$ICI_SRC_PATH/}:${BASH_LINENO[1]} ${FUNCNAME[1]} $*"
+    for ((i=3;i<${#BASH_SOURCE[@]};i++)); do
+        ici_color_output ${ANSI_MAGENTA} "   AT:${BASH_SOURCE[$i]#$ICI_SRC_PATH/}:${BASH_LINENO[$((i-1))]} ${FUNCNAME[$((i-1))]}"
+    done
+  fi
+}
+
+function ici_trace {
+  if [ "$TRACE" = true ]; then
+    ici_color_output ${ANSI_MAGENTA} "TRACE:${BASH_SOURCE[2]#$ICI_SRC_PATH/}:${BASH_LINENO[1]} ${FUNCNAME[1]} $*"
+  fi
+}
+
 function ici_set_u {
   [[ "${BASH_VERSINFO[0]}_${BASH_VERSINFO[1]}" < "4_4" ]] || set -u
 }
+
 function ici_with_unset_variables {
   set +u
   "$@"
@@ -189,6 +207,8 @@ function ici_exit {
     local exit_code=${1:-$?}  # If 1st arg is not passed, set last error code.
     trap - EXIT # Reset signal handler since the shell is about to exit.
 
+    ici_backtrace "$@"
+
     local cleanup=()
     # shellcheck disable=SC2016
     IFS=: command eval 'cleanup=(${_CLEANUP})'
@@ -205,9 +225,9 @@ function ici_exit {
     fi
 
     if [ "$exit_code" == "$EXPECT_EXIT_CODE" ]; then
-        exit 0
+        exit_code=0
     elif [ "$exit_code" == "0" ]; then # 0 was not expected
-        exit 1
+        exit_code=1
     fi
 
     exec {__ici_log_fd}>&-
@@ -248,7 +268,7 @@ function ici_error {
         __ici_log_fd=$__ici_err_fd ici_color_output ${ANSI_RED} "$1"
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
-        ici_exit 1
+        exit_code=1
     fi
     ici_exit "$exit_code"
 }
@@ -338,6 +358,7 @@ function ici_get_log_cmd {
 }
 
 function ici_guard {
+    ici_trace "$@"
     local err=0
     "$@" || err=$?
     if [ "$err" -ne 0 ]; then
@@ -346,6 +367,7 @@ function ici_guard {
 }
 
 function ici_quiet {
+    ici_trace "$@"
     local out; out=$(mktemp)
     # shellcheck disable=SC2216
     # shellcheck disable=SC2260
@@ -415,6 +437,7 @@ function ici_asroot {
 }
 
 function ici_exec_for_command {
+  ici_trace "$@"
   local command=$1; shift
   if ! command -v "$command" > /dev/null; then
     "$@"
@@ -452,6 +475,7 @@ function ici_parse_jobs {
 }
 
 function ici_find_nonhidden {
+  ici_trace "$@"
   local path=$1; shift
   local args=()
   if [ $# -gt 0 ]; then
@@ -479,6 +503,7 @@ function ici_source_component {
 }
 
 function ici_check_builder {
+  ici_trace "$@"
   [ -z "$BUILDER" ] || ici_resolve_component BUILDER builders > /dev/null
 }
 
@@ -499,10 +524,12 @@ function ici_join_array {
 }
 
 function ici_cleanup_later {
+  ici_trace "$@"
   _CLEANUP=$(ici_join_array : "$_CLEANUP" "$@")
 }
 
 function ici_make_temp_dir {
+  ici_trace "$@"
   local -n ici_make_temp_dir_res=$1;
   ici_make_temp_dir_res=$(mktemp -d)
   ici_log "ici_make_temp_dir: $1 -> $ici_make_temp_dir_res"
