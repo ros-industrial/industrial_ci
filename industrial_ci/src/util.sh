@@ -337,6 +337,14 @@ function ici_get_log_cmd {
     done
 }
 
+function ici_guard {
+    local err=0
+    "$@" || err=$?
+    if [ "$err" -ne 0 ]; then
+        ici_error "'$(ici_get_log_cmd "$@")' returned with $err" "$err"
+    fi
+}
+
 function ici_quiet {
     local out; out=$(mktemp)
     # shellcheck disable=SC2216
@@ -357,10 +365,10 @@ function ici_cmd {
     ici_color_output ${ANSI_BOLD} "$ $cmd"
     # shellcheck disable=SC2216
     # shellcheck disable=SC2260
-    "$@" | cat # '|| err=$?' disables errexit
+    "$@" | cat
     local err=${PIPESTATUS[0]}
     if [ "$err" -ne 0 ]; then
-        ici_error "'$cmd' returned with $err" "$err"
+        ici_error "'$(ici_get_log_cmd "$@")' returned with $err" "$err"
     fi
 }
 
@@ -467,8 +475,7 @@ function ici_resolve_component {
 function ici_source_component {
   local script
   script=$(ici_resolve_component "$@")
-  # shellcheck disable=SC1090
-  source "$script"
+  ici_guard source "$script"
 }
 
 function ici_check_builder {

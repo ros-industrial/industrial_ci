@@ -73,14 +73,14 @@ function ici_gpg {
     ici_make_temp_dir homedir
     local keyring=$1
     shift
-    ici_asroot touch "$keyring"
+    ici_guard ici_asroot touch "$keyring"
     ici_cmd ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
 }
 
 function ici_gpg_import {
     local keyring=$1
     shift
-    gpg --dearmor | ici_quiet ici_asroot tee "$keyring"
+    ici_guard gpg --dearmor | ici_quiet ici_asroot tee "$keyring"
     ici_cmd gpg --no-options --trust-model always --no-default-keyring --keyring "$keyring" --fingerprint
 }
 
@@ -115,7 +115,7 @@ function ici_init_apt {
     fi
     echo 'debconf debconf/frontend select Noninteractive' | ici_asroot debconf-set-selections
 
-    ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
+    ici_guard ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 
     if apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 2>/dev/null | grep -q expired; then
         ici_warn "Expired ROS repository key found, installing new one"
@@ -140,7 +140,7 @@ function ici_init_apt {
         local deb_opts=(arch="$(dpkg --print-architecture)" signed-by="$_ROS_KEYRING")
         ici_setup_gpg_key
 
-        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
+        ici_guard ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
         ici_cmd ici_asroot apt-get update -qq
     fi
 
@@ -170,7 +170,7 @@ function ici_setup_git_client {
 }
 
 function ici_vcs_import {
-    vcs import --recursive --force "$@"
+    ici_guard vcs import --recursive --force "$@"
 }
 
 function ici_import_repository {
@@ -204,7 +204,7 @@ function ici_import_file {
     case "$file" in
     *.zip|*.tar|*.tar.*|*.tgz|*.tbz2)
         ici_install_pkgs_for_command bsdtar bsdtar
-        bsdtar -C "$sourcespace" -xf "$file"
+        ici_guard bsdtar -C "$sourcespace" -xf "$file"
         ;;
     *)
         ici_install_pkgs_for_command vcs python3-vcstool
@@ -231,7 +231,7 @@ function ici_import_url {
         processor=(ici_vcs_import "$sourcespace")
     ;;
     esac
-    ici_process_url "$url" "${processor[@]}"
+    ici_guard ici_process_url "$url" "${processor[@]}"
 }
 
 function  ici_import_directory {
@@ -240,22 +240,22 @@ function  ici_import_directory {
     local target
     target=${sourcespace:?}/$(basename "$dir")
 
-    rm -rf "$target"
-    mkdir "$target"
+    ici_guard rm -rf "$target"
+    ici_guard mkdir "$target"
     local args=()
     for p in "$BASEDIR" "$CCACHE_DIR" "$(readlink -m "$ICI_SRC_PATH/../..")"; do
         if [[ $p/ ==  $dir/?* ]]; then
             args+=("--exclude=.${p#$dir}")
         fi
     done
-    tar c "${args[@]}" -C "$dir" . | tar x -C "$target"
+    ici_guard tar c "${args[@]}" -C "$dir" . | ici_guard tar x -C "$target"
 }
 
 function ici_prepare_sourcespace {
     local sourcespace=$1; shift
     local basepath=$TARGET_REPO_PATH
 
-    mkdir -p "$sourcespace"
+    ici_guard mkdir -p "$sourcespace"
 
     for source in "$@"; do
         case "$source" in
@@ -268,7 +268,7 @@ function ici_prepare_sourcespace {
         -.)
             local file; file=$(basename "$basepath")
             ici_log "Removing '${sourcespace:?}/$file'"
-            rm -r "${sourcespace:?}/$file"
+            ici_guard rm -r "${sourcespace:?}/$file"
             ;;
         -*)
             local file="${source:1}"
@@ -276,7 +276,7 @@ function ici_prepare_sourcespace {
               file="$(basename "$basepath")/$file"
             fi
             ici_log "Removing '${sourcespace:?}/$file'"
-            rm -r "${sourcespace:?}/$file"
+            ici_guard rm -r "${sourcespace:?}/$file"
             ;;
         .)
             ici_log "Copying '$basepath'"
