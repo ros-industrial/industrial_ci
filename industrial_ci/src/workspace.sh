@@ -53,19 +53,17 @@ function ici_parse_repository_url {
 }
 
 function ici_apt_install {
-    ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
+    ici_cmd ici_quiet ici_filter "Setting up" ici_asroot apt-get -qq install -y --no-upgrade --no-install-recommends "$@"
 }
 
 function ici_pip_install {
-    ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
+    ici_cmd ici_asroot "${PYTHON_VERSION_NAME}" -m pip install -q "$@"
 }
 
 function ici_process_url {
     local url=$1; shift
     ici_install_pkgs_for_command wget wget
-    set -o pipefail
-    wget -O- -q "$url" | "$@"
-    set +o pipefail
+    ici_guard wget -O- -q "$url" | ici_guard "$@"
 }
 
 function ici_gpg {
@@ -73,8 +71,15 @@ function ici_gpg {
     ici_make_temp_dir homedir
     local keyring=$1
     shift
-    ici_asroot touch "$keyring"
-    ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
+    ici_guard ici_asroot touch "$keyring"
+    ici_cmd ici_asroot gpg --homedir "$homedir" --no-auto-check-trustdb --trust-model always --no-options --no-default-keyring --secret-keyring /dev/null --keyring "$keyring" "$@"
+}
+
+function ici_gpg_import {
+    local keyring=$1
+    shift
+    ici_guard gpg --dearmor | >/dev/null ici_guard ici_asroot tee "$keyring"
+    ici_cmd gpg --no-options --trust-model always --no-default-keyring --keyring "$keyring" --fingerprint
 }
 
 function ici_gpg_import {
@@ -111,18 +116,18 @@ function ici_setup_gpg_key {
 
 function ici_init_apt {
     if [ -n "$APT_PROXY" ]; then
-      echo "Acquire::http::Proxy \"$APT_PROXY\";" > /etc/apt/apt.conf.d/99-industrial_ci-proxy
+      echo "Acquire::http::Proxy \"$APT_PROXY\";" | >/dev/null ici_asroot tee /etc/apt/apt.conf.d/99-industrial_ci-proxy
     fi
-    echo 'debconf debconf/frontend select Noninteractive' | ici_asroot debconf-set-selections
+    echo 'debconf debconf/frontend select Noninteractive' |  ici_quiet ici_asroot debconf-set-selections
 
-    ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
+    ici_cmd ici_asroot sed -i "/^# deb.*multiverse/ s/^# //" /etc/apt/sources.list
 
-    if apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 2>/dev/null | grep -q expired; then
+    if 2>/dev/null apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 | grep -q expired; then
         ici_warn "Expired ROS repository key found, installing new one"
-        ici_retry 3 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+        ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     fi
 
-    ici_asroot apt-get update -qq
+    ici_cmd ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential gnupg2 dirmngr)
     if ! ls /etc/ssl/certs/* 2&> /dev/null; then
@@ -140,8 +145,8 @@ function ici_init_apt {
         local deb_opts=(arch="$(dpkg --print-architecture)" signed-by="$_ROS_KEYRING")
         ici_setup_gpg_key
 
-        ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main" > /dev/null
-        ici_asroot apt-get update -qq
+        >/dev/null ici_asroot tee "/etc/apt/sources.list.d/ros${ROS_VERSION}-latest.list" <<< "deb [${deb_opts[*]}] ${ROS_REPOSITORY_PATH} $(lsb_release -sc) main"
+        ici_cmd ici_asroot apt-get update -qq
     fi
 
     # If more DEBs needed during preparation, define ADDITIONAL_DEBS variable where you list the name of DEB(S, delimitted by whitespace)
@@ -170,7 +175,7 @@ function ici_setup_git_client {
 }
 
 function ici_vcs_import {
-    vcs import --recursive --force "$@"
+    ici_guard vcs import --recursive --force "$@"
 }
 
 function ici_import_repository {
@@ -204,7 +209,7 @@ function ici_import_file {
     case "$file" in
     *.zip|*.tar|*.tar.*|*.tgz|*.tbz2)
         ici_install_pkgs_for_command bsdtar bsdtar
-        bsdtar -C "$sourcespace" -xf "$file"
+        ici_guard bsdtar -C "$sourcespace" -xf "$file"
         ;;
     *)
         ici_install_pkgs_for_command vcs python3-vcstool
@@ -231,7 +236,7 @@ function ici_import_url {
         processor=(ici_vcs_import "$sourcespace")
     ;;
     esac
-    ici_process_url "$url" "${processor[@]}"
+    ici_guard ici_process_url "$url" "${processor[@]}"
 }
 
 function  ici_import_directory {
@@ -240,22 +245,22 @@ function  ici_import_directory {
     local target
     target=${sourcespace:?}/$(basename "$dir")
 
-    rm -rf "$target"
-    mkdir "$target"
+    ici_guard rm -rf "$target"
+    ici_guard mkdir "$target"
     local args=()
     for p in "$BASEDIR" "$CCACHE_DIR" "$(readlink -m "$ICI_SRC_PATH/../..")"; do
         if [[ $p/ ==  $dir/?* ]]; then
             args+=("--exclude=.${p#$dir}")
         fi
     done
-    tar c "${args[@]}" -C "$dir" . | tar x -C "$target"
+    ici_guard tar c "${args[@]}" -C "$dir" . | ici_guard tar x -C "$target"
 }
 
 function ici_prepare_sourcespace {
     local sourcespace=$1; shift
     local basepath=$TARGET_REPO_PATH
 
-    mkdir -p "$sourcespace"
+    ici_guard mkdir -p "$sourcespace"
 
     for source in "$@"; do
         case "$source" in
@@ -268,7 +273,7 @@ function ici_prepare_sourcespace {
         -.)
             local file; file=$(basename "$basepath")
             ici_log "Removing '${sourcespace:?}/$file'"
-            rm -r "${sourcespace:?}/$file"
+            ici_guard rm -r "${sourcespace:?}/$file"
             ;;
         -*)
             local file="${source:1}"
@@ -276,7 +281,7 @@ function ici_prepare_sourcespace {
               file="$(basename "$basepath")/$file"
             fi
             ici_log "Removing '${sourcespace:?}/$file'"
-            rm -r "${sourcespace:?}/$file"
+            ici_guard rm -r "${sourcespace:?}/$file"
             ;;
         .)
             ici_log "Copying '$basepath'"
@@ -314,15 +319,13 @@ function ici_setup_rosdep {
     ici_install_pkgs_for_command "pip${ROS_PYTHON_VERSION}" "${PYTHON_VERSION_NAME}-pip"
 
     if [ "$ROS_DISTRO" = "indigo" ] || [ "$ROS_DISTRO" = "jade" ]; then
-        ici_quiet ici_apt_install "ros-$ROS_DISTRO-roslib"
+        ici_apt_install "ros-$ROS_DISTRO-roslib"
     else
         ici_apt_install "ros-$ROS_DISTRO-ros-environment"
     fi
 
-    # Setup rosdep
-    rosdep --version
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
-        ici_asroot rosdep init
+        ici_cmd ici_quiet ici_asroot rosdep init
     fi
 
     update_opts=()
@@ -333,7 +336,7 @@ function ici_setup_rosdep {
         update_opts+=(--include-eol-distros)
     fi
 
-    ici_retry 2 rosdep update "${update_opts[@]}"
+    ici_retry 2 ici_cmd ici_quiet rosdep update "${update_opts[@]}"
 }
 
 function ici_extend_space {
@@ -343,7 +346,7 @@ function ici_extend_space {
 function ici_exec_in_workspace {
     local extend=$1; shift
     local path=$1; shift
-    ( ici_source_setup "$extend" && cd "$path" && exec "$@")
+    ( ici_source_setup "$extend" && cd "$path" && exec "$@") || return
 }
 
 function ici_install_dependencies {
@@ -361,15 +364,7 @@ function ici_install_dependencies {
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
 
-    local out; out=$(mktemp)
-    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}" |& tee "$out" | grep "executing command" | cat
-    local err=${PIPESTATUS[0]}
-    if [ "$err" -ne 0 ]; then
-        cat "$out"
-    fi
-    rm -rf "$out"
-    return "$err"
-
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd ici_quiet ici_filter "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}"
 }
 
 function ici_build_workspace {

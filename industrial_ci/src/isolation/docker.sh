@@ -74,7 +74,7 @@ function ici_isolate() {
   fi
 
   if [ "$DOCKER_PULL" != false ]; then
-      ici_step "pull_docker_image"  docker pull "$DOCKER_IMAGE"
+      ici_step "pull_docker_image"  ici_cmd docker pull "$DOCKER_IMAGE"
   fi
 
   if [ -z "${ROS_DISTRO:-}" ]; then
@@ -140,7 +140,7 @@ function ici_run_cmd_in_docker() {
   fi
 
   local cid
-  cid=$(docker create "${opts[@]}" "$@")
+  cid=$(ici_cmd docker create --init "${opts[@]}" "$@")
 
   # detect user inside container
   local image
@@ -155,19 +155,18 @@ function ici_run_cmd_in_docker() {
     docker_cp "$d" "$cid:${docker_query[*]:2}/" "${docker_query[0]}" "${docker_query[1]}"
   done
 
-  docker start -a "$cid" > >(sed 's/\r$//') &
-  trap 'docker kill --signal=SIGTERM $cid' INT
+  trap '>/dev/null ici_label ici_quiet docker kill --signal=SIGTERM $cid && >/dev/null docker wait $cid' INT
+  ( trap '' INT &&  ici_label docker start -a "$cid" > >(sed 's/\r$//') ) &
   local ret=0
   wait %% || ret=$?
-  trap - INT
+
   if [ -n "$DOCKER_COMMIT" ]; then
-    ici_log "Committing container to tag: '$DOCKER_COMMIT'"
     local msg=()
     if [ -n "$DOCKER_COMMIT_MSG" ]; then
       msg=(-m "$DOCKER_COMMIT_MSG")
     fi
-    ici_quiet docker commit "${msg[@]}" "$cid" "$DOCKER_COMMIT"
-    ici_quiet docker rm "$cid"
+    ici_cmd docker commit "${msg[@]}" "$cid" "$DOCKER_COMMIT"
+    ici_cmd ici_quiet docker rm "$cid"
   fi
   return "$ret"
 }

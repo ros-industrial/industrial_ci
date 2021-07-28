@@ -45,7 +45,7 @@ function builder_run_build {
     fi
     _append_job_opts opts PARALLEL_BUILDS 0
     _catkin_config "$extend" "$ws"
-    ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize  --no-status "$@"
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin build "${opts[@]}" --summarize  --no-status "$@"
 }
 
 function builder_run_tests {
@@ -59,11 +59,11 @@ function builder_run_tests {
         opts+=(-i)
     fi
     _append_job_opts opts PARALLEL_TESTS 1
-    ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
 }
 
 function builder_test_results {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin_test_results --verbose
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin_test_results --verbose
 }

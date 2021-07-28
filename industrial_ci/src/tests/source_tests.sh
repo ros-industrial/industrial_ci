@@ -145,8 +145,8 @@ function run_pylint_check {
     mapfile -t files < <(ici_find_nonhidden "$target_ws/src" "${find_pattern[@]}")
 
     if [ "${#files[@]}" -ne 0 ]; then
-        ici_step "install_pylint" ici_quiet ici_install_pkgs_for_command "pylint" "pylint"
-        ici_step "run_pylint" ici_exec_in_workspace "$(ici_extend_space "$target_ws")" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
+        ici_step "install_pylint" ici_install_pkgs_for_command "pylint" "pylint"
+        ici_step "run_pylint" ici_cmd ici_exec_in_workspace "$(ici_extend_space "$target_ws")" "$target_ws" "pylint" "${args[@]}" "${files[@]}"
     else
         ici_warn "No python files found, skipping pylint"
     fi
@@ -167,7 +167,7 @@ function run_source_tests {
     fi
 
     ici_source_builder
-    ici_step "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "${BUILDER}_setup" builder_setup
 
     ici_step "setup_rosdep" ici_setup_rosdep
 
@@ -194,7 +194,7 @@ function run_source_tests {
         if [ "$CATKIN_LINT" == "pedantic" ]; then
           catkin_lint_args+=(--strict -W2)
         fi
-        ici_with_ws "$target_ws" ici_step "catkin_lint" ici_exec_in_workspace "$extend" "$target_ws"  catkin_lint --explain "${catkin_lint_args[@]}" src
+        ici_with_ws "$target_ws" ici_step "catkin_lint" ici_cmd ici_exec_in_workspace "$extend" "$target_ws" catkin_lint --explain "${catkin_lint_args[@]}" src
 
     fi
     if [ "${CLANG_TIDY:-false}" != false ]; then

@@ -6,7 +6,7 @@ function prepare_black_check() {
 }
 
 function install_black() {
-  ici_quiet ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
+  ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
   ici_asroot pip3 install black
 }
 
