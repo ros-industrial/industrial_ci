@@ -27,5 +27,5 @@ function ici_extend_space {
 function _catkin_config {
     local extend=$1; shift
     local ws=$1; shift
-    ici_exec_in_workspace "$extend" "$ws" catkin config --isolate-devel
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin config --isolate-devel
 }

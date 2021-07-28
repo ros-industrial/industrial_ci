@@ -21,8 +21,8 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function setup_ros_buildfarm() {
-    ici_quiet ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
-    ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
+    ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
+    ici_cmd ici_quiet ici_asroot pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
 }
 
 function setup_ros_prerelease() {
@@ -100,7 +100,7 @@ function prepare_ros_prerelease() {
 
 function run_ros_prerelease() {
     ici_source_builder
-    ici_step "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "${BUILDER}_setup" builder_setup
 
     ici_step "setup_ros_prerelease" setup_ros_prerelease
 
@@ -108,14 +108,14 @@ function run_ros_prerelease() {
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
-    ici_step "prepare_prerelease_workspaces" prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_step 'generate_prerelease_script' sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+    ici_step "prepare_prerelease_workspaces" ici_cmd prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
+    ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
     local setup_sh=
     if [ -f "${UNDERLAY:?}/setup.sh" ]; then
         setup_sh=". $UNDERLAY/setup.sh && "
     fi
-    ABORT_ON_TEST_FAILURE=1 ici_step "run_prerelease_script" sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
+    ABORT_ON_TEST_FAILURE=1 ici_step "run_prerelease_script" ici_cmd sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
     ici_log 'ROS Prerelease Test went successful.'
 }

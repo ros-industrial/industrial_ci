@@ -36,7 +36,7 @@ source "${ICI_SRC_PATH}/ros.sh"
 # shellcheck source=industrial_ci/src/workspace.sh
 source "${ICI_SRC_PATH}/workspace.sh"
 
-trap ici_exit EXIT # install industrial_ci exit handler
+trap 'ici_exit 143' EXIT # install industrial_ci exit handler
 
 if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
 

@@ -24,6 +24,7 @@ ANSI_RED=31
 ANSI_GREEN=32
 ANSI_YELLOW=33
 ANSI_BLUE=34
+ANSI_BOLD=1
 
 export _FOLDING_TYPE=${_FOLDING_TYPE:-none}
 export ICI_FOLD_NAME=${ICI_FOLD_NAME:-}
@@ -67,7 +68,7 @@ function _sub_shell() (
     if [ -f "$e/setup.bash" ]; then
       ici_source_setup "$e"
       if [ -n "$*" ]; then
-        (exec "$@")
+        (exec "$@") || return
       fi
       return 0
     fi
@@ -76,6 +77,12 @@ function _sub_shell() (
   }
   eval "$*"
 )
+
+function _label_hook() {
+      ici_log
+      # shellcheck disable=SC2001
+      ici_color_output ${ANSI_BOLD} "$(sed -e 's/^/$ /' <<< "$1")"
+}
 
 function ici_hook() {
   local name=${1^^}
@@ -89,11 +96,13 @@ function ici_hook() {
     ici_time_start "$1"
 
     if [ -n "$script" ]; then
-      _sub_shell "$script"
+      _label_hook "( $script; )"
+      _sub_shell "$script" || ici_exit
     fi
 
     if [ -n "$script_embed" ]; then
-      eval "$script_embed"
+      _label_hook "eval \"$script_embed\""
+      eval "$script_embed" || ici_exit
       ici_set_u
     fi
 
@@ -203,10 +212,12 @@ function ici_exit {
         ici_time_end "$color_wrap" "$exit_code"
     fi
 
+
+
     if [ "$exit_code" == "$EXPECT_EXIT_CODE" ]; then
-        exit 0
+        exit_code=0
     elif [ "$exit_code" == "0" ]; then # 0 was not expected
-        exit 1
+        exit_code=1
     fi
 
     exec {__ici_log_fd}>&-
@@ -247,7 +258,7 @@ function ici_error {
         __ici_log_fd=$__ici_err_fd ici_color_output ${ANSI_RED} "$1"
     fi
     if [ "$exit_code" == "0" ]; then # 0 is not error
-        ici_exit 1
+        exit_code=1
     fi
     ici_exit "$exit_code"
 }
@@ -313,22 +324,80 @@ function ici_retry {
   return $ret
 }
 
+function ici_get_log_cmd {
+    local post=""
+    while true; do
+        case "$1" in
+            ici_asroot)
+                echo -n "sudo "
+                ;;
+            ici_exec_in_workspace)
+                echo -n "( source $2/setup.bash && "
+                if [ "$3" != '.' ]; then
+                  echo -n "cd $3 && "
+                fi
+                shift 2
+                post="$post; )"
+                ;;
+            ici_filter)
+                post=" | grep -E '$2' "
+                shift 1
+                ;;
+            ici_quiet)
+                post=" > /dev/null "
+                ;;
+            ici_cmd|ici_guard|ici_label)
+                ;;
+            *)
+              echo "$*$post"
+              return
+        esac
+        shift
+    done
+}
+
 function ici_quiet {
     local out; out=$(mktemp)
-    # shellcheck disable=SC2216
-    # shellcheck disable=SC2260
-    "$@" &> "$out" | true # '|| err=$?' disables errexit
-    local err=${PIPESTATUS[0]}
+    local err=0
+    "$@" &> "$out" || err=$?
     if [ "$err" -ne 0 ]; then
-        cat "$out"
+        ici_redirect cat "$out"
+        rm -rf "$out"
     fi
     rm -rf "$out"
     return "$err"
 }
 
-function ici_exec {
-    ici_log "Executing '$*'"
-    ici_quiet "$@"
+function ici_filter {
+    local filter=$1; shift
+    local out; out=$(mktemp)
+    "$@" | grep -E "$filter" | ici_redirect cat || true
+    local err=${PIPESTATUS[0]}
+    if [ "$err" -ne 0 ]; then
+        ici_redirect cat "$out"
+    fi
+    rm -rf "$out"
+    return "$err"
+}
+
+
+function ici_guard {
+    local err=0
+    "$@" || err=$?
+    if [ "$err" -ne 0 ]; then
+        ici_error "'$(ici_get_log_cmd "$@")' returned with $err" "$err"
+    fi
+}
+
+function ici_label {
+    local cmd; cmd=$(ici_get_log_cmd "$@")
+    ici_log
+    ici_color_output ${ANSI_BOLD} "$ $cmd"
+     "$@"
+}
+
+function ici_cmd {
+    ici_label ici_guard "$@"
 }
 
 function ici_asroot {
@@ -400,8 +469,7 @@ function ici_resolve_component {
 function ici_source_component {
   local script
   script=$(ici_resolve_component "$@")
-  # shellcheck disable=SC1090
-  source "$script"
+  ici_guard source "$script"
 }
 
 function ici_check_builder {

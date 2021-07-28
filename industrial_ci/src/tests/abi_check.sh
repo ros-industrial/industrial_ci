@@ -18,7 +18,7 @@
 function _install_universal_ctags() {
     ici_apt_install autoconf automake pkg-config
     ici_import_repository /tmp github:universal-ctags/ctags.git#master
-    (cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install)
+    (ici_guard cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install) || return
     rm -rf /tmp/ctags
 }
 
@@ -26,7 +26,7 @@ function _import_and_make_install() {
   local repo=$1; shift
   ici_import_repository /tmp "github:$repo.git#master"
   local dir; dir=/tmp/$(basename "$repo")
-  (cd "$dir" && ici_asroot make install prefix=/usr)
+  (ici_guard cd "$dir" && ici_asroot make install prefix=/usr) || return
   rm -rf "$dir"
 }
 
@@ -122,7 +122,7 @@ function abi_report() {
   local reports_dir=$1; shift
 
   abi_install_compliance_checker
-  ici_quiet ici_install_pkgs_for_command links links
+  ici_install_pkgs_for_command links links
 
   mkdir -p "$reports_dir"
 
@@ -179,7 +179,7 @@ function run_abi_check() {
     ici_with_ws "$base_ws" ici_step "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
 
     ici_source_builder
-    ici_step "${BUILDER}_setup" ici_quiet builder_setup
+    ici_step "${BUILDER}_setup" builder_setup
     ici_step "setup_rosdep" ici_setup_rosdep
 
     if [ -n "$CCACHE_DIR" ]; then
