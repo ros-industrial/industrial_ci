@@ -140,7 +140,7 @@ function ici_run_cmd_in_docker() {
   fi
 
   local cid
-  cid=$(docker create "${opts[@]}" "$@")
+  cid=$(docker create --init "${opts[@]}" "$@")
 
   # detect user inside container
   local image
@@ -155,11 +155,9 @@ function ici_run_cmd_in_docker() {
     docker_cp "$d" "$cid:${docker_query[*]:2}/" "${docker_query[0]}" "${docker_query[1]}"
   done
 
-  docker start -a "$cid" > >(sed 's/\r$//') &
-  trap 'docker kill --signal=SIGTERM $cid' INT
+  trap '>/dev/null docker kill --signal=SIGTERM $cid' INT
   local ret=0
-  wait %% || ret=$?
-  trap - INT
+  docker start -a "$cid" > >(sed 's/\r$//') || ret=$?
   if [ -n "$DOCKER_COMMIT" ]; then
     ici_log "Committing container to tag: '$DOCKER_COMMIT'"
     local msg=()
