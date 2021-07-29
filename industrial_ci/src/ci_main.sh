@@ -39,7 +39,7 @@ source "${ICI_SRC_PATH}/deprecated.sh"
 # shellcheck source=industrial_ci/src/ros.sh
 source "${ICI_SRC_PATH}/ros.sh"
 
-trap ici_exit EXIT # install industrial_ci exit handler
+ici_setup
 
 export ISOLATION=${ISOLATION:-docker}
 if [ "${CI:-}" != true ] ; then
@@ -71,5 +71,6 @@ ici_log "Running test '$TEST'"
 name=$(basename "$TEST")
 name=${name%.*}
 
-"prepare_$name"
-ici_isolate "$TEST" "run_${name}"
+"prepare_$name" || ici_exit
+ici_isolate "$TEST" "run_${name}" || ici_exit
+ici_exit 0
