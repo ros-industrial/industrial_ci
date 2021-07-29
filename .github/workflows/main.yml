@@ -16,6 +16,7 @@ jobs:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
   industrial_ci:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', VERBOSE_OUTPUT: true, CATKIN_LINT: true, AFTER_SCRIPT: '[ "$$(command -v catkin_lint)" = /usr/local/bin/catkin_lint ]'}
@@ -91,6 +92,7 @@ jobs:
 
   abicheck:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - repo: 'ros/actionlib'
@@ -126,6 +128,7 @@ jobs:
     env:
       ISOLATION: shell
     strategy:
+      fail-fast: false
       matrix:
         env:
           - {ROS_DISTRO: melodic, UBUNTU: 18.04}
@@ -173,6 +176,7 @@ jobs:
 
   industrial_ci_external:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - repo: 'ros-industrial/industrial_core'
