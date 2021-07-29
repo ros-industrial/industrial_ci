@@ -19,6 +19,7 @@ jobs:
   industrial_ci:
     if: github.repository == 'ros-industrial/industrial_ci' # don't run on forks
     strategy:
+      fail-fast: false
       matrix:
         env:
           - {ROS_DISTRO: melodic, PRERELEASE: true}
