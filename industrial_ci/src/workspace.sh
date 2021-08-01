@@ -346,7 +346,7 @@ function ici_extend_space {
 function ici_exec_in_workspace {
     local extend=$1; shift
     local path=$1; shift
-    ( ici_source_setup "$extend" && cd "$path" && exec "$@") || return
+    ( ici_source_setup "$extend" && cd "$path" && exec "$@") || ici_exit
 }
 
 function ici_install_dependencies {
@@ -415,8 +415,10 @@ function ici_source_setup {
 }
 
 function ici_with_ws() {
+    local err=0
     # shellcheck disable=SC2034
     current_ws=$1; shift
-    "$@"
+    "$@" || err=$?
     unset current_ws
+    return "$err"
 }
