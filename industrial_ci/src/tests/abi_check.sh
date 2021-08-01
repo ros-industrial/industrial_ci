@@ -18,7 +18,7 @@
 function _install_universal_ctags() {
     ici_apt_install autoconf automake pkg-config
     ici_import_repository /tmp github:universal-ctags/ctags.git#master
-    (ici_guard cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install) || return
+    (ici_guard cd /tmp/ctags && ./autogen.sh && ./configure && ici_asroot make install) || ici_exit
     rm -rf /tmp/ctags
 }
 
@@ -26,7 +26,7 @@ function _import_and_make_install() {
   local repo=$1; shift
   ici_import_repository /tmp "github:$repo.git#master"
   local dir; dir=/tmp/$(basename "$repo")
-  (ici_guard cd "$dir" && ici_asroot make install prefix=/usr) || return
+  (ici_guard cd "$dir" && ici_asroot make install prefix=/usr) || ici_exit
   rm -rf "$dir"
 }
 
@@ -144,7 +144,7 @@ function abi_report() {
               ici_warn "'$(basename "$l" .dump)': Invalid input ABI dump. Perhaps this library does not any export symbols."
               ici_time_end "${ANSI_YELLOW}"
           else
-              ici_exit "$ret"
+              return "$ret"
           fi
       fi
   done

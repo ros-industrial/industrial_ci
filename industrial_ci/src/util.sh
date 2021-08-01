@@ -35,11 +35,13 @@ export ICI_TIME_ID=${ICI_TIME_ID:-}
 
 __ici_log_fd=1
 __ici_err_fd=2
+__ici_top_level=0
 
 function ici_setup {
     trap 'ici_trap_exit' EXIT # install industrial_ci exit handler
     exec {__ici_log_fd}>&1
     exec {__ici_err_fd}>&2
+    __ici_top_level=$BASH_SUBSHELL
 }
 
 function ici_redirect {
@@ -82,9 +84,11 @@ function ici_set_u {
 }
 
 function ici_with_unset_variables {
+  local err=0
   set +u
-  "$@"
+  "$@" || err=$?
   ici_set_u
+  return "$err"
 }
 
 function _sub_shell() (
@@ -101,7 +105,7 @@ function _sub_shell() (
     done
     return 1
   }
-  eval "$*"
+  eval "$*" || ici_exit
 )
 
 function _label_hook() {
@@ -155,7 +159,7 @@ function ici_hook() {
 #######################################
 
 function ici_time_start {
-    ici_hook "before_${1}"
+    ici_hook "before_${1}" || ici_exit
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set +x; fi
     ICI_START_TIME=$(date -u +%s%N)
     ICI_TIME_ID="$(printf %08x $((RANDOM * RANDOM)))"
@@ -199,37 +203,39 @@ function ici_time_end {
 
     ICI_FOLD_NAME=
     if [ "$DEBUG_BASH" ] && [ "$DEBUG_BASH" == true ]; then set -x; fi
-    ici_hook "after_${name}"
+    ici_hook "after_${name}" || ici_exit
 }
 
 function ici_step {
     local name=$1; shift
     ici_time_start "$name"
-    "$@"
+    "$@" || ici_exit
     ici_time_end
 }
 
 function ici_teardown {
-    local exit_code=$1
-    trap - EXIT # Reset signal handler since the shell is about to exit.
+    if [  "$BASH_SUBSHELL" -le "$__ici_top_level" ]; then
+        local exit_code=$1
+        trap - EXIT # Reset signal handler since the shell is about to exit.
 
-    local cleanup=()
-    # shellcheck disable=SC2016
-    IFS=: command eval 'cleanup=(${_CLEANUP})'
-    for c in "${cleanup[@]}"; do
-      ici_warn Cleaning up "${c/#\~/$HOME}"
-      rm -rf "${c/#\~/$HOME}"
-    done
+        local cleanup=()
+        # shellcheck disable=SC2016
+        IFS=: command eval 'cleanup=(${_CLEANUP})'
+        for c in "${cleanup[@]}"; do
+          ici_warn Cleaning up "${c/#\~/$HOME}"
+          rm -rf "${c/#\~/$HOME}"
+        done
 
-    # end fold if needed
-    if [ -n "$ICI_FOLD_NAME" ]; then
-        local color_wrap=${ANSI_GREEN}
-        if [ "$exit_code" -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
-        ici_time_end "$color_wrap" "$exit_code"
+        # end fold if needed
+        if [ -n "$ICI_FOLD_NAME" ]; then
+            local color_wrap=${ANSI_GREEN}
+            if [ "$exit_code" -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
+            ici_time_end "$color_wrap" "$exit_code"
+        fi
+
+        exec {__ici_log_fd}>&-
+        exec {__ici_err_fd}>&-
     fi
-
-    exec {__ici_log_fd}>&-
-    exec {__ici_err_fd}>&-
 }
 
 function ici_trap_exit {

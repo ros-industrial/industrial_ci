@@ -70,8 +70,8 @@ else
     fi
 fi
 
-"$@"
+"$@" || ici_exit
 
-ici_hook "after_script"
+ici_hook "after_script" || ici_exit
 
 ici_exit 0
