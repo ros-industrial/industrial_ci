@@ -74,7 +74,7 @@ function _sub_shell() (
     done
     return 1
   }
-  eval "$@"
+  eval "$*"
 )
 
 function ici_hook() {
