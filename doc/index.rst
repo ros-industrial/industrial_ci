@@ -314,6 +314,11 @@ Or mixed:
 
   DOWNSTREAM_WORKSPACE="github:ros-simulation/gazebo_ros_pkgs@melodic-devel https://raw.githubusercontent.com/ros-controls/ros_control/melodic-devel/ros_control.rosinstall -ros_control additional.repos"
 
+To depend on a different repository of a private server using git and the SSH protocol:
+::
+
+  UPSTREAM_WORKSPACE='git+ssh://git@private.server.net/repository#branch'
+
 To filter the target workspace:
 ::
 

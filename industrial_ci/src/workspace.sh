@@ -37,7 +37,7 @@ function ici_parse_repository_url {
             gitlab | gl)
                 echo "${name%.git}" "git" "https://gitlab.com/$repo" "$fragment"
                 ;;
-            'git+file'*|'git+http'*)
+            'git+file'*|'git+http'*|'git+ssh'*)
                 echo "${name%.git}" "git" "${scheme#git+}:$repo" "$fragment"
                 ;;
             git+*)
