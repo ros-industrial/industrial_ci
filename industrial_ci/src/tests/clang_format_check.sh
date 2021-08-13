@@ -37,7 +37,7 @@ function run_clang_format_check() {
 
   ici_time_start run_clang_format_check
   while read -r file; do
-    ici_log "Checking '${file#$path/}'"
+    ici_log "Checking '${file#"$path/"}'"
     if ! $clang_format_executable -style="$CLANG_FORMAT_CHECK" "$file" | git diff --exit-code "$file" - ; then
       err=$((err +1))
     fi
