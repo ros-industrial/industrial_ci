@@ -547,7 +547,7 @@ function ici_join_array {
       res+="$sep$elem"
     fi
   done
-  echo "${res#$sep}"
+  echo "${res#"$sep"}"
 }
 
 function ici_cleanup_later {
