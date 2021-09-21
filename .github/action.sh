@@ -42,4 +42,10 @@ if [ "${ABICHECK_MERGE:-}" = "auto" ]; then
   [ "$GITHUB_EVENT_NAME" != "pull_request" ] || ABICHECK_MERGE=true
 fi
 
-env "$@" bash "$DIR_THIS/../industrial_ci/src/ci_main.sh"
+if [ "${ACT:-}" = true ]; then
+  export _BUNDLE_ICI=true
+  _FOLDING_TYPE=none
+  ici_warn "Detected act, bundling industrial_ci"
+fi
+
+env "$@" bash "$ICI_SRC_PATH/ci_main.sh"

@@ -19,6 +19,7 @@ export DOCKER_COMMIT=${DOCKER_COMMIT:-}
 export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
 export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .ssh .subversion}
 export DOCKER_PULL=${DOCKER_PULL:-true}
+export _BUNDLE_ICI=${_BUNDLE_ICI:-false}
 
 # ici_forward_mount VARNAME/FILE rw/ro [PATH]
 function ici_forward_mount() {
@@ -84,7 +85,11 @@ function ici_isolate() {
   fi
 
   ici_forward_mount TARGET_REPO_PATH ro
-  ici_forward_mount ICI_SRC_PATH ro
+  if [ "$_BUNDLE_ICI" = true ]; then
+    ici_forward_variable ICI_SRC_PATH
+  else
+    ici_forward_mount ICI_SRC_PATH ro
+  fi
   ici_forward_mount BASEDIR rw
   ici_forward_mount CCACHE_DIR rw
   ici_forward_mount SSH_AUTH_SOCK rw # forward ssh agent into docker container
@@ -154,6 +159,10 @@ function ici_run_cmd_in_docker() {
     ici_warn "Copy credentials: $d"
     docker_cp "$d" "$cid:${docker_query[*]:2}/" "${docker_query[0]}" "${docker_query[1]}"
   done
+
+  if [ "$_BUNDLE_ICI" = true ]; then
+    tar -cPf - "$ICI_SRC_PATH" | docker cp - "$cid:/"
+  fi
 
   trap '>/dev/null ici_label ici_quiet docker kill --signal=SIGTERM $cid && >/dev/null docker wait $cid' INT
   ( trap '' INT &&  ici_label docker start -a "$cid" > >(sed 's/\r$//') ) &
