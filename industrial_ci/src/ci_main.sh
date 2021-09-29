@@ -29,6 +29,8 @@ export ICI_SRC_PATH; ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && p
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"
 if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
+# shellcheck source=industrial_ci/src/coverage.sh
+source "${ICI_SRC_PATH}/coverage.sh"
 
 # shellcheck source=industrial_ci/src/util.sh
 source "${ICI_SRC_PATH}/util.sh"

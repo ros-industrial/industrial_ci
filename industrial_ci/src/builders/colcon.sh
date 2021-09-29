@@ -56,7 +56,15 @@ function builder_run_tests {
     elif [ "$jobs" -gt 1 ]; then
         opts+=(--executor parallel --parallel-workers "$jobs")
     fi
+    opts+=("$@")
     ici_cmd ici_exec_in_workspace "$extend" "$ws" colcon test  "${opts[@]}"
+}
+
+function builder_run_tests_with_coverage {
+    local extend=$1; shift
+    local ws=$1; shift
+    builder_run_tests "$extend" "$ws" --pytest-with-coverage \
+                                      --pytest-args --cov-report=term
 }
 
 function builder_test_results {
