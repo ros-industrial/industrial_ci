@@ -692,6 +692,53 @@ Since v0.6.0, you can run locally using ``.travis.yml`` you already defined for 
 
    rosrun industrial_ci run_travis --help
 
+Run locally using GitHub-Workflow config
+++++++++++++++++++++++++++++++++++++++++
+
+You can run GitHub actions locally using `act <https://github.com/nektos/act>`__.
+For its installation, follow the `official install instructions <https://github.com/nektos/act#installation>`__.
+Installation in short:
+
+* install docker engine;
+* install ``act`` using `bash script <https://github.com/nektos/act#bash-script>`__ (tested on Ubuntu and its derivatives) or download the `static binaries <https://github.com/nektos/act/releases>`__;
+* When asked about which ``act`` image you would like to install, choose medium (default choice).
+
+Before running a GH-Action locally, please check that you are using the `industrial_ci` as follows:
+
+::
+
+  - uses: ros-industrial/industrial_ci@master
+    env:
+      ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
+      ROS_REPO: ${{ matrix.ROS_REPO }}
+
+Or for more complicated cases:
+
+::
+
+  - uses: ros-industrial/industrial_ci@master
+      with:
+        config: ${{toJSON(matrix.env)}}
+
+Often used configuration is actually not supported by GH (more details in #590)
+
+::
+
+  - uses: ros-industrial/industrial_ci@master
+      env: ${{matrix.env}}
+
+After that, go to the package you would like to test and start a workflow using act:
+
+* ``act`` - execute all workflows
+* ``act -l`` - list all defined workflows
+* ``act -j <my_workflow>`` - execute specific workflow
+
+Some useful flags:
+
+* to get more detailed output, use ``-v`` flag
+* to reuse action containers, use ``-r`` flag (makes your actions much faster)
+* for everything else check `act flags <https://github.com/nektos/act#flags>`__
+
 Recurring runs for debugging
 ++++++++++++++++++++++++++++
 Please note that ``run_ci`` and ``run_travis`` will download all dependencies every time, just as CI services would do.
