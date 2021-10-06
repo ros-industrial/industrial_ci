@@ -128,7 +128,8 @@ function _get_prefix() {
     fi
 }
 
-function _set_ros_package_path {
+function ici_set_ros_repository_path {
+    local current_repository_path=$1; shift
     if [ -z "${ROS_REPOSITORY_PATH}" ]; then
         case "$ROS_REPO" in
         "building")
@@ -149,6 +150,14 @@ function _set_ros_package_path {
         "ros2")
             _use_repo_or_final_snapshot "http://packages.ros.org/ros2/ubuntu"
             ;;
+        "")
+            if [ -n "$current_repository_path" ]; then
+                export ROS_REPOSITORY_PATH=$current_repository_path
+                return
+            fi
+            ici_warn "Using default ROS_REPO=testing"
+            export ROS_REPO=testing
+            ;&
         "testing")
             _use_repo_or_final_snapshot "http://packages.ros.org/$(_get_prefix)-testing/ubuntu"
             ;;
@@ -177,6 +186,5 @@ function _set_ros_package_path {
 function ici_configure_ros() {
     if [ -n "${ROS_DISTRO}" ]; then
         _set_ros_defaults
-        _set_ros_package_path
     fi
 }
