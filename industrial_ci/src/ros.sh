@@ -176,6 +176,9 @@ function ici_set_ros_repository_path {
         "final"|????-??-??)
             _use_snapshot "${ROS_REPO}"
             ;;
+        "false")
+                export ROS_REPOSITORY_PATH=$current_repository_path
+            ;;
         *)
             ici_error "ROS repo '$ROS_REPO' is not supported"
             ;;
