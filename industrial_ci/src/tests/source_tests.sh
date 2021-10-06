@@ -183,7 +183,7 @@ function run_source_tests {
         TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
     fi
     if [ -n "$CODE_COVERAGE" ]; then
-        ici_run "install_coveragepy" ici_install_pkgs_for_command coverage "$PYTHON_VERSION_NAME-coverage"
+        ici_step "install_coveragepy" ici_install_pkgs_for_command coverage "$PYTHON_VERSION_NAME-coverage"
         TARGET_CMAKE_ARGS="$TARGET_CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS='--coverage' -DCMAKE_CXX_FLAGS='--coverage'"
         export CATKIN_TEST_COVERAGE=1
     fi
@@ -211,7 +211,7 @@ function run_source_tests {
     fi
 
     if [ -n "${CODE_COVERAGE}" ]; then
-        ici_run "collect_target_coverage_report" ici_collect_coverage_report "$target_ws"
+        ici_step "collect_target_coverage_report" ici_collect_coverage_report "$target_ws"
     fi
 
     extend="$(ici_extend_space "$target_ws")"

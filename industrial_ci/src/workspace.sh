@@ -404,7 +404,7 @@ function ici_test_workspace {
     local err=0
 
     if [ "${name}" = "target" ] && [ -n "$CODE_COVERAGE" ] && [ "$BUILDER" = "colcon" ]; then
-      ici_run "run_${name}_test_with_coverage" builder_run_tests_with_coverage "$extend" "$ws"
+      ici_step "run_${name}_test_with_coverage" builder_run_tests_with_coverage "$extend" "$ws"
     else
     ici_step "run_${name}_test" builder_run_tests "$extend" "$ws"
     fi
