@@ -334,15 +334,11 @@ As you see in the `optional variables section <./index.rst#optional-environment-
 Pulling Docker image from an online hub
 +++++++++++++++++++++++++++++++++++++++
 
-You can pull any *Docker* image by specifying in ``DOCKER_IMAGE`` variable, as long as a  ROS package repository has been set-up (`example <http://wiki.ros.org/kinetic/Installation/Ubuntu#Installation.2BAC8-Ubuntu.2BAC8-Sources.Setup_your_sources.list>`__).
-If your Docker image is missing any required softwate, then you can add it by spef ``ADDITIONAL_DEBS`` (see `variables section <./index.rst#optional-environment-variables>`__).
+You can pull any *Docker* image by specifying in ``DOCKER_IMAGE`` variable.
+If your *Docker* image is ROS-based, you can omit ``ROS_DISTRO`` as long as the Dockerfile sets this environment variable (``ENV ROS_DISTRO``)
+However, ``ROS_REPO`` (or non-recommended ``ROS_REPOSITORY_PATH``), and ``ROS_DISTRO`` can still be used to modify the target container.
 
-Some more notes:
-
-* Setting ``DOCKER_IMAGE`` is a bit tricky:
-   * disables the set-up of ROS based on ``ROS_REPO`` (or non-recommended ``ROS_REPOSITORY_PATH``), and ROS_DISTRO.
-   * but ``ROS_DISTRO`` needs to be set if it was not set in the image.
-* Some common credentials such as ``.docker``, ``.ssh``, ``.subversion`` are passed from CI native platform to Docker container.
+Please note that the entrypoint and command of the image will get ignored.
 
 Pass custom variables to Docker
 -------------------------------

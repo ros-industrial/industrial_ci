@@ -55,6 +55,10 @@ jobs:
           - {ROS_DISTRO: melodic, OS_NAME: debian, EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: melodic, OS_NAME: debian, OS_CODE_NAME: bionic, EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: melodic, ROS_REPO: ros, BUILDER: colcon, AFTER_SCRIPT: 'rosenv && [ "$$CMAKE_PREFIX_PATH" = "/root/target_ws/install/industrial_ci:/opt/ros/melodic" ]'}
+          - {DOCKER_IMAGE: "ros:noetic", AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 2}
+          - {DOCKER_IMAGE: "ros:noetic", ROS_REPO: testing, AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 1}
+          - {DOCKER_IMAGE: "ros:melodic", AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 2}
+          - {DOCKER_IMAGE: "ros:melodic", ROS_REPO: testing, AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: noetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: noetic, PRERELEASE: true}
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
