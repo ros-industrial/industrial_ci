@@ -492,11 +492,7 @@ function ici_parse_jobs {
       _ici_parse_jobs_res="$3";;
   "true")
       _ici_parse_jobs_res="0";;
-  "True")
-      _ici_parse_jobs_res="0";;
   "false")
-      _ici_parse_jobs_res="1";;
-  "False")
       _ici_parse_jobs_res="1";;
   *)
       if ! [[ "$_ici_parse_jobs_res" =~ ^[0-9]+$ ]]; then
