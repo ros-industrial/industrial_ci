@@ -168,6 +168,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ADDITIONAL_DEBS** (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: ``ros-indigo-roslint ros-indigo-gazebo-ros``
 * **AFTER_SCRIPT** (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`__ where ``after_script`` doesn't affect the build result, the result in the commands specified with this DOES affect the build result. See more `here <./index.rst#run-pre-post-process-custom-commands>`__.
 * **APT_PROXY** (default: not set): Configure APT to use the provided URL as http proxy.
+* **BASEDIR** (default: ``$HOME``): Base directory in which the upstream, target, and downstream workspaces will be built. Note: this directory is bind-mounted, so its contents will not persist in the image created during the build
 * **BLACK_CHECK** (default: not set): If true, will check Python code formatting with `Black <https://black.readthedocs.io/en/stable/>`__.
 * **BUILDER** (default: ``catkin_tools`` for ROS1, ``colcon`` for ROS2): Select the builder e.g. to build ROS1 packages with colcon (options: ``catkin_tools``, ``colcon``, ``catkin_make``, ``catkin_make_isolated``).
 * **CATKIN_LINT** (default: not set. Value range: [true|pedantic]): If ``true``, run `catkin_lint <http://fkie.github.io/catkin_lint/>`__ with ``--explain`` option. If ``pedantic``, ``catkin_lint`` command runs with ``--strict -W2`` option, i.e. more verbose output will print, and the CI job fails if there's any error and/or warning occurs. Industrial CI uses the `latest version available from pypi <https://pypi.org/project/catkin-lint/>`__. If the older version in the `ros repository <http://packages.ros.org/ros/ubuntu/pool/main/c/catkin-lint/>`__ is required, :code:`ADDITIONAL_DEBS='python-catkin-lint'` can be added to the CI Config.
@@ -203,6 +204,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **OS_NAME** (default: derived from OS_CODE_NAME): Possible options: {``ubuntu``, ``debian``}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
 * **PARALLEL_BUILDS** (default: 0): Sets the number of parallel build jobs among all packages. ``0`` or ``true`` unsets the limit.
 * **PARALLEL_TESTS** (default: 1): Sets the number of parallel test jobs. ``0`` or ``true`` unsets the limit.
+* **PREFIX** (default: not set): Prefix string or directory for the workspaces created during the build job. The upstream, target, and downstream workspaces will be created at ``$BASEDIR/${PREFIX}<upstream_ws|target_ws|downstream_ws>``.
 * **PRERELEASE** (default: ``false``): If ``true``, run `Prerelease Test on docker that emulates ROS buildfarm <http://wiki.ros.org/bloom/Tutorials/PrereleaseTest/>`__. The usage of Prerelease Test feature is `explained more in this section <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#run-ros-prerelease-test>`__.
 * **PRERELEASE_DOWNSTREAM_DEPTH** (default: ``0``): Number of the levels of the package dependencies the Prerelease Test targets at. Range of the level is defined by ROS buildfarm (`<http://prerelease.ros.org>`__). NOTE: a job can run exponentially longer for the values greater than ``0`` depending on how many packages depend on your package (and remember a job on Travis CI can only run for up to 50 minutes).
 * **PRERELEASE_REPONAME** (default: ``$TARGET_REPO_NAME``): The name of the target of Prerelease Test in rosdistro (that you select at `<http://prerelease.ros.org>`__). You can specify this if your repository name differs from the corresponding rosdisto entry. See `here <https://github.com/ros-industrial/industrial_ci/pull/145/files#r108062114>`__ for more usage.
@@ -235,20 +237,20 @@ A. Upstream workspace: Source packages that are needed for building or testing t
 
    1. Fetch source code (``UPSTREAM_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``~/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
 
 B. Target workspace: Packages in your target repository that should get build and tested
 
    1. Fetch source code (``TARGET_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/target_ws``, chained to upstream workspace or /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``~/${PREFIX}target_ws``, chained to upstream workspace or /opt/ros (or ``UNDERLAY``)
    4. run tests (opt-out with ``NOT_TEST_BUILD``)
 
 C. Downstream workspace: Packages that should get tested against your target repository
 
    1. Fetch source code (``DOWNSTREAM_WORKSPACE``)
    2. Install dependencies with rosdep
-   3. Build workspace ``~/downstream_ws``, chained to target workspace
+   3. Build workspace ``~/${PREFIX}downstream_ws``, chained to target workspace
    4. run tests (opt-out with ``NOT_TEST_DOWNSTREAM``)
 
 Workspace definition
@@ -728,7 +730,7 @@ Note for rerun_ci limitations
 
 ``rerun_ci`` is managing ``DOCKER_COMMIT`` and ``DOCKER_COMMIT_MSG`` variables under the hood, so if the user set them they will not take effect, unlike `normal cases <#re-use-the-container-image>`__.
 
-If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/target_ws/src/'``.
+If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/${PREFIX}target_ws/src/'``.
 
 For maintainers of industrial_ci repository
 ================================================
