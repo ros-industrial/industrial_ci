@@ -37,9 +37,9 @@ jobs:
           # determine whether dependencies have changed, and ccache will manage
           # updating the cache for us. Adding 'run_id' to the key will force an
           # upload at the end of the job.
-          key: ccache-${{ matrix.ros_distro }}-${{ matrix.ros_repo }}-${{github.run_id}}
+          key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
           restore-keys: |
-            ccache-${{ matrix.ros_distro }}-${{ matrix.ros_repo }}-
+            ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-
       - uses: 'ros-industrial/industrial_ci@master' # run industrial_ci
         env: # either pass all entries explicitly
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
