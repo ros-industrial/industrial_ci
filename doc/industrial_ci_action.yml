@@ -1,16 +1,15 @@
 # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).
-# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
+# For troubleshooting, see README (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)
 
 name: CI
 
-# This determines when this workflow is run
-on:
+on: # this determines when this workflow is run
   push:
-  #   branches: [ master, melodic-devel ] #  When master or melodic-devel branch is pushed to
+  #   branches: [ master, melodic-devel ] #  when master or melodic-devel branch is pushed to
   pull_request:
-  #   branches: [ master ] # When there is a pull request against master
-  # schedule: # uncomment to run every day at 4 AM (UTC)
-  #  - cron: '0 4 * * *'
+  #   branches: [ master ] # when there is a pull request against master
+  # schedule: # uncomment to run periodically
+  #  - cron: '0 4 * * *' # every day at 4 AM (UTC)
   workflow_dispatch: # allow manually starting this workflow
 
 jobs:
@@ -27,7 +26,7 @@ jobs:
         include: # add additional configurations
           - {ROS_DISTRO: kinetic, ROS_REPO: testing}
     env:
-      CCACHE_DIR: /github/home/.ccache # Directory for ccache (and how we enable ccache in industrial_ci)
+      CCACHE_DIR: "${{ github.workspace }}/.ccache" # directory for ccache (and how we enable ccache in industrial_ci)
     steps:
       - uses: actions/checkout@v2 # clone target repository
       - uses: actions/cache@v2 # fetch/store the directory used by ccache before/after the ci run
