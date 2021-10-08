@@ -29,14 +29,18 @@ jobs:
       CCACHE_DIR: /github/home/.ccache # Directory for ccache (and how we enable ccache in industrial_ci)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      # This step will fetch/store the directory used by ccache before/after the ci run
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v2 # clone target repository
+      - uses: actions/cache@v2 # fetch/store the directory used by ccache before/after the ci run
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ccache-${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}
-      # Run industrial_ci
-      - uses: 'ros-industrial/industrial_ci@master'
+          # we always want the ccache cache to be persisted, as we cannot easily
+          # determine whether dependencies have changed, and ccache will manage
+          # updating the cache for us. Adding 'run_id' to the key will force an
+          # upload at the end of the job.
+          key: ccache-${{ matrix.ros_distro }}-${{ matrix.ros_repo }}-${{github.run_id}}
+          restore-keys: |
+            ccache-${{ matrix.ros_distro }}-${{ matrix.ros_repo }}-
+      - uses: 'ros-industrial/industrial_ci@master' # run industrial_ci
         env: # either pass all entries explicitly
           ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
           ROS_REPO: ${{ matrix.ROS_REPO }}
