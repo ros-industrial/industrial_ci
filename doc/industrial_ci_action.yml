@@ -18,10 +18,13 @@ on: [push, pull_request] # on all pushes and PRs
 jobs:
   industrial_ci:
     strategy:
-      matrix:
-        env:
-          - {ROS_DISTRO: melodic, ROS_REPO: testing}
-          - {ROS_DISTRO: melodic, ROS_REPO: main}
+      matrix: # matrix is the product of entries
+        ROS_DISTRO: [melodic]
+        ROS_REPO: [testing, main]
+        # exclude: # specific configuration can be excludes
+        #   - {ROS_DISTRO: melodic, ROS_REPO: testing}
+        include: # add additional configurations
+          - {ROS_DISTRO: kinetic, ROS_REPO: testing}
     env:
       CCACHE_DIR: /github/home/.ccache # Directory for ccache (and how we enable ccache in industrial_ci)
     runs-on: ubuntu-latest
@@ -34,4 +37,8 @@ jobs:
           key: ccache-${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}
       # Run industrial_ci
       - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{ matrix.env }}
+        env: # either pass all entries explicitly
+          ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
+          ROS_REPO: ${{ matrix.ROS_REPO }}
+        # with: # or pass the full matrix as config
+        #    config: ${{toJSON(matrix)}}
