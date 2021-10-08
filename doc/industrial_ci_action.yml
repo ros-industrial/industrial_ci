@@ -4,20 +4,21 @@
 name: CI
 
 # This determines when this workflow is run
-on: [push, pull_request] # on all pushes and PRs
-
-# or more fine-grained
-# on:
-#   # When master or melodic-devel branch is pushed to
-#   push:
-#     branches: [ master, melodic-devel ]
-#   # When there is a pull request against master
-#   pull_request:
-#     branches: [ master ]
+on:
+  push:
+  #   branches: [ master, melodic-devel ] #  When master or melodic-devel branch is pushed to
+  pull_request:
+  #   branches: [ master ] # When there is a pull request against master
+  # schedule: # uncomment to run every day at 4 AM (UTC)
+  #  - cron: '0 4 * * *'
+  workflow_dispatch: # allow manually starting this workflow
 
 jobs:
   industrial_ci:
+    name: ROS ${{ matrix.ROS_DISTRO } (${{ matrix.ROS_REPO }})
+    runs-on: ubuntu-latest
     strategy:
+      # fail-fast: false # uncomment if failing jobs should not cancel the others immediately
       matrix: # matrix is the product of entries
         ROS_DISTRO: [melodic]
         ROS_REPO: [testing, main]
@@ -27,7 +28,6 @@ jobs:
           - {ROS_DISTRO: kinetic, ROS_REPO: testing}
     env:
       CCACHE_DIR: /github/home/.ccache # Directory for ccache (and how we enable ccache in industrial_ci)
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # clone target repository
       - uses: actions/cache@v2 # fetch/store the directory used by ccache before/after the ci run
