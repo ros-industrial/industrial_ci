@@ -15,7 +15,7 @@ on:
 
 jobs:
   industrial_ci:
-    name: ROS ${{ matrix.ROS_DISTRO } (${{ matrix.ROS_REPO }})
+    name: ROS ${{ matrix.ROS_DISTRO }} (${{ matrix.ROS_REPO }})
     runs-on: ubuntu-latest
     strategy:
       # fail-fast: false # uncomment if failing jobs should not cancel the others immediately
