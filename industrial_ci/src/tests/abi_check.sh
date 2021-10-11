@@ -172,9 +172,9 @@ function run_abi_check() {
         ABICHECK_URL="git+file://${TARGET_REPO_PATH}${ABICHECK_URL}"
     fi
 
-    base_ws=$BASEDIR/${PREFIX:-}base_ws
-    upstream_ws=$BASEDIR/${PREFIX:-}upstream_ws
-    target_ws=$BASEDIR/${PREFIX:-}target_ws
+    base_ws=$BASEDIR/${PREFIX}base_ws
+    upstream_ws=$BASEDIR/${PREFIX}upstream_ws
+    target_ws=$BASEDIR/${PREFIX}target_ws
 
     ici_with_ws "$base_ws" ici_step "abi_get_base" ici_prepare_sourcespace "$base_ws/src" "$ABICHECK_URL"
 
