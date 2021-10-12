@@ -168,7 +168,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ADDITIONAL_DEBS** (default: not set): More DEBs to be used. List the name of DEB(s delimitted by whitespace if multiple DEBs specified). Needs to be full-qualified Ubuntu package name. E.g.: ``ros-indigo-roslint ros-indigo-gazebo-ros``
 * **AFTER_SCRIPT** (default: not set): Used to specify shell commands that run after all source tests. NOTE: `Unlike Travis CI <https://docs.travis-ci.com/user/customizing-the-build#Breaking-the-Build>`__ where ``after_script`` doesn't affect the build result, the result in the commands specified with this DOES affect the build result. See more `here <./index.rst#run-pre-post-process-custom-commands>`__.
 * **APT_PROXY** (default: not set): Configure APT to use the provided URL as http proxy.
-* **BASEDIR** (default: ``$HOME``): Base directory in which the upstream, target, and downstream workspaces will be built. Note: this directory is bind-mounted, so its contents will not persist in the image created during the build
+* **BASEDIR** (default: ``$HOME``): Base directory in which the upstream, target, and downstream workspaces will be built. Note: this directory is bind-mounted, so it can be read by the CI service, but its contents will not persist in the image configured by ``DOCKER_COMMIT``
 * **BLACK_CHECK** (default: not set): If true, will check Python code formatting with `Black <https://black.readthedocs.io/en/stable/>`__.
 * **BUILDER** (default: ``catkin_tools`` for ROS1, ``colcon`` for ROS2): Select the builder e.g. to build ROS1 packages with colcon (options: ``catkin_tools``, ``colcon``, ``catkin_make``, ``catkin_make_isolated``).
 * **CATKIN_LINT** (default: not set. Value range: [true|pedantic]): If ``true``, run `catkin_lint <http://fkie.github.io/catkin_lint/>`__ with ``--explain`` option. If ``pedantic``, ``catkin_lint`` command runs with ``--strict -W2`` option, i.e. more verbose output will print, and the CI job fails if there's any error and/or warning occurs. Industrial CI uses the `latest version available from pypi <https://pypi.org/project/catkin-lint/>`__. If the older version in the `ros repository <http://packages.ros.org/ros/ubuntu/pool/main/c/catkin-lint/>`__ is required, :code:`ADDITIONAL_DEBS='python-catkin-lint'` can be added to the CI Config.
@@ -237,7 +237,7 @@ A. Upstream workspace: Source packages that are needed for building or testing t
 
    1. Fetch source code (``UPSTREAM_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``$BASEDIR/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
 
 B. Target workspace: Packages in your target repository that should get build and tested
 
@@ -730,7 +730,7 @@ Note for rerun_ci limitations
 
 ``rerun_ci`` is managing ``DOCKER_COMMIT`` and ``DOCKER_COMMIT_MSG`` variables under the hood, so if the user set them they will not take effect, unlike `normal cases <#re-use-the-container-image>`__.
 
-If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/${PREFIX}target_ws/src/'``.
+If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/target_ws/src/'``.
 
 For maintainers of industrial_ci repository
 ================================================
