@@ -237,7 +237,7 @@ A. Upstream workspace: Source packages that are needed for building or testing t
 
    1. Fetch source code (``UPSTREAM_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``$BASEDIR/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``~/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
 
 B. Target workspace: Packages in your target repository that should get build and tested
 
