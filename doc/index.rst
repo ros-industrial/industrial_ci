@@ -237,20 +237,20 @@ A. Upstream workspace: Source packages that are needed for building or testing t
 
    1. Fetch source code (``UPSTREAM_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``$BASEDIR/${PREFIX}upstream_ws``, chained to /opt/ros (or ``UNDERLAY``)
 
 B. Target workspace: Packages in your target repository that should get build and tested
 
    1. Fetch source code (``TARGET_WORKSPACE``)
    2. Install dependencies with ``rosdep``
-   3. Build workspace ``~/${PREFIX}target_ws``, chained to upstream workspace or /opt/ros (or ``UNDERLAY``)
+   3. Build workspace ``$BASEDIR/${PREFIX}target_ws``, chained to upstream workspace or /opt/ros (or ``UNDERLAY``)
    4. run tests (opt-out with ``NOT_TEST_BUILD``)
 
 C. Downstream workspace: Packages that should get tested against your target repository
 
    1. Fetch source code (``DOWNSTREAM_WORKSPACE``)
    2. Install dependencies with rosdep
-   3. Build workspace ``~/${PREFIX}downstream_ws``, chained to target workspace
+   3. Build workspace ``$BASEDIR/${PREFIX}downstream_ws``, chained to target workspace
    4. run tests (opt-out with ``NOT_TEST_DOWNSTREAM``)
 
 Workspace definition
