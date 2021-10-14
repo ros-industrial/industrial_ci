@@ -76,8 +76,8 @@ Special care must be taken, if you use any of these variables:
 ### Workspace layout
 
 The workspace layout has changed (new [workspace management](index.rst#workspace-management)).
-The target workspace is now located in `~/target_ws`.
-The upstream workspace packages are now located in `~/upstream_ws`.
+The target workspace is now located in `$BASEDIR/${PREFIX}target_ws`.
+The upstream workspace packages are now located in `$BASEDIR/${PREFIX}upstream_ws`.
 
 ### Job control
 
