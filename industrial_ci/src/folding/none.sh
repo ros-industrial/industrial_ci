@@ -24,3 +24,7 @@ function  ici_end_fold() {
     shift 4
     echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 }
+
+function ici_report_result() {
+    true
+}

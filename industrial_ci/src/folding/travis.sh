@@ -32,3 +32,7 @@ function  ici_end_fold() {
     ici_ansi_cleared_line "travis_time:end:$tag:start=$start,finish=$end,duration=$((end - start))"
     ici_ansi_cleared_line "travis_fold:end:$name"
 }
+
+function ici_report_result() {
+    true
+}
