@@ -79,7 +79,7 @@ rm -rf "\$fixes"
 EOF
     chmod +x "$db.command"
 
-    echo "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
+    ici_log "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
 
     printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$#" "$@"
     cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
