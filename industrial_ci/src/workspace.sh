@@ -392,9 +392,12 @@ function ici_test_workspace {
     local name=$1; shift
     local extend=$1; shift
     local ws=$1; shift
+    local err=0
 
     ici_step "run_${name}_test" builder_run_tests "$extend" "$ws"
-    builder_test_results "$extend" "$ws"
+    builder_test_results "$extend" "$ws" || err=$?
+    ici_report_result "${name}_test_results" "$err"
+    return "$err"
 }
 
 function ici_source_setup {
