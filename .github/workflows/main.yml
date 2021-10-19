@@ -94,6 +94,25 @@ jobs:
         with:
           config: ${{toJSON(matrix)}}
 
+  outputs:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, EXPECT_EXIT_CODE: 1}
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: './'
+        id: ici
+        with:
+          config: ${{toJSON(matrix)}}
+      - name: Check output
+        run: |
+          test "${{ steps.ici.outputs.target_test_results}}" = "0" || exit 1
+          test "${{ steps.ici.outputs.clang_tidy_checks}}" = "1" || exit 1
+
   abicheck:
     strategy:
       fail-fast: false
