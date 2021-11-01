@@ -97,8 +97,8 @@ function ici_collect_coverage_report {
       fi
       ;;
     *) # Expose LCOV and Cobertura XML files by default
-      cp "$target_ws"/coverage.info "$COVERAGE_REPORT_PATH" || echo "No cpp coverage report"
-      cp "$target_ws"/coverage.xml "$COVERAGE_REPORT_PATH" || echo "No python coverage report"
+      cp "$target_ws"/coverage.info "$COVERAGE_REPORT_PATH" 2>/dev/null || echo "No cpp coverage report"
+      cp "$target_ws"/coverage.xml "$COVERAGE_REPORT_PATH" 2>/dev/null || echo "No python coverage report"
       ;;
   esac
 }
