@@ -75,4 +75,9 @@ name=${name%.*}
 
 "prepare_$name" || ici_exit
 ici_isolate "$TEST" "run_${name}" || ici_exit
+
+if [ "$CODE_COVERAGE" ]; then
+  ici_step "upload_coverage_report" upload_coverage_report
+fi
+
 ici_exit 0
