@@ -101,6 +101,14 @@ function ici_isolate() {
       ici_forward_variable "$hook"
   done
 
+  # mount coverage report folder
+  if [ "$CODE_COVERAGE" ]; then
+    # Create folder to give the correct user rights outside docker
+    ici_guard mkdir -p "$TARGET_REPO_PATH/.ici_coverage_report/"
+
+    run_opts+=(-v "$TARGET_REPO_PATH/.ici_coverage_report:/root/.ici_coverage_report" -e "COVERAGE_REPORT_PATH=/root/.ici_coverage_report")
+  fi
+
   ici_run_cmd_in_docker "${_docker_run_opts[@]}" "${run_opts[@]}" \
                         -t \
                         --entrypoint '' \
