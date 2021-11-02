@@ -36,7 +36,9 @@ function ici_combine_cpp_reports {
   lcov --extract coverage.info "$(pwd)/src/$TARGET_REPO_NAME/*" \
        --output-file coverage.info | grep -ve "^Extracting"
   # Filter out test files
-  lcov --remove coverage.info "*/test/*" \
+  local excludes=()
+  ici_parse_env_array excludes CODE_COVERAGE_EXCLUDES
+  lcov --remove coverage.info "*/test/*" "${excludes[@]}" \
        --output-file coverage.info | grep -ve "^removing"
   # Some sed magic to remove identifiable absolute path
   sed -i "s~$(pwd)/src/$TARGET_REPO_NAME/~~g" coverage.info
@@ -77,7 +79,7 @@ function ici_collect_coverage_report {
         "${PYTHON_VERSION_NAME}-dev" "${PYTHON_VERSION_NAME}-wheel"
       "${PYTHON_VERSION_NAME}" -m pip install coveralls
       # Use coveragerc file used for coveralls ignore
-      printf "[report]\ninclude = \n\t%s/src/%s/*\nomit = \n\t*/test/*\n\t*/setup.py" "$target_ws" "$TARGET_REPO_NAME" \
+      printf "[report]\ninclude = \n\t%s/src/%s/*\nomit = \n\t*/test/*\n\t*/setup.py\n\t%s" "$target_ws" "$TARGET_REPO_NAME" "${CODE_COVERAGE_EXCLUDES/ /\\t\\n}" \
         > "$target_ws/src/$TARGET_REPO_NAME/.default.coveragerc"
       if [ -f "$target_ws"/coverage.info ]; then
         # Install and run coveralls-lcov within git directory
