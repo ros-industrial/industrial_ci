@@ -1,5 +1,5 @@
 name: 'ROS industrial_ci'
-description: "unning various CI checks for ROS package repositories"
+description: "Running various CI checks for ROS package repositories"
 
 inputs:
   config:
