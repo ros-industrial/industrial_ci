@@ -29,3 +29,7 @@ function  ici_end_fold() {
     local end=$1; shift
     ici_ansi_cleared_line "section_end:${end::-9}:$name"
 }
+
+function ici_report_result() {
+    true
+}

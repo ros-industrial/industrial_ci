@@ -1,12 +1,10 @@
 name: 'ROS industrial_ci'
+description: "Running various CI checks for ROS package repositories"
+
 inputs:
   config:
     description: 'Configuration in JSON format, e.g. from matrix'
     required: false
 runs:
-  using: "composite"
-  steps:
-    - run: $GITHUB_ACTION_PATH/.github/action.sh
-      shell: bash
-      env:
-        INPUT_CONFIG: ${{ inputs.config }}
+  using: 'node12'
+  main: '.github/action.js'

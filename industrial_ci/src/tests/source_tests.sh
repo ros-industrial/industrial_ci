@@ -124,6 +124,7 @@ function run_clang_tidy_check {
     fi
 
     if [ "${#errors[@]}" -gt "0" ]; then
+        ici_report_result clang_tidy_checks 1
         ici_error "Clang tidy check(s) failed: ${errors[*]}"
     fi
 }

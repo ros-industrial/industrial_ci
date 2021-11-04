@@ -23,6 +23,10 @@ function  ici_end_fold() {
     ici_error "ici_end_fold is not implemented"
 }
 
+function ici_report_result() {
+    true
+}
+
 function ici_cmd {
     _ici_guard ici_label ici_quiet "$@"
 }
