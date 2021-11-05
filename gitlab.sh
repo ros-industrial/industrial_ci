@@ -35,7 +35,7 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   # shellcheck disable=SC2046
   eval $(ssh-agent -s)
   # add key to agent
-  ssh-add <(echo "$SSH_PRIVATE_KEY") || { res=$?; echo "could not add ssh key"; exit $res; }
+  ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d) || { res=$?; echo "could not add ssh key"; exit $res; }
 
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
