@@ -34,8 +34,11 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   # start SSH agent
   # shellcheck disable=SC2046
   eval $(ssh-agent -s)
+  # Avoiding https://github.com/ros-industrial/industrial_ci/issues/756
+  echo "${SSH_PRIVATE_KEY}" | tr -d ' ' | base64 --decode > private.ssh_key
+  chmod 600 private.ssh_key
   # add key to agent
-  ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d) || { res=$?; echo "could not add ssh key"; exit $res; }
+  ssh-add <private.ssh_key || { res=$?; echo "could not add ssh key"; exit $res; }
 
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
