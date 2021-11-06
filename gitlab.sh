@@ -36,7 +36,7 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   eval $(ssh-agent -s)
   # Avoiding https://github.com/ros-industrial/industrial_ci/issues/756
   # add key to agent
-  echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
+  echo -n "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
     # setup known hosts
