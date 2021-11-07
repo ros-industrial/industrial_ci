@@ -23,3 +23,9 @@ ici_warn "BUILDER=catkin_tools_devel should only be used in addition to the othe
 function ici_extend_space {
     echo "$1/devel"
 }
+
+function _catkin_config {
+    local extend=$1; shift
+    local ws=$1; shift
+    ici_exec_in_workspace "$extend" "$ws" catkin config --init
+}
