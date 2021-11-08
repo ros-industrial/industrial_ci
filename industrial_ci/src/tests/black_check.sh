@@ -1,8 +1,10 @@
 #!/bin/bash
 
 function prepare_black_check() {
-  export DOCKER_IMAGE=${DOCKER_IMAGE:-python:3}
-  export ROS_DISTRO=${ROS_DISTRO:-false}
+  if [ -z "${ROS_DISTRO:-}" ]; then
+    export DOCKER_IMAGE=${DOCKER_IMAGE:-python:3}
+    export ROS_DISTRO=false
+  fi
 }
 
 function install_black() {
