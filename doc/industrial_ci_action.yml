@@ -32,10 +32,9 @@ jobs:
       - uses: actions/cache@v2 # fetch/store the directory used by ccache before/after the ci run
         with:
           path: ${{ env.CCACHE_DIR }}
-          # we always want the ccache cache to be persisted, as we cannot easily
-          # determine whether dependencies have changed, and ccache will manage
-          # updating the cache for us. Adding 'run_id' to the key will force an
-          # upload at the end of the job.
+          # This configuration will always create a new ccache cache starting off from the previous one (if any).
+          # In this simple version it will be shared between all builds of the same ROS_REPO and ROS_REPO
+          # and might need some fine-tuning to match the use case
           key: ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-${{github.run_id}}
           restore-keys: |
             ccache-${{ matrix.ROS_DISTRO }}-${{ matrix.ROS_REPO }}-
