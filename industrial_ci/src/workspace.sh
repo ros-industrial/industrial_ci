@@ -140,9 +140,11 @@ function ici_init_apt {
         ici_apt_install "${debs_default[@]}"
     fi
 
-    local current_repository_path
-    current_repository_path="$(apt-cache policy "ros-$ROS_DISTRO-ros-core" 2> /dev/null | grep -Eo "[^ ]+://[^ ]+")" || true
-    ici_set_ros_repository_path "$current_repository_path"
+    if [ -n "$ROS_DISTRO" ]; then
+        local current_repository_path
+        current_repository_path="$(apt-cache policy "ros-$ROS_DISTRO-ros-core" 2> /dev/null | grep -Eo "[^ ]+://[^ ]+")" || true
+        ici_set_ros_repository_path "$current_repository_path"
+    fi
 
     if [ -n "${ROS_REPOSITORY_PATH:-}" ] && ! grep -qFs "$ROS_REPOSITORY_PATH" /etc/apt/sources.list.d/*.list; then
         if [ -n "$current_repository_path" ] && [ "$current_repository_path" != "$ROS_REPOSITORY_PATH" ]; then
