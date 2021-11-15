@@ -77,6 +77,11 @@ name=${name%.*}
 ici_isolate "$TEST" "run_${name}" || ici_exit
 
 if [ "$CODE_COVERAGE" ]; then
+
+  # Needed for ici_apt_install in travis with coveralls.io
+  # shellcheck source=industrial_ci/src/workspace.sh
+  source "${ICI_SRC_PATH}/workspace.sh"
+
   ici_step "upload_coverage_report" upload_coverage_report
 fi
 
