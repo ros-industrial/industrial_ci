@@ -268,6 +268,7 @@ function  ici_import_directory {
 function ici_prepare_sourcespace {
     local sourcespace=$1; shift
     local basepath=$TARGET_REPO_PATH
+    local last=""
 
     ici_guard mkdir -p "$sourcespace"
 
@@ -275,6 +276,10 @@ function ici_prepare_sourcespace {
         case "$source" in
         git* | bitbucket:* | bb:* | gh:* | gl:*)
             ici_import_repository "$sourcespace" "$source"
+            # Remember imported repository in variable last
+            local parsed; parsed=$(ici_parse_repository_url "$source")
+            IFS=" " read -r -a parts <<< "$parsed" # name, type, url, version
+            last=${parts[0]}
             ;;
         http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
             ici_import_url "$sourcespace" "$source"
@@ -285,10 +290,9 @@ function ici_prepare_sourcespace {
             ici_guard rm -r "${sourcespace:?}/$file"
             ;;
         -*)
-            local file="${source:1}"
-            if [ ! -e "${sourcespace:?}/$file" ]; then
-              file="$(basename "$basepath")/$file"
-            fi
+            for file in "${source:1}" "$last/${source:1}" "$(basename "$basepath")/${source:1}"; do
+                if [ -e "${sourcespace:?}/$file" ]; then break; fi
+            done
             ici_log "Removing '${sourcespace:?}/$file'"
             ici_guard rm -r "${sourcespace:?}/$file"
             ;;
