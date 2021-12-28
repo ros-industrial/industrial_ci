@@ -296,6 +296,13 @@ function ici_prepare_sourcespace {
             ici_log "Removing '${sourcespace:?}/$file'"
             ici_guard rm -r "${sourcespace:?}/$file"
             ;;
+        +*)
+            for file in "${source:1}" "$last/${source:1}"; do
+                if [ -e "${sourcespace:?}/$file" ]; then break; fi
+            done
+            ici_log "Moving '${sourcespace:?}/$file' to '${sourcespace:?}'"
+            ici_guard mv "${sourcespace:?}/$file" "${sourcespace:?}"
+            ;;
         .)
             ici_log "Copying '$basepath'"
             ici_import_directory "$sourcespace" "$basepath"

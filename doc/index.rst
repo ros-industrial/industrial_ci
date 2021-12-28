@@ -272,6 +272,7 @@ Each workspace can be composed as a sequence of the following items:
 * relative path of a ``*.repos`` or ``*.rosinstall`` file
 * (relative) directory path to a source directory
 * directory path prefixed with ``-`` to remove the directory, as a path relative to either the source space or the target repository
+* directory path prefixed with ``+`` to move a directory (relative to last imported repository) to the main source space
 * ``.`` to copy the full target repository
 
 For backwards compatibility, ``UPSTREAM_WORKSPACE`` can be set to ``debian`` and ``file`` as well, but not in combination with the other options and with a deprecation warning.
