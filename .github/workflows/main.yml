@@ -163,7 +163,7 @@ jobs:
           - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, UBUNTU: 20.04, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
           - {ROS_DISTRO: foxy, UBUNTU: 20.04}
-          - {ROS_DISTRO: galactic, PRERELEASE: true, UBUNTU: 20.04}
+          - {ROS_DISTRO: galactic, PRERELEASE: true, UBUNTU: 20.04, TARGET_WORKSPACE: ". github:ros-controls/control_msgs#galactic-devel"}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
     steps:
       - uses: actions/checkout@v1
