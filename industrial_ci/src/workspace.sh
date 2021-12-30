@@ -274,45 +274,29 @@ function ici_apply_directory_filter {
     local basepath=$1; shift
     local source=$1; shift
     local filter=${1-}
+    local path="$basepath/$source"
     case "$source" in
         "")
             ici_error "source is empty string"
             ;;
-        -.)
-            local file; file=$(basename "$basepath")
-            ici_log "Removing '${sourcespace:?}/$file'"
-            ici_guard rm -r "${sourcespace:?}/$file"
-            ;;
         -*)
-            local file="${source:1}"
-            if [ ! -e "${sourcespace:?}/$file" ]; then
-              file="$(basename "$basepath")/$file"
-            fi
-            ici_log "Removing '${sourcespace:?}/$file'"
-            ici_guard rm -r "${sourcespace:?}/$file"
+            ici_log "Removing '${source:1}'"
+            ici_guard rm -r "${sourcespace:?}/${source:1}"
             ;;
         /*)
-            if [ -d "$source" ]; then
-                ici_log "Copying '$source'"
-                ici_import_directory  "$sourcespace" "$source" "$filter"
-            elif [ -f "$source" ]; then
-                ici_import_file "$sourcespace" "$source"
-            else
-                ici_error "'$source' cannot be found"
-            fi
-            ;;
+            path=$source
+            ;&
         *)
-            if [ -d "$basepath/$source" ]; then
+            if [ -d "$path" ]; then
                 ici_log "Copying '$source'"
-                ici_import_directory "$sourcespace" "$basepath/$source" "$filter"
-            elif [ -f "$basepath/$source" ]; then
-                ici_import_file "$sourcespace" "$basepath/$source"
+                ici_import_directory "$sourcespace" "$path" "$filter"
+            elif [ -f "$path" ]; then
+                ici_import_file "$sourcespace" "$path"
             else
                 ici_error "cannot read source from '$source'"
             fi
             ;;
         esac
-
 }
 
 function ici_filter_directory {
@@ -358,6 +342,10 @@ function ici_prepare_sourcespace {
         .)
             ici_log "Copying '$basepath'"
             ici_import_directory "$sourcespace" "$basepath" "$filter"
+            ;;
+        -./*)
+            ici_log "Removing '${source:1}'"
+            ici_guard rm -r "${sourcespace:?}/$(basename "$basepath")${source:1}"
             ;;
         *)
             ici_apply_directory_filter "$sourcespace" "$basepath" "$source" "$filter"
