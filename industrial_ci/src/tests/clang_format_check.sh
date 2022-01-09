@@ -19,7 +19,8 @@ function prepare_clang_format_check() {
   true
 }
 
-function install_clang_format_check() {
+function run_clang_format_check() {
+  local err=0
   local path=/tmp/clang_format_check
   mkdir -p "$path"
   ici_cleanup_later "$path"
@@ -34,11 +35,6 @@ function install_clang_format_check() {
   local sources=()
   ici_parse_env_array sources TARGET_WORKSPACE
   ici_step "prepare_sourcespace" ici_prepare_sourcespace "$path" "${sources[@]}"
-}
-
-function run_clang_format_check() {
-  local err=0
-  local path=/tmp/clang_format_check
 
   ici_time_start run_clang_format_check
   while read -r file; do
