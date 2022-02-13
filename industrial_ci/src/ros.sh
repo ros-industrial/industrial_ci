@@ -81,7 +81,7 @@ function _set_ros_defaults {
         _ros2_defaults "focal"
         ;;
     "rolling")
-        _ros2_defaults "focal"
+        _ros2_defaults "jammy"
         ;;
     "false")
         unset ROS_DISTRO
