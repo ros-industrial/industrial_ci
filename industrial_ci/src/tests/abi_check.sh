@@ -81,7 +81,7 @@ function abi_process_workspace() {
   local version=${1:-$tag}
 
   local cflags="-g -Og"
-  local cmake_args=(--cmake-args "-DCMAKE_C_FLAGS=$cflags" "-DCMAKE_CXX_FLAGS=$cflags")
+  local cmake_args=(--cmake-args "-DCMAKE_C_FLAGS=\"$cflags\"" "-DCMAKE_CXX_FLAGS=\"$cflags\"")
 
   ici_step "install_${tag}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$workspace/src"
   ici_step "abi_build_${tag}" builder_run_build "$extend" "$workspace" "${cmake_args[@]}"
