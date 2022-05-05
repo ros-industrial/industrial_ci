@@ -80,6 +80,9 @@ function _set_ros_defaults {
     "galactic")
         _ros2_defaults "focal"
         ;;
+    "humble")
+        _ros2_defaults "jammy"
+        ;;
     "rolling")
         _ros2_defaults "jammy"
         ;;
