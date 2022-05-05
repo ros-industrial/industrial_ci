@@ -239,6 +239,10 @@ jobs:
           - repo: 'ros-controls/control_msgs'
             ref: 'galactic-devel'
             env: {ROS_DISTRO: galactic, PRERELEASE: true}
+          
+          - repo: 'ros-controls/control_msgs'
+            ref: 'galactic-devel'
+            env: {ROS_DISTRO: humble, PRERELEASE: true, ROS_REPO: testing}
 
     runs-on: ubuntu-latest
     steps:
