@@ -64,6 +64,7 @@ jobs:
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
           - {ROS_DISTRO: foxy, AFTER_SCRIPT: 'rosenv ros2 run industrial_ci run_travis', ADDITIONAL_DEBS: "ros-foxy-ros2run"}
           - {ROS_DISTRO: galactic, TRACE: true}
+          - {ROS_DISTRO: humble}
           - {ROS_DISTRO: rolling}
 
           # Are CXXFLAGS correctly passed? These tests should fail due to -Werror (exit code is for catkin tools: 1 and for colcon: 2)
@@ -238,6 +239,10 @@ jobs:
           - repo: 'ros-controls/control_msgs'
             ref: 'galactic-devel'
             env: {ROS_DISTRO: galactic, PRERELEASE: true}
+          
+          - repo: 'ros-controls/control_msgs'
+            ref: 'galactic-devel'
+            env: {ROS_DISTRO: humble, PRERELEASE: true}
 
     runs-on: ubuntu-latest
     steps:
