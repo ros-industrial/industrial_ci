@@ -59,7 +59,7 @@ function builder_run_tests {
         opts+=(-i)
     fi
     _append_job_opts opts PARALLEL_TESTS 1
-    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin build --catkin-make-args run_tests -- "${opts[@]}" --no-status
+    ici_cmd ici_exec_in_workspace "$extend" "$ws" catkin run_tests "${opts[@]}" --no-status
 }
 
 function builder_test_results {
