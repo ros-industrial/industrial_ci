@@ -52,4 +52,4 @@ else
     echo "Tests failed exit code '$ret'"
 fi
 
-exit $ret
+exit "$ret"

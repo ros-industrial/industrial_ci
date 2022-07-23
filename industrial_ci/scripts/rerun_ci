@@ -75,4 +75,4 @@ env -i "${keep_env[@]}" "$script_dir/run_ci" "$repo_dir" "$@" "${force_env[@]}" 
 
 echo "Please do not forget to clean-up: docker rmi $DOCKER_COMMIT"
 
-exit $ret
+exit "$ret"
