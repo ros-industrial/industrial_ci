@@ -115,7 +115,7 @@ function ici_run_cmd_in_docker() {
     ici_quiet docker commit -m "$DOCKER_COMMIT_MSG" "$cid" "$commit_image"
   fi
   ici_quiet docker rm "$cid"
-  return $ret
+  return "$ret"
 }
 
 # work-around for https://github.com/moby/moby/issues/34096

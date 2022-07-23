@@ -190,7 +190,7 @@ function ici_retry {
   done
 
   ici_color_output ${ANSI_RED} "'$*' failed $tries times"
-  return $ret
+  return "$ret"
 }
 
 function ici_quiet {
