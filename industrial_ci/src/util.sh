@@ -92,6 +92,7 @@ function ici_with_unset_variables {
 }
 
 function _sub_shell() (
+  # shellcheck disable=SC2317
   function rosenv() {
     # if current_ws not set, use an invalid path to skip it
     for e in $(ici_extend_space "${current_ws:-/dev/null}") $(ici_extend_space "$BASEDIR/${PREFIX}downstream_ws") $(ici_extend_space "$BASEDIR/${PREFIX}target_ws") $(ici_extend_space "$BASEDIR/${PREFIX}base_ws") $(ici_extend_space "$BASEDIR/${PREFIX}upstream_ws") "$UNDERLAY"; do
@@ -372,7 +373,7 @@ function ici_retry {
   done
 
   ici_color_output ${ANSI_RED} "'$*' failed $tries times"
-  return $ret
+  return "$ret"
 }
 
 function ici_get_log_cmd {

@@ -82,13 +82,6 @@ function ici_gpg_import {
     ici_cmd gpg --no-options --trust-model always --no-default-keyring --keyring "$keyring" --fingerprint
 }
 
-function ici_gpg_import {
-    local keyring=$1
-    shift
-    gpg --dearmor | >/dev/null ici_asroot tee "$keyring"
-    gpg --no-options --trust-model always --no-default-keyring --keyring "$keyring" --fingerprint
-}
-
 function ici_setup_gpg_key {
     case "$ROS_REPOSITORY_KEY}" in
     *://*)
