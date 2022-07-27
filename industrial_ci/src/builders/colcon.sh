@@ -28,11 +28,10 @@ function builder_setup {
 function builder_run_build {
     local extend=$1; shift
     local ws=$1; shift
-    local output_handler
+    local opts=(--event-handlers "${_colcon_event_handlers[@]}")
     if [ "${VERBOSE_OUTPUT:-false}" != false ]; then
-        output_handler="console_cohesion+"
+        opts+=("console_cohesion+")
     fi
-    local opts=(--event-handlers "${_colcon_event_handlers[@]}" "${output_handler}")
     local jobs
     ici_parse_jobs jobs PARALLEL_BUILDS 0
     if [ "$jobs" -eq 1 ]; then
