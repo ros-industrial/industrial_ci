@@ -38,9 +38,7 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   PRKEY_EXTENDED="${SSH_PRIVATE_KEY}\n"
   echo -e "DEBUG: ssh key: ${SSH_PRIVATE_KEY}"
   # add key to agent
-#  echo -n "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
-  # https://gitlab.com/gitlab-examples/ssh-private-key/-/issues/1#note_15038961
-  ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 --decode)
+  echo -n "${SSH_PRIVATE_KEY}" | tr -d '\r' | base64 --decode | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
     # setup known hosts
