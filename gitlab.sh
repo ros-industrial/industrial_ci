@@ -38,7 +38,7 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   PRKEY_EXTENDED="${SSH_PRIVATE_KEY}\n"
   echo -e "DEBUG: ssh key: ${PRKEY_EXTENDED}"
   # add key to agent
-  echo -e "${PRKEY_EXTENDED}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
+  echo -n "${PRKEY_EXTENDED}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
     # setup known hosts
