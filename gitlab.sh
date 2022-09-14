@@ -36,9 +36,9 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   eval $(ssh-agent -s)
   # Adding new line at the end of ssh key to avoid https://github.com/ros-industrial/industrial_ci/issues/756
   PRKEY_EXTENDED="${SSH_PRIVATE_KEY}\n"
-  echo -e "DEBUG: ssh key: ${PRKEY_EXTENDED}"
+  echo -e "DEBUG: ssh key: ${SSH_PRIVATE_KEY}"
   # add key to agent
-  echo -n "${PRKEY_EXTENDED}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
+  echo -n "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add - > /dev/null || { res=$?; echo "could not add ssh key"; exit $res; }
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
     # setup known hosts
