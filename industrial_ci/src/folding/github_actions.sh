@@ -26,5 +26,7 @@ function  ici_end_fold() {
 }
 
 function ici_report_result() {
-    echo "$1=$2" >> "$GITHUB_OUTPUT"
+    if [ -n "$GITHUB_OUTPUT" ]; then
+        echo "$1=$2" >> "$GITHUB_OUTPUT"
+    fi
 }
