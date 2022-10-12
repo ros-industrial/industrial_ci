@@ -26,5 +26,5 @@ function  ici_end_fold() {
 }
 
 function ici_report_result() {
-    echo "::set-output name=$1::$2"
+    echo "$1=$2" >> "$GITHUB_OUTPUT"
 }
