@@ -161,7 +161,8 @@ function ici_mark_deprecated {
 #   (None)
 #######################################
 function ici_error {
-    local exit_code=${2:-$?} #
+    # shellcheck disable=SC2319
+    local exit_code=${2:-$?} # If 2nd arg is not passed, set last error code.
     if [ -n "$1" ]; then
         ici_color_output ${ANSI_RED} "$1"
     fi
