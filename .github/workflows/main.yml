@@ -14,7 +14,7 @@ jobs:
       - uses: docker://koalaman/shellcheck-alpine
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
-  industrial_ci:
+  ici:
     env:
       TRACE: true
     strategy:
@@ -203,7 +203,7 @@ jobs:
           python2 industrial_ci/scripts/run_travis
           industrial_ci/scripts/run_travis 1
 
-  industrial_ci_external:
+  ici_ext:
     strategy:
       fail-fast: false
       matrix:
@@ -239,7 +239,7 @@ jobs:
           - repo: 'ros-controls/control_msgs'
             ref: 'galactic-devel'
             env: {ROS_DISTRO: galactic, PRERELEASE: true}
-          
+
           - repo: 'ros-controls/control_msgs'
             ref: 'galactic-devel'
             env: {ROS_DISTRO: humble, PRERELEASE: true}
