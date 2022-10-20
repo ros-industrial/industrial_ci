@@ -141,7 +141,7 @@ For GitHub Actions
              - {ROS_DISTRO: melodic, ROS_REPO: main}
        runs-on: ubuntu-latest
        steps:
-         - uses: actions/checkout@v1
+         - uses: actions/checkout@v3
          - uses: 'ros-industrial/industrial_ci@master'
            env: ${{matrix.env}}
 

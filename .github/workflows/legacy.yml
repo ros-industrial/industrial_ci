@@ -10,7 +10,7 @@ jobs:
     if: github.repository == 'ros-industrial/industrial_ci' # don't run on forks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
         with:
           ref: legacy
       - uses: docker://koalaman/shellcheck-alpine
@@ -31,7 +31,7 @@ jobs:
           - {ROS_DISTRO: melodic}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
         with:
           ref: legacy
       - run: ./ci.sh
