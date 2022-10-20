@@ -10,7 +10,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: docker://koalaman/shellcheck-alpine
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
@@ -94,7 +94,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: './'
         with:
           config: ${{toJSON(matrix)}}
@@ -108,7 +108,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: './'
         id: ici
         with:
@@ -139,13 +139,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout external repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{matrix.repo}}
           ref: ${{matrix.ref}}
           fetch-depth: ${{matrix.depth}}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: .industrial_ci
 
@@ -167,14 +167,14 @@ jobs:
           - {ROS_DISTRO: galactic, PRERELEASE: true, UBUNTU: 20.04, TARGET_WORKSPACE: ". github:ros-controls/control_msgs#galactic-devel"}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: './'
         env: ${{matrix.env}}
 
   builders:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - run: |
           for BUILDER in $(ls industrial_ci/src/builders/*.sh); do
             echo "##[group]BUILDER=$BUILDER"
@@ -185,7 +185,7 @@ jobs:
   test_arm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
       - uses: './'
         env:
@@ -196,7 +196,7 @@ jobs:
   run_travis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - run: |
           sudo apt install -y python-yaml
           industrial_ci/scripts/run_travis
@@ -247,13 +247,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout external repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{matrix.repo}}
           ref: ${{matrix.ref}}
           fetch-depth: ${{matrix.depth}}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: .industrial_ci
 
