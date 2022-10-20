@@ -63,32 +63,14 @@ function run_clang_tidy {
         ici_error "CLANG_TIDY_JOBS=$CLANG_TIDY_JOBS is invalid."
     fi
 
-    rm -rf "$db".{command,warn,error}
-    cat > "$db.command" << EOF
-#!/bin/bash
-num_non_file_args=\$1; shift
-args=("\${@:1:\$num_non_file_args}")
-files=("\${@:\$((num_non_file_args+1))}")
-fixes=\$(mktemp)
-rm -f /tmp/clang_tidy_output.\$\$
-for f in "\${files[@]}" ; do
-  ( cd \$(dirname \$f); clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\${args[@]}" \$f &>> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; } )
-  if [ -s "\$fixes" ]; then touch "$db.warn"; fi
-done
-rm -rf "\$fixes"
-EOF
-    chmod +x "$db.command"
-
+    local err=0
     ici_log "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
+    printf "%s\0" "${files[@]}" | xargs --null run-clang-tidy "-j$max_jobs" "-header-filter=$regex" "-p=$build" "$@" | tee "$db.tidy.log" || err=$?
 
-    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$#" "$@"
-    cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
-    rm -rf /tmp/clang_tidy_output.*
-
-    if [ -f "$db.error" ]; then
+    if [ "$err" -ne "0" ]; then
        _run_clang_tidy_errors+=("$name")
-       ici_time_end "${ANSI_RED}"
-    elif [ -f "$db.warn" ]; then
+       ici_time_end "${ANSI_RED}" "$err"
+    elif grep -q ": warning: " "$db.tidy.log"; then
         _run_clang_tidy_warnings+=("$name")
         ici_time_end "${ANSI_YELLOW}"
     else
