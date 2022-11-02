@@ -92,8 +92,24 @@ function run_clang_tidy_check {
 
     ici_hook "before_clang_tidy_checks"
 
+    # replace -export-fixes <filename> with temporary file
+    local fixes_final=""
+    local fixes_tmp
+    local num_args=${#clang_tidy_args[@]}
+    fixes_tmp=$(mktemp)
+    for (( i=0; i<num_args; i++ )); do
+        if [ "${clang_tidy_args[i]}" == "-export-fixes" ]; then
+            fixes_final="${clang_tidy_args[i+1]}"
+            clang_tidy_args[i+1]="$fixes_tmp"
+        fi
+    done
+
+    # run clang-tidy checks on all build folders in target_ws
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
+        if [ -n "${fixes_final}" ]; then
+            "${ICI_SRC_PATH}/tests/merge_fixes.py" "$fixes_final" "$fixes_tmp"
+        fi
     done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
 
     ici_hook "after_clang_tidy_checks"
