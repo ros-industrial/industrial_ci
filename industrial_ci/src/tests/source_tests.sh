@@ -112,6 +112,10 @@ function run_clang_tidy_check {
         fi
     done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
 
+    if [ -n "${fixes_final}" ]; then
+        # translate file names in fixes file
+        sed -i "s#$target_ws/src/$TARGET_REPO_NAME/#$TARGET_REPO_PATH/#g" "${fixes_final}"
+    fi
     ici_hook "after_clang_tidy_checks"
 
     if [ "${#warnings[@]}" -gt "0" ]; then
