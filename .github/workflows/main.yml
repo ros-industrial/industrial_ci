@@ -198,9 +198,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          sudo apt install -y python-yaml
+          sudo apt install -y python3-yaml
           industrial_ci/scripts/run_travis
-          python2 industrial_ci/scripts/run_travis
           industrial_ci/scripts/run_travis 1
 
   ici_ext:
