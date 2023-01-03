@@ -91,6 +91,7 @@ jobs:
           - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, CLANG_TIDY_ARGS: "-checks=-*,modernize-use-nullptr", EXPECT_EXIT_CODE: 1}
 
+          - {ROS_DISTRO: noetic, PYLINT_ARG: "--errors-only", PYLINT_EXCLUDE: "sample_talker.py", PYLINT_CHECK: "true"}
 
     runs-on: ubuntu-latest
     steps:
