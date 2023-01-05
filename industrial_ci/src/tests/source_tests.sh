@@ -66,7 +66,7 @@ function run_clang_tidy {
     local err=0
     ici_log "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
     set -o pipefail
-    printf "%s\0" "${files[@]}" | xargs --null run-clang-tidy "-j$max_jobs" "-header-filter=$regex" "-p=$build" "$@" 2>&1 | tee "$db.tidy.log" || err=$?
+    printf "%s\0" "${files[@]}" | xargs --null run-clang-tidy "-j$max_jobs" "-header-filter=\"$regex\"" "-p=$build" "$@" 2>&1 | tee "$db.tidy.log" || err=$?
     set +o pipefail
 
     if [ "$err" -ne "0" ]; then
