@@ -65,6 +65,9 @@ function prepare_prerelease_workspaces() {
 }
 
 function prepare_ros_prerelease() {
+    if [ "$ROS_VERSION_EOL" = true ]; then
+        ici_error "$ROS_DISTRO is EOL, pre-releases test are not supported anymore."
+    fi
     if [ "$BUILDER" != "colcon" ]; then
         export BUILDER=catkin_make_isolated
     fi
