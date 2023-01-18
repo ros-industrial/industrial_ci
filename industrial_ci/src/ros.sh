@@ -79,6 +79,7 @@ function _set_ros_defaults {
         ;;
     "galactic")
         _ros2_defaults "focal"
+        export ROS_VERSION_EOL=true
         ;;
     "humble")
         _ros2_defaults "jammy"
