@@ -95,7 +95,6 @@ function prepare_ros_prerelease() {
       CCACHE_DIR= # prevent cachedir from beeing added twice
     fi
     export DOCKER_IMAGE=${DOCKER_IMAGE:-ros:noetic-ros-core}
-    export ROS_DISTRO=noetic
 }
 
 function run_ros_prerelease() {

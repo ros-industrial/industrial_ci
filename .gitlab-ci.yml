@@ -17,7 +17,7 @@ cache:
 
 # enable docker-in-docker
 services:
-  - docker:19.03.5-dind
+  - docker:20.10.16-dind
 
 before_script:
   - apk add --update bash coreutils tar grep # install industrial_ci dependencies
@@ -35,11 +35,6 @@ indigo:
 kinetic:
   script: .industrial_ci/gitlab.sh ROS_DISTRO=kinetic  # alternate syntax
 
-melodic:
-  script: .industrial_ci/gitlab.sh
-  variables:
-    ROS_DISTRO: "melodic"
-    PRERELEASE: "true"
 
 noetic:
   image: ros:noetic
@@ -48,6 +43,14 @@ noetic:
   services: []
   variables:
     ISOLATION: shell
+
+humble:
+  script: .industrial_ci/gitlab.sh
+  variables:
+    TARGET_WORKSPACE: ". github:ros-controls/control_msgs#galactic-devel"
+    ROS_DISTRO: "humble"
+    PRERELEASE: "true"
+    CCACHE_DIR:
 
 dashing:
   script: .industrial_ci/gitlab.sh ROS_DISTRO=dashing
