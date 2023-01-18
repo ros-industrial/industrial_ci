@@ -216,7 +216,7 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ROSINSTALL_FILENAME** (*deprecated*, default: ``.travis.rosinstall``): Only used when ``UPSTREAM_WORKSPACE`` is set to ``file``. See ``UPSTREAM_WORKSPACE`` description.
 * **PYLINT_ARGS** (default: not set): pass command line arguments to ``pylint`` command (e.g. ``--output-format=parseable --errors-only``) - can e.g. be used to ``ignore_modules``
 * **PYLINT_CHECK** (default: false): If ``true``, run ``pylint`` checks
-* **PYLINT_EXCLUDE** (default: not set): can be used to exclude files via the ``-not -path`` filter
+* **PYLINT_EXCLUDE** (default: not set): Pattern that can be used to exclude files via the ``-not -path`` filter. 
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
 * **UNDERLAY** (default: not set): Path to an install space (instead of ``/opt/ros/$ROS_DISTRO``) to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image
