@@ -15,7 +15,7 @@ Industrial CI
     :alt: License
 
 CI (Continuous Integration) configuration for `ROS` (`Robot Operating System <http://ros.org>`__).
-This is the refactored version with ROS2 support, the old verson can be found in the `legacy branch <https://github.com/ros-industrial/industrial_ci/tree/legacy>`__.
+This is the refactored version with ROS2 support, the old version can be found in the `legacy branch <https://github.com/ros-industrial/industrial_ci/tree/legacy>`__.
 Please check the `migration guide <doc/migration_guide.md>`__ as well.
 
 .. contents:: Table of Contents
