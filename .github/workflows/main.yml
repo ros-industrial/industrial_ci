@@ -2,7 +2,13 @@ name: CI
 
 on:
   push:
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/*.rst'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/*.rst'
   schedule:
     - cron: "0 0 * * *" # every day at midnight
 
