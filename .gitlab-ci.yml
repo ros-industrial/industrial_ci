@@ -11,7 +11,7 @@ variables:
 
 # enable docker-in-docker
 services:
-  - docker:19.03.5-dind
+  - docker:20.10.16-dind
 
 before_script:
   - apk add --update bash coreutils tar # install industrial_ci dependencies
