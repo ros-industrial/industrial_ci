@@ -94,6 +94,7 @@ function ici_isolate() {
   ici_forward_mount CCACHE_DIR rw
   ici_forward_mount SSH_AUTH_SOCK rw # forward ssh agent into docker container
   ici_forward_mount GITHUB_OUTPUT rw # for ici_report_result in GitHub Actions
+  ici_forward_mount /home/runner/.gitconfig rw # forward custom mappings for multiple private repos in GitHub Actions
 
   local run_opts
   ici_parse_env_array run_opts DOCKER_RUN_OPTS
