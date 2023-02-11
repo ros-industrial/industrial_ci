@@ -102,8 +102,6 @@ function prepare_ros_prerelease() {
 
 function run_ros_prerelease() {
     ici_source_builder
-    ici_step "${BUILDER}_setup" builder_setup
-
     ici_step "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
