@@ -42,6 +42,7 @@ function setup_ros_prerelease() {
     if [ "$BUILDER" != "colcon" ]; then
         ici_install_pkgs_for_command catkin_test_results ros-noetic-catkin
     else
+        ici_source_builder
         builder_setup
     fi
 
@@ -108,7 +109,6 @@ function prepare_ros_prerelease() {
 }
 
 function run_ros_prerelease() {
-    ici_source_builder
     ici_step "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
