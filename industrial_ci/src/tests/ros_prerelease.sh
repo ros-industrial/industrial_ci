@@ -38,6 +38,16 @@ function setup_ros_prerelease() {
     fi
 
     ici_setup_git_client
+
+    if [ "$BUILDER" != "colcon" ]; then
+        # We always use a Noetic docker image for ROS1
+        ici_install_pkgs_for_command catkin_test_results ros-noetic-catkin
+        UNDERLAY=/opt/ros/noetic
+    else
+        ici_source_builder
+        builder_setup
+    fi
+
     ici_install_pkgs_for_command docker docker.io
     ici_install_pkgs_for_command sudo sudo
     ici_install_pkgs_for_command lsb_release lsb-release
@@ -101,9 +111,6 @@ function prepare_ros_prerelease() {
 }
 
 function run_ros_prerelease() {
-    ici_source_builder
-    ici_step "${BUILDER}_setup" builder_setup
-
     ici_step "setup_ros_prerelease" setup_ros_prerelease
 
     # Environment vars.
