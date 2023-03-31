@@ -118,11 +118,7 @@ function run_ros_prerelease() {
     ici_step "prepare_prerelease_workspaces" ici_cmd prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
     ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
-    local setup_sh=
-    if [ -f "${UNDERLAY:?}/setup.sh" ]; then
-        setup_sh=". $UNDERLAY/setup.sh && "
-    fi
-    ABORT_ON_TEST_FAILURE=1 ici_step "run_prerelease_script" ici_cmd sudo -EH -u ci sh -c "${setup_sh}cd '$WORKSPACE' && exec ./prerelease.sh -y"
+    ABORT_ON_TEST_FAILURE=1 ici_step "run_prerelease_script" ici_cmd sudo -EH -u ci sh -c ". /opt/ros/noetic/setup.sh && cd '$WORKSPACE' && exec ./prerelease.sh -y"
 
     ici_log 'ROS Prerelease Test went successful.'
 }
