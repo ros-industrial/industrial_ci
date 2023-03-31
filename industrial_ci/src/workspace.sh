@@ -361,7 +361,7 @@ function ici_install_dependencies {
       cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*'):" || true
     fi
 
-    rosdep_opts=(-q --from-paths "$@" "${UNDERLAY:?}" --ignore-src -y)
+    rosdep_opts=(-q --from-paths "$@" --ignore-src -y)
     if [ -n "$skip_keys" ]; then
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
