@@ -159,7 +159,7 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: melodic, UBUNTU: 18.04}
-          - {ROS_DISTRO: melodic, PRERELEASE: true, UBUNTU: 18.04}
+          - {ROS_DISTRO: melodic, PRERELEASE: true, UBUNTU: 20.04}  # ROS1 prerelease tests need to run on a 20.04 image
           - {ROS_DISTRO: noetic, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, UBUNTU: 20.04, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
