@@ -386,7 +386,7 @@ function ici_build_workspace {
     fi
 
     ici_step "setup_${name}_workspace" ici_prepare_sourcespace "$ws/src" "${sources[@]}"
-    ici_step "install_${name}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$ws/src"
+    ici_step "install_${name}_dependencies" ici_install_dependencies "$extend" "$ROSDEP_SKIP_KEYS" "$ws/src" "${ROSDEP_SOURCE_FOLDERS[@]}"
     ici_step "build_${name}_workspace" builder_run_build "$extend" "$ws" "${args[@]}"
 }
 
