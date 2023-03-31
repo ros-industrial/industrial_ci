@@ -38,6 +38,13 @@ function setup_ros_prerelease() {
     fi
 
     ici_setup_git_client
+
+    if [ "$BUILDER" != "colcon" ]; then
+        ici_install_pkgs_for_command catkin_test_results ros-noetic-catkin
+    else
+        builder_setup
+    fi
+
     ici_install_pkgs_for_command docker docker.io
     ici_install_pkgs_for_command sudo sudo
     ici_install_pkgs_for_command lsb_release lsb-release
