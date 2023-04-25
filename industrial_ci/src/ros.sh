@@ -84,6 +84,9 @@ function _set_ros_defaults {
     "humble")
         _ros2_defaults "jammy"
         ;;
+    "iron")
+        _ros2_defaults "jammy"
+        ;;
     "rolling")
         _ros2_defaults "jammy"
         ;;
