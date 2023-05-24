@@ -36,20 +36,25 @@ function  _ros2_defaults {
     export ROS_PYTHON_VERSION=3
 }
 
+function _ros_is_eol {
+    export ROS_VERSION_EOL=true
+    export ROSDEP_SOURCES_VERSION=${ROSDEP_SOURCES_VERSION:-$1}
+}
+
 function _set_ros_defaults {
     case "$ROS_DISTRO" in
     "indigo"|"jade")
         _ros1_defaults "trusty"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "kinetic/2021-05-11"
         export _ROS_KEYRING=/etc/apt/trusted.gpg.d/ros-archive-keyring.gpg # signed-by is not supported
         ;;
     "kinetic")
         _ros1_defaults "xenial"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "kinetic/2021-05-11"
         ;;
     "lunar")
         _ros1_defaults "xenial"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "kinetic/2021-05-11"
         ;;
     "melodic")
         _ros1_defaults "bionic"
@@ -60,26 +65,26 @@ function _set_ros_defaults {
         ;;
     "ardent")
         _ros2_defaults "xenial"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "dashing/2021-06-10"
         ;;
     "bouncy"|"crystal")
         _ros2_defaults "bionic"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "dashing/2021-06-10"
         ;;
     "dashing")
         _ros2_defaults "bionic"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "dashing/2021-06-10"
         ;;
     "eloquent")
         _ros2_defaults "bionic"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "eloquent/2020-12-12"
         ;;
     "foxy")
         _ros2_defaults "focal"
         ;;
     "galactic")
         _ros2_defaults "focal"
-        export ROS_VERSION_EOL=true
+        _ros_is_eol "galactic/2022-12-09"
         ;;
     "humble")
         _ros2_defaults "jammy"
