@@ -19,10 +19,6 @@ jobs:
         env:
           - {ROS_DISTRO: melodic, PRERELEASE: true}
           - {ROS_DISTRO: melodic, ROS_REPO: ros}
-          - {ROS_DISTRO: indigo}
-          - {ROS_DISTRO: jade}
-          - {ROS_DISTRO: kinetic}
-          - {ROS_DISTRO: lunar}
           - {ROS_DISTRO: melodic}
     runs-on: ubuntu-latest
     steps:
