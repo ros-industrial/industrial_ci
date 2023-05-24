@@ -329,6 +329,9 @@ function ici_setup_rosdep {
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
         ici_cmd ici_quiet ici_asroot rosdep init
     fi
+    if [ -n "$ROSDEP_SOURCES_VERSION" ]; then
+        ici_cmd ici_quiet ici_asroot sed -E -i "s;(https://raw.githubusercontent.com/ros/rosdistro/)master;\1$ROSDEP_SOURCES_VERSION;g" /etc/ros/rosdep/sources.list.d/*.list
+    fi
 
     update_opts=()
     if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
