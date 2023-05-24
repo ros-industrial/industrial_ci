@@ -21,7 +21,7 @@ function builder_setup {
     ici_install_pkgs_for_command colcon python3-colcon-common-extensions
     if [ "$ROS_DISTRO" = "kinetic" ] || [ "$ROS_DISTRO" = "ardent" ]; then
         ici_install_pkgs_for_command pip3 python3-pip
-        ici_asroot pip3 install -U setuptools
+        ici_asroot pip3 install -U setuptools==30.3.0
     fi
 }
 
