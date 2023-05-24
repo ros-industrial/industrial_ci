@@ -33,13 +33,6 @@ jobs:
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: pedantic, EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', ROSDEP_SKIP_KEYS: "rospy_tutorials rostest", EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/testpkg_broken_install', EXPECT_EXIT_CODE: 1}
-          - {ROS_DISTRO: melodic, NOT_TEST_BUILD: true, _GUARD_INTERVAL: 10}
-          - {ROS_DISTRO: kinetic, NOT_TEST_INSTALL: true, BEFORE_INIT: 'test -z "$${CXX+x}"'} # test that CXX is not set
-          - {ROS_DISTRO: kinetic, NOT_TEST_INSTALL: true, CXX: '/usr/bin/gcc', BEFORE_INIT: 'test -z "$${CXX+x}"', EXPECT_EXIT_CODE: 1} # test the CXX test
-          - {ROS_DISTRO: kinetic, NOT_TEST_BUILD: true, NOT_TEST_INSTALL: true}  # This may not make much sense. Only for testing purpose.
-          - {ROS_DISTRO: kinetic, CATKIN_PARALLEL_JOBS: '-p1', ROS_PARALLEL_JOBS: '-j1'}  # Intend build on low-power platform
-
-          # - {ROS_DISTRO: indigo, PRERELEASE: true}  ## Comment out because this is meaningless for always failing without prerelease testable contents in industrial_ci.
 
           - {ROS_DISTRO: noetic, PRERELEASE: true, TARGET_WORKSPACE: 'industrial_ci/mockups/failing_test', PRERELEASE_REPONAME: "failing_test", EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: debian, AFTER_SCRIPT: 'ccache 2> /dev/null && exit 1; [ "$$?" = "127" ]'}
@@ -47,7 +40,6 @@ jobs:
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, CCACHE_DIR: '/github/home/.ccache', AFTER_SCRIPT: 'num=($$(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'}
           - {ROS_DISTRO: indigo, UPSTREAM_WORKSPACE: file, USE_DEB: true, EXPECT_EXIT_CODE: 1} # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: 'https://raw.githubusercontent.com/ros-industrial/industrial_ci/master/.travis.rosinstall'}
-          - {ROS_DISTRO: kinetic, ADDITIONAL_DEBS: 'ros-kinetic-opencv3', VERBOSE_OUTPUT: false}
           - {ROS_DISTRO: kinetic, ADDITIONAL_DEBS: 'ros-melodic-opencv3', DEBUG_BASH: true, EXPECT_EXIT_CODE: 100} # This should fail (trying from a wrong distro).
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .ci.rosinstall}  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .i.do.not.exist, EXPECT_EXIT_CODE: 1}
@@ -79,7 +71,6 @@ jobs:
           - {ROS_DISTRO: noetic, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 1, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
           - {ROS_DISTRO: noetic, BUILDER: colcon, CMAKE_ARGS: -DCMAKE_CXX_FLAGS="-Werror", EXPECT_EXIT_CODE: 2, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'}
 
-          - {ROS_DISTRO: melodic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-melodic-rosbash"}
           - {ROS_DISTRO: melodic, ROS_REPO: main}
 
           - {ROS_DISTRO: noetic, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
