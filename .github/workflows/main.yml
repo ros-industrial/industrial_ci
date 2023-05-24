@@ -165,7 +165,6 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - {ROS_DISTRO: melodic, UBUNTU: 18.04}
           - {ROS_DISTRO: noetic, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, PRERELEASE: true, UBUNTU: 20.04}
           - {ROS_DISTRO: noetic, UBUNTU: 20.04, TEST: debians, TARGET_WORKSPACE: ". industrial_ci/mockups/industrial_ci_testpkg"}
