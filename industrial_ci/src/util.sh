@@ -473,6 +473,11 @@ function ici_exec_for_command {
   fi
 }
 
+function ici_split_chain {
+    # shellcheck disable=SC2034
+    IFS=":" read -r -a "$1" <<< "$2"
+}
+
 function ici_split_array {
     # shellcheck disable=SC2034
     IFS=" " read -r -a "$1" <<< "$*"

@@ -58,14 +58,14 @@ function abi_install_compliance_checker() {
 function abi_dump_libraries() {
     abi_install_dumper
 
-    local extend=$1; shift
+    local space=$1; shift
     local output=$1; shift
 
     local ld_library_path
     ld_library_path=$(ici_source_setup "$extend" && echo "$LD_LIBRARY_PATH")
 
     mkdir -p "$output"
-    for d in "$extend"/*/lib "$extend/lib"; do
+    for d in "$space"/*/lib "$space/lib"; do
       for l in "$d"/*.so; do
         if [ "$l" != "$d/*.so" ]; then
           abi-dumper "$l" -ld-library-path "$ld_library_path" -o "$output/$(basename "$l" .so).dump" -public-headers "$d/../include" "$@"
@@ -191,7 +191,7 @@ function run_abi_check() {
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
-        extend="$(ici_extend_space "$upstream_ws")"
+        extend="$(ici_prefix_extend "$upstream_ws" "$extend")"
     fi
 
     mkdir -p "$target_ws/src"

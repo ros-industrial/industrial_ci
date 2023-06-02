@@ -176,7 +176,7 @@ function run_source_tests {
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
-        extend="$(ici_extend_space "$upstream_ws")"
+        extend="$(ici_prefix_extend "$upstream_ws" "$extend")"
     fi
 
     if [ "${CLANG_TIDY:-false}" != false ]; then
@@ -205,7 +205,8 @@ function run_source_tests {
         run_pylint_check "$target_ws"
     fi
 
-    extend="$(ici_extend_space "$target_ws")"
+    extend="$(ici_prefix_extend "$target_ws" "$extend")"
+
     if [ -n "$DOWNSTREAM_WORKSPACE" ]; then
         ici_with_ws "$downstream_ws" ici_build_workspace "downstream" "$extend" "$downstream_ws"
         #extend="$(ici_extend_space "$downstream_ws")"

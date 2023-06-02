@@ -348,6 +348,12 @@ function ici_extend_space {
   echo "$1/install"
 }
 
+function ici_prefix_extend {
+    local prefix=$1; shift
+    local extend=$1; shift
+    echo "$(ici_extend_space "$prefix")${extend:+:}${extend}"
+}
+
 function ici_exec_in_workspace {
     local extend=$1; shift
     local path=$1; shift
@@ -376,6 +382,9 @@ function ici_build_workspace {
     local name=$1; shift
     local extend=$1; shift
     local ws=$1; shift
+
+    local chain=()
+    ici_split_chain extend "$extend"
 
     local ws_sources=()
     ici_parse_env_array  ws_sources "${name^^}_WORKSPACE"
@@ -407,13 +416,17 @@ function ici_test_workspace {
 
 function ici_source_setup {
     local extend=$1; shift
-    if  [ ! -f "$extend/setup.bash" ]; then
-        if [ "$extend" != "/opt/ros/$ROS_DISTRO" ]; then
-            ici_error "'$extend' is not a devel/install space"
+
+    local spaces=()
+    ici_split_chain spaces "$extend"
+
+    if  [ ! -f "${spaces[0]}/setup.bash" ]; then
+        if [ "${spaces[0]}" != "/opt/ros/$ROS_DISTRO" ]; then
+            ici_error "'${spaces[0]}' is not a devel/install space"
         fi
     else
-        ici_with_unset_variables source "$extend/setup.bash"
-        if [ "$ROS_VERSION" -eq 1 ] && [ -f "$extend/.colcon_install_layout" ]; then
+        ici_with_unset_variables source "${spaces[0]}/setup.bash"
+        if [ "$ROS_VERSION" -eq 1 ] && [ -f "${spaces[0]}/.colcon_install_layout" ]; then
             # Fix for https://github.com/ros-industrial/industrial_ci/issues/624
             # (Re)populate ROS_PACKAGE_PATH from all underlays
             # shellcheck disable=SC1090
