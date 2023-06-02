@@ -364,13 +364,16 @@ function ici_install_dependencies {
     local extend=$1; shift
     local skip_keys=$1; shift
 
+    local spaces=()
+    ici_split_chain spaces "$extend"
+
     local cmake_prefix_path=
     if [ "$ROS_VERSION" -eq 2 ]; then
       # work-around for https://github.com/ros-infrastructure/rosdep/issues/724
       cmake_prefix_path="$(ici_exec_in_workspace "$extend" . env | grep -oP '^CMAKE_PREFIX_PATH=\K.*'):" || true
     fi
 
-    rosdep_opts=(-q --from-paths "$@" --ignore-src -y)
+    rosdep_opts=(-q --from-paths "$@" "${spaces[@]}" --ignore-src -y)
     if [ -n "$skip_keys" ]; then
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
@@ -382,9 +385,6 @@ function ici_build_workspace {
     local name=$1; shift
     local extend=$1; shift
     local ws=$1; shift
-
-    local chain=()
-    ici_split_chain extend "$extend"
 
     local ws_sources=()
     ici_parse_env_array  ws_sources "${name^^}_WORKSPACE"
