@@ -96,7 +96,8 @@ function _set_ros_defaults {
         _ros2_defaults "jammy"
         ;;
     "false")
-        unset ROS_DISTRO
+        export BUILDER=${BUILDER:-colcon}
+        export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-3}
         ;;
     *)
         ici_error "ROS_DISTRO '$ROS_DISTRO' is not supported"
