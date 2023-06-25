@@ -81,6 +81,7 @@ function _set_ros_defaults {
         ;;
     "foxy")
         _ros2_defaults "focal"
+        _ros_is_eol "foxy/2023-06-20"
         ;;
     "galactic")
         _ros2_defaults "focal"
