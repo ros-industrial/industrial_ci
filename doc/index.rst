@@ -29,7 +29,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`__ *(EOL)*
 * `Lunar <http://wiki.ros.org/lunar>`__ *(EOL)*
-* `Melodic <http://wiki.ros.org/melodic>`__
+* `Melodic <http://wiki.ros.org/melodic>`__ *(EOL)*
 * `Noetic <http://wiki.ros.org/noetic>`__
 * `Ardent <https://index.ros.org/doc/ros2/Releases/Release-Ardent-Apalone/>`__ *(EOL)*
 * `Bouncy <https://index.ros.org/doc/ros2/Releases/Bouncy/>`__ *(EOL)*

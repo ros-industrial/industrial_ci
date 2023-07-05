@@ -22,8 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - {ROS_DISTRO: melodic, PRERELEASE: true}
-          - {ROS_DISTRO: melodic, ROS_REPO: ros}
           - {ROS_DISTRO: melodic}
     runs-on: ubuntu-latest
     steps:
