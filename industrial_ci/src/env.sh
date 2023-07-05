@@ -78,10 +78,10 @@ if [ -z "$OS_CODE_NAME" ]; then
     "kinetic")
         OS_CODE_NAME="xenial"
         ROS_VERSION_EOL=true
-        ROS_VERSION_FINAL=
         ;;
     "melodic")
         OS_CODE_NAME="bionic"
+        ROS_VERSION_EOL=true
         ;;
     "")
         if [ -n "$DOCKER_IMAGE" ] || [ -n "$DOCKER_BASE_IMAGE" ]; then
