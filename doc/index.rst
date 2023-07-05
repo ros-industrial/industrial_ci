@@ -30,7 +30,7 @@ Following `ROS distributions <http://wiki.ros.org/action/login/Distributions>`__
 * `Jade <http://wiki.ros.org/jade>`__ *(EOL)*
 * `Kinetic <http://wiki.ros.org/kinetic>`__ *(EOL)*
 * `Lunar <http://wiki.ros.org/lunar>`__ *(EOL)*
-* `Melodic <http://wiki.ros.org/melodic>`__
+* `Melodic <http://wiki.ros.org/melodic>`__ *(EOL)*
 
 Supported CIs
 +++++++++++++
