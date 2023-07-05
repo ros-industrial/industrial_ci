@@ -58,6 +58,7 @@ function _set_ros_defaults {
         ;;
     "melodic")
         _ros1_defaults "bionic"
+        _ros_is_eol "melodic/2023-06-27"
         ;;
     "noetic")
         _ros1_defaults "focal"
