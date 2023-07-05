@@ -20,16 +20,10 @@ before_script:
 
 # setup the actual tests
 
-indigo:
-  script: .industrial_ci/gitlab.sh
-  variables:
-    ROS_DISTRO: "indigo"
-
-kinetic:
-  script: .industrial_ci/gitlab.sh ROS_DISTRO=kinetic  # alternate syntax
-
 melodic:
   script: .industrial_ci/gitlab.sh
   variables:
     ROS_DISTRO: "melodic"
-    PRERELEASE: "true"
+
+melodic_alternate:
+  script: .industrial_ci/gitlab.sh ROS_DISTRO=melodic  # alternate syntax
