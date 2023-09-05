@@ -27,14 +27,15 @@ function make_repo() {
 
 function update_repo() (
     local repo=$1; shift
-    ici_guard cd "$repo" && ici_guard dpkg-scanpackages .  > Packages
+    ici_guard apt-ftparchive packages "$repo" > "$repo/Packages"
+    ici_guard apt-ftparchive release -o APT::FTPArchive::Release::Origin=industrial_ci "$repo" > "$repo/Release"
 )
 
 function use_repo() (
     local repo=$1; shift
     ici_guard ici_asroot rm -f /etc/apt/apt.conf.d/docker-clean
     echo "deb [trusted=yes] file://$repo ./" | >/dev/null ici_guard ici_asroot tee /etc/apt/sources.list.d/ici_debians.list
-    echo -e 'Package: *\nPin: origin ""\nPin-Priority: 1000' | >/dev/null ici_guard ici_asroot tee /etc/apt/preferences.d/ici_debians
+    echo -e 'Package: *\nPin: release o=industrial_ci\nPin-Priority: 1000' | >/dev/null ici_guard ici_asroot tee /etc/apt/preferences.d/ici_debians
     ici_guard ici_asroot apt-get -o APT::Sandbox::User=root update -qq
 )
 
@@ -103,7 +104,7 @@ function run_debians() {
     ici_source_builder
     ici_step "${BUILDER}_setup" builder_setup
     ici_step "setup_bloom" ici_install_pkgs_for_command bloom-generate python3-bloom debhelper
-    ici_step "setup_dpkg_dev" ici_install_pkgs_for_command dpkg-scanpackages dpkg-dev
+    ici_step "setup_apt_utils" ici_install_pkgs_for_command apt-ftparchive apt-utils
     ici_step "setup_docker" ici_install_pkgs_for_command docker docker.io
     ici_step "setup_rosdep" ici_setup_rosdep
 
