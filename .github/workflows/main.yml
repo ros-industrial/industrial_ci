@@ -76,7 +76,6 @@ jobs:
           - {ROS_DISTRO: kinetic, ADDITIONAL_DEBS: 'ros-melodic-opencv3', DEBUG_BASH: true, EXPECT_EXIT_CODE: 100} # This should fail (trying from a wrong distro).
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .ci.rosinstall}  # Testing arbitrary file name without ROS_DISTRO suffix. As of 6/3/2016 this fails due to https://github.com/ros-industrial/industrial_core/pull/144#issuecomment-223186764
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, ROSINSTALL_FILENAME: .i.do.not.exist, EXPECT_EXIT_CODE: 1}
-          - {DOCKER_IMAGE: 'ros:kinetic-ros-base', ROS_REPO: ros, NOT_TEST_BUILD: true, DEBUG_BASH: true, VERBOSE_OUTPUT: false, DOCKER_COMMIT: img_temp, POST_PROCESS: 'eval docker image inspect $$DOCKER_COMMIT --format="$$DOCKER_COMMIT:\ \"{{.Size}}\" bytes"'}
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'grep -q ID=ubuntu /etc/os-release && grep -q VERSION_CODENAME=focal /etc/os-release'}
           - {ROS_DISTRO: noetic, BEFORE_INIT: 'grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"10\" /etc/os-release', EXPECT_EXIT_CODE: 1}
           - {ROS_DISTRO: noetic, OS_NAME: debian, OS_CODE_NAME: buster, AFTER_SCRIPT: 'grep -q ID=debian /etc/os-release && grep -q VERSION_ID=\"10\" /etc/os-release'}
@@ -85,6 +84,7 @@ jobs:
           - {ROS_DISTRO: melodic, ROS_REPO: ros, BUILDER: colcon, AFTER_SCRIPT: 'rosenv && [ "$$CMAKE_PREFIX_PATH" = "/root/target_ws/install/industrial_ci:/opt/ros/melodic" ]'}
           - {DOCKER_IMAGE: "ros:noetic", AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 2}
           - {DOCKER_IMAGE: "ros:noetic", ROS_REPO: testing, AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 1}
+          - {DOCKER_IMAGE: 'ros:noetic', ROS_REPO: ros, NOT_TEST_BUILD: true, DEBUG_BASH: true, VERBOSE_OUTPUT: false, DOCKER_COMMIT: img_temp, POST_PROCESS: 'eval docker image inspect $$DOCKER_COMMIT --format="$$DOCKER_COMMIT:\ \"{{.Size}}\" bytes"'}
           - {ROS_DISTRO: noetic, PRERELEASE: true}
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
           - {ROS_DISTRO: foxy, AFTER_SCRIPT: 'rosenv ros2 run industrial_ci run_travis', ADDITIONAL_DEBS: "ros-foxy-ros2run"}
