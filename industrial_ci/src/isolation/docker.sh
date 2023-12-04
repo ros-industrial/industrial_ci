@@ -17,7 +17,7 @@
 
 export DOCKER_COMMIT=${DOCKER_COMMIT:-}
 export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
-export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .ssh .subversion}
+export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .gitconfig .ssh .subversion}
 export DOCKER_PULL=${DOCKER_PULL:-true}
 export _BUNDLE_ICI=${_BUNDLE_ICI:-false}
 
@@ -131,7 +131,7 @@ function ici_run_cmd_in_docker() {
   local cleanup=""
 
   for d in "${credentials[@]}"; do
-    if [ -d "$HOME/$d" ]; then
+    if [ -e "$HOME/$d" ]; then
       to_copy+=(~/"$d")
       # shellcheck disable=SC2088
       cleanup=$(ici_join_array : "$cleanup" "~/$d")
