@@ -31,12 +31,17 @@ from industrial_ci.common import *
 
 # read global and job-specific envs from
 def read_env(env):
-    m = env
+    m = []
     g = ''
     if isinstance(env, dict):
-        m = env['matrix']
-        if 'global' in env:
-            g = ' '.join(env['global'])
+        for l in env['strategy']['matrix']['include']:
+            job_env = ''
+            for key, value in l.items():
+                job_env += key+"='"+str(value) + "' " # adds a space to every element
+            job_env = job_env[:-1] # remove space from last element
+            m.append(job_env)
+        for key, value in env['env'].items():
+            g += " "+key+"='"+str(value)+"'"
     return g, m
 
 def main(scripts_dir, argv):
@@ -46,9 +51,9 @@ def main(scripts_dir, argv):
 
     args, extra_env = parse_extra_args(argv[1:])
 
-    path, args = find_config_file(args, ['.travis.yml', '.travis.yaml'])
+    path, args = find_config_file(args, ['.github/workflows/main.yml','.github/workflows/main.yaml'])
     config = read_yaml(path)
-    global_env, job_envs = read_env(config['env'])
+    global_env, job_envs = read_env(config['jobs']['industrial_ci'])
     allow_failures = read_allow_failures(config)
     job_envs =   [ x for x in job_envs if x not in allow_failures ] \
                + [None] * read_num_include(config) \
