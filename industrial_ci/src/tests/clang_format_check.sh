@@ -21,8 +21,9 @@ function prepare_clang_format_check() {
 
 function run_clang_format_check() {
   local err=0
-  local path
-  ici_make_temp_dir path
+  local path=/tmp/clang_format_check
+  mkdir -p "$path"
+  ici_cleanup_later "$path"
 
   # Check whether a specific version of clang-format is desired
   local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
