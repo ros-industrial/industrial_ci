@@ -96,6 +96,8 @@ function _set_ros_defaults {
         ;;
     "rolling")
         _ros2_defaults "jammy"
+        export ROSDEP_SOURCES_VERSION=${ROSDEP_SOURCES_VERSION:-rolling/2024-02-28}
+        export ROS_REPO=${ROS_REPO:-main}
         ;;
     "false")
         unset ROS_DISTRO
