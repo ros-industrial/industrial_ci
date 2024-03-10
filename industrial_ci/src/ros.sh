@@ -96,6 +96,7 @@ function _set_ros_defaults {
         ;;
     "rolling")
         _ros2_defaults "noble"
+        export ROS_REPO=${ROS_REPO:-main}
         ;;
     "false")
         unset ROS_DISTRO
