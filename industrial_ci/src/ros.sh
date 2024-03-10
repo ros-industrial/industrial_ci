@@ -96,7 +96,6 @@ function _set_ros_defaults {
         ;;
     "rolling")
         _ros2_defaults "noble"
-        _use_repo_or_final_snapshot "https://repo.ros2.org/ubuntu/building/"
         ;;
     "false")
         unset ROS_DISTRO
