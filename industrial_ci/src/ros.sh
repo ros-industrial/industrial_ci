@@ -95,7 +95,7 @@ function _set_ros_defaults {
         _ros2_defaults "jammy"
         ;;
     "rolling")
-        _ros2_defaults "jammy"
+        _ros2_defaults "noble"
         ;;
     "false")
         unset ROS_DISTRO
