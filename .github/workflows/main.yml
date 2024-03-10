@@ -60,15 +60,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', VERBOSE_OUTPUT: true, CATKIN_LINT: true, AFTER_SCRIPT: '[ "$$(command -v catkin_lint)" = /usr/local/bin/catkin_lint ]'}
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: true, ADDITIONAL_DEBS: 'python-catkin-lint', AFTER_SCRIPT: '[ "$$(command -v catkin_lint)" = /usr/bin/catkin_lint ]'}
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CMAKE_ARGS: '-DFAIL_CMAKE=true', EXPECT_EXIT_CODE: 1}
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: pedantic, EXPECT_EXIT_CODE: 1}
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', ROSDEP_SKIP_KEYS: "rospy_tutorials rostest", EXPECT_EXIT_CODE: 1}
-          - {ROS_DISTRO: kinetic, TARGET_WORKSPACE: 'industrial_ci/mockups/testpkg_broken_install', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', VERBOSE_OUTPUT: true, CATKIN_LINT: true, AFTER_SCRIPT: '[ "$$(command -v catkin_lint)" = /usr/local/bin/catkin_lint ]'}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: true, ADDITIONAL_DEBS: 'python-catkin-lint', AFTER_SCRIPT: '[ "$$(command -v catkin_lint)" = /usr/bin/catkin_lint ]'}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CMAKE_ARGS: '-DFAIL_CMAKE=true', EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', CATKIN_LINT: pedantic, EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg', ROSDEP_SKIP_KEYS: "rospy_tutorials rostest", EXPECT_EXIT_CODE: 1}
+          - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/testpkg_broken_install', EXPECT_EXIT_CODE: 1}
 
           - {ROS_DISTRO: noetic, PRERELEASE: true, TARGET_WORKSPACE: 'industrial_ci/mockups/failing_test', PRERELEASE_REPONAME: "failing_test", EXPECT_EXIT_CODE: 1}
-          - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: debian, AFTER_SCRIPT: 'ccache 2> /dev/null && exit 1; [ "$$?" = "127" ]'}
+          - {ROS_DISTRO: melodic, UPSTREAM_WORKSPACE: debian, AFTER_SCRIPT: 'ccache 2> /dev/null && exit 1; [ "$$?" = "127" ]'}
            # Using default file name for ROSINSTALL_FILENAME, test CCACHE, verify cache was filled
           - {ROS_DISTRO: kinetic, UPSTREAM_WORKSPACE: file, CCACHE_DIR: '/github/home/.ccache', AFTER_SCRIPT: 'num=($$(ccache -s | grep "files in cache")) && (( num[-1] > 0 ))'}
           - {ROS_DISTRO: indigo, UPSTREAM_WORKSPACE: file, USE_DEB: true, EXPECT_EXIT_CODE: 1} # Expected to fail. See https://github.com/ros-industrial/industrial_ci/pull/74
