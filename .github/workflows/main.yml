@@ -41,7 +41,11 @@ jobs:
         - galactic
         - humble
         - iron
-        - rolling
+        include:
+          - distro: rolling
+            ubuntu: jammy
+          - distro: rolling
+            ubuntu:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -49,6 +53,10 @@ jobs:
         run: |
           echo "BEFORE_BUILD_TARGET_WORKSPACE=sed -i /condition/d /root/target_ws/src/industrial_ci/industrial_ci/package.xml" >> "$GITHUB_ENV"
         if: matrix.distro == 'ardent'
+      - name: set OS_CODE_NAME
+        run: |
+          echo "OS_CODE_NAME=${{ matrix.ubuntu }}" >> "$GITHUB_ENV"
+        if: ${{ matrix.ubuntu }}
       - uses: './'
         env:
           ROS_DISTRO: ${{ matrix.distro }}
