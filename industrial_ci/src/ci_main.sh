@@ -29,6 +29,8 @@ export ICI_SRC_PATH; ICI_SRC_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && p
 # shellcheck source=industrial_ci/src/env.sh
 source "${ICI_SRC_PATH}/env.sh"
 if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
+# shellcheck source=industrial_ci/src/coverage.sh
+source "${ICI_SRC_PATH}/coverage.sh"
 
 # shellcheck source=industrial_ci/src/util.sh
 source "${ICI_SRC_PATH}/util.sh"
@@ -73,4 +75,14 @@ name=${name%.*}
 
 "prepare_$name" || ici_exit
 ici_isolate "$TEST" "run_${name}" || ici_exit
+
+if [ "$CODE_COVERAGE" ]; then
+
+  # Needed for ici_apt_install in travis with coveralls.io
+  # shellcheck source=industrial_ci/src/workspace.sh
+  source "${ICI_SRC_PATH}/workspace.sh"
+
+  ici_step "upload_coverage_report" upload_coverage_report
+fi
+
 ici_exit 0
