@@ -99,7 +99,8 @@ function _set_ros_defaults {
         _use_repo_or_final_snapshot "https://repo.ros2.org/ubuntu/building/"
         ;;
     "false")
-        unset ROS_DISTRO
+        export BUILDER=${BUILDER:-colcon}
+        export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-3}
         ;;
     *)
         ici_error "ROS_DISTRO '$ROS_DISTRO' is not supported"
