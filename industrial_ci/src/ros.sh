@@ -99,6 +99,10 @@ function _set_ros_defaults {
         _use_repo_or_final_snapshot "https://repo.ros2.org/ubuntu/building/"
         ;;
     "false")
+        export BUILDER=${BUILDER:-colcon}
+        export ROS_VERSION=0
+        export ROS_VERSION_EOL=false
+        export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-3}
         unset ROS_DISTRO
         ;;
     *)
@@ -111,7 +115,6 @@ function _set_ros_defaults {
     elif [ "$ROS_PYTHON_VERSION" = 3 ]; then
         export PYTHON_VERSION_NAME=python3
     fi
-
 }
 
 function _use_snapshot() {
