@@ -404,8 +404,7 @@ function ici_test_workspace {
     local err=0
 
     ici_step "run_${name}_test" builder_run_tests "$extend" "$ws"
-    builder_test_results "$extend" "$ws" || err=$?
-    ici_report_result "${name}_test_results" "$err"
+    ici_with_result "${name}_test_results" builder_test_results "$extend" "$ws" || err=$?
     return "$err"
 }
 
@@ -432,5 +431,15 @@ function ici_with_ws() {
     current_ws=$1; shift
     "$@" || err=$?
     unset current_ws
+    return "$err"
+}
+
+function ici_with_result() {
+    local err=0
+    # shellcheck disable=SC2034
+    ICI_RESULT_NAME=$1; shift
+    "$@" || err=$?
+    ici_report_result "$ICI_RESULT_NAME" "$err"
+    unset ICI_RESULT_NAME
     return "$err"
 }
