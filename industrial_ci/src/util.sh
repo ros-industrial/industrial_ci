@@ -233,6 +233,8 @@ function ici_teardown {
             local color_wrap=${ANSI_GREEN}
             if [ "$exit_code" -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
             ici_time_end "$color_wrap" "$exit_code"
+        elif [ -n "${ICI_RESULT_NAME:-}" ]; then
+            ici_report_result "$ICI_RESULT_NAME" "${exit_code}"
         fi
 
         exec {__ici_log_fd}>&-
