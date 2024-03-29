@@ -95,3 +95,4 @@ ici_mark_deprecated DOCKER_COMMIT_CREDENTIALS "Credentials will be copied, but n
 
 ici_rename_deprecated HASHKEY_SKS ROS_REPOSITORY_KEY
 ici_rename_deprecated APTKEY_STORE_HTTPS ROS_REPOSITORY_KEY
+ici_rename_deprecated ROSDEP_SOURCES_VERSION ROSDISTRO_INDEX_VERSION

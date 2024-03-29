@@ -38,7 +38,7 @@ function  _ros2_defaults {
 
 function _ros_is_eol {
     export ROS_VERSION_EOL=true
-    export ROSDEP_SOURCES_VERSION=${ROSDEP_SOURCES_VERSION:-$1}
+    export ROSDISTRO_INDEX_VERSION=${ROSDISTRO_INDEX_VERSION:-$1}
 }
 
 function _set_ros_defaults {
