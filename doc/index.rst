@@ -214,11 +214,11 @@ Note that some of these currently tied only to a single option, but we still lea
 * **ROS_REPOSITORY_KEY** (default: not set): Location of ROS' binary repository key; either as URL, file path or fingerprint.
 * **ROS_REPOSITORY_PATH**: Location of ROS' binary repositories where depended packages get installed from (typically both standard repo (``http://packages.ros.org/ros/ubuntu``) and `"Shadow-Fixed" repository <http://wiki.ros.org/ShadowRepository>`__ (``http://packages.ros.org/ros-shadow-fixed/ubuntu``)). Since version 0.3.4, ``ROS_REPO`` is recommended, and ``ROS_REPOSITORY_PATH`` is for more intermediate usage only (e.g. to specify your own binary repository (non-standard / in house)). Backward compatibility is preserved.
 * **ROSDEP_SKIP_KEYS** (default: not set): space-separated list of keys that should get skipped by ``rosdep install``.
-* **ROSDEP_SOURCES_VERSION** (default: not set): If set, patch the files in /etc/ros/rosdep/sources.list.d/*.list to use this version instead of master.
+* **ROSDISTRO_INDEX_VERSION** (default: not set): If set, patch the files in /etc/ros/rosdep/sources.list.d/*.list to use this version instead of master and set ROSDISTRO_INDEX_URL accordingly
 * **ROSINSTALL_FILENAME** (*deprecated*, default: ``.travis.rosinstall``): Only used when ``UPSTREAM_WORKSPACE`` is set to ``file``. See ``UPSTREAM_WORKSPACE`` description.
 * **PYLINT_ARGS** (default: not set): pass command line arguments to ``pylint`` command (e.g. ``--output-format=parseable --errors-only``) - can e.g. be used to ``ignore_modules``
 * **PYLINT_CHECK** (default: false): If ``true``, run ``pylint`` checks
-* **PYLINT_EXCLUDE** (default: not set): Pattern that can be used to exclude files via the ``-not -path`` filter. 
+* **PYLINT_EXCLUDE** (default: not set): Pattern that can be used to exclude files via the ``-not -path`` filter.
 * **TARGET_CMAKE_ARGS** (default: not set): Addtional CMake arguments for target `workspace <#workspace-management>`__.
 * **TARGET_WORKSPACE** (default: ``$TARGET_REPO_PATH``): Definition of sources for target `workspace <#workspace-management>`__.
 * **UNDERLAY** (default: not set): Path to an install space (instead of ``/opt/ros/$ROS_DISTRO``) to be used as an underlay of the workspaces being set up be ICI, e.g. a workspace provided by a custom docker image

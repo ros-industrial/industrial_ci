@@ -329,14 +329,18 @@ function ici_setup_rosdep {
     if ! [ -d /etc/ros/rosdep/sources.list.d ]; then
         ici_cmd ici_quiet ici_asroot rosdep init
     fi
-    if [ -n "$ROSDEP_SOURCES_VERSION" ]; then
-        ici_cmd ici_quiet ici_asroot sed -E -i "s;(https://raw.githubusercontent.com/ros/rosdistro/)master;\1$ROSDEP_SOURCES_VERSION;g" /etc/ros/rosdep/sources.list.d/*.list
-    fi
-
     update_opts=()
     if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
         update_opts+=(--rosdistro "$ROS_DISTRO")
     fi
+
+    if [ -n "$ROSDISTRO_INDEX_VERSION" ]; then
+        if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
+            export ROSDISTRO_INDEX_URL=https://raw.githubusercontent.com/ros/rosdistro/$ROSDISTRO_INDEX_VERSION/index-v4.yaml
+        fi
+        ici_cmd ici_quiet ici_asroot sed -E -i "s;(https://raw.githubusercontent.com/ros/rosdistro/)master;\1$ROSDISTRO_INDEX_VERSION;g" /etc/ros/rosdep/sources.list.d/*.list
+    fi
+
     if [ "$ROS_VERSION_EOL" = true ]; then
         update_opts+=(--include-eol-distros)
     fi
