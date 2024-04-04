@@ -36,6 +36,9 @@ source "${ICI_SRC_PATH}/ros.sh"
 # shellcheck source=industrial_ci/src/workspace.sh
 source "${ICI_SRC_PATH}/workspace.sh"
 
+# shellcheck source=industrial_ci/src/coverage.sh
+source "${ICI_SRC_PATH}/coverage.sh"
+
 ici_setup
 
 if [ "$DEBUG_BASH" = true ]; then set -x; fi # print trace if DEBUG
