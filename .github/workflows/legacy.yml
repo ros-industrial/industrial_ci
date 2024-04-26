@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - {ROS_DISTRO: melodic}
+          - {ROS_DISTRO: noetic}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
