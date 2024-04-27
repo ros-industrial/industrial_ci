@@ -17,7 +17,7 @@ cache:
 
 # enable docker-in-docker
 services:
-  - docker:20.10.16-dind
+  - docker:26.1.0-dind
 
 before_script:
   - apk add --update bash coreutils tar grep # install industrial_ci dependencies
@@ -31,9 +31,6 @@ indigo:
   variables:
     ROS_DISTRO: "indigo"
     TARGET_WORKSPACE: 'industrial_ci/mockups/industrial_ci_testpkg'
-
-kinetic:
-  script: .industrial_ci/gitlab.sh ROS_DISTRO=kinetic  # alternate syntax
 
 
 noetic:
@@ -59,15 +56,15 @@ dashing:
 
 docker_pull:
   script:
-    - docker pull ros:kinetic
-    - docker tag ros:kinetic industrial-ci/ubuntu:xenial
-    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" EXPECT_EXIT_CODE=1
+    - docker pull ros:noetic
+    - docker tag ros:noetic industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=boetic DOCKER_IMAGE="industrial-ci/ubuntu:focal" EXPECT_EXIT_CODE=1
 
 docker_no_pull:
   script:
-    - docker pull ros:kinetic
-    - docker tag ros:kinetic industrial-ci/ubuntu:xenial
-    - .industrial_ci/gitlab.sh ROS_DISTRO=kinetic DOCKER_IMAGE="industrial-ci/ubuntu:xenial" DOCKER_PULL=false
+    - docker pull ros:noetic
+    - docker tag ros:noetic industrial-ci/ubuntu:xenial
+    - .industrial_ci/gitlab.sh ROS_DISTRO=noetic DOCKER_IMAGE="industrial-ci/ubuntu:focal" DOCKER_PULL=false
 
 test_arm:
   script:
