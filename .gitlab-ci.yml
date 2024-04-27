@@ -58,7 +58,7 @@ docker_pull:
   script:
     - docker pull ros:noetic
     - docker tag ros:noetic industrial-ci/ubuntu:xenial
-    - .industrial_ci/gitlab.sh ROS_DISTRO=boetic DOCKER_IMAGE="industrial-ci/ubuntu:focal" EXPECT_EXIT_CODE=1
+    - .industrial_ci/gitlab.sh ROS_DISTRO=noetic DOCKER_IMAGE="industrial-ci/ubuntu:focal" EXPECT_EXIT_CODE=1
 
 docker_no_pull:
   script:
