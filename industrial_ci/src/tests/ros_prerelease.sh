@@ -114,6 +114,10 @@ function run_ros_prerelease() {
     ici_step "prepare_prerelease_workspaces" ici_cmd prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
     ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci /tmp/ros_buildfarm/bin/python -m ros_buildfarm.scripts.prerelease.generate_prerelease_script "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
+    # patch prerelease_build_underlay.sh to create test_results, if no tests were run
+    # shellcheck disable=SC2016
+    ici_asroot sed -i '/test_result_EXECUTABLE="colcon"/a mkdir -p "$WORKSPACE/ws/test_results"' "$WORKSPACE/prerelease_build_underlay.sh"
+
     local setup_sh=
     if [ -f "${UNDERLAY:?}/setup.sh" ]; then
         setup_sh=". $UNDERLAY/setup.sh && "
