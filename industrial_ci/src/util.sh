@@ -92,7 +92,7 @@ function ici_with_unset_variables {
 }
 
 function _sub_shell() (
-  # shellcheck disable=SC2317
+  # shellcheck disable=SC2317,SC2329
   function rosenv() {
     # if current_ws not set, use an invalid path to skip it
     for e in $(ici_extend_space "${current_ws:-/dev/null}") $(ici_extend_space "$BASEDIR/${PREFIX}downstream_ws") $(ici_extend_space "$BASEDIR/${PREFIX}target_ws") $(ici_extend_space "$BASEDIR/${PREFIX}base_ws") $(ici_extend_space "$BASEDIR/${PREFIX}upstream_ws") "$UNDERLAY"; do
@@ -233,6 +233,8 @@ function ici_teardown {
             local color_wrap=${ANSI_GREEN}
             if [ "$exit_code" -ne "0" ]; then color_wrap=${ANSI_RED}; fi  # Red color for errors
             ici_time_end "$color_wrap" "$exit_code"
+        elif [ -n "${ICI_RESULT_NAME:-}" ]; then
+            ici_report_result "$ICI_RESULT_NAME" "${exit_code}"
         fi
 
         exec {__ici_log_fd}>&-

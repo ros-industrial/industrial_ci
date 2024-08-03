@@ -94,6 +94,9 @@ function _set_ros_defaults {
     "iron")
         _ros2_defaults "jammy"
         ;;
+    "jazzy")
+        _ros2_defaults "noble"
+        ;;
     "rolling")
         _ros2_defaults "noble"
         if [ "$OS_CODE_NAME" == "jammy" ]; then
