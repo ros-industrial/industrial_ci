@@ -21,8 +21,9 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function setup_ros_buildfarm() {
-    ici_install_pkgs_for_command pip3 python3-pip python3-setuptools python3-wheel
-    ici_cmd ici_quiet ici_asroot pip3 install ros_buildfarm
+    ici_apt_install python3-pip python3-setuptools python3-wheel python3-venv python3-vcstool
+    ici_cmd python3 -mvenv /tmp/ros_buildfarm --system-site-packages
+    ici_cmd ici_quiet /tmp/ros_buildfarm/bin/pip3 install git+https://github.com/ros-infrastructure/ros_buildfarm.git
 }
 
 function setup_ros_prerelease() {
@@ -41,7 +42,7 @@ function setup_ros_prerelease() {
     ici_install_pkgs_for_command docker docker.io
     ici_install_pkgs_for_command sudo sudo
     ici_install_pkgs_for_command lsb_release lsb-release
-    ici_exec_for_command generate_prerelease_script.py setup_ros_buildfarm
+    setup_ros_buildfarm
 }
 
 function prepare_prerelease_workspaces() {
@@ -111,7 +112,7 @@ function run_ros_prerelease() {
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
 
     ici_step "prepare_prerelease_workspaces" ici_cmd prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci generate_prerelease_script.py "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+    ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci /tmp/ros_buildfarm/bin/python -m ros_buildfarm.scripts.prerelease.generate_prerelease_script "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
 
     local setup_sh=
     if [ -f "${UNDERLAY:?}/setup.sh" ]; then
