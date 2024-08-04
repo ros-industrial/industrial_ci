@@ -62,6 +62,19 @@ jobs:
         env:
           ROS_DISTRO: ${{ matrix.distro }}
 
+  prerelease:
+    strategy:
+      fail-fast: false
+      matrix:
+        ROS_DISTRO: [noetic, humble, jazzy]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: ros industrial-ci
+      uses: './'
+      env:
+        PRERELEASE: true
+        ROS_DISTRO: ${{ matrix.ROS_DISTRO }}
   ici:
     env:
       TRACE: true
@@ -94,7 +107,6 @@ jobs:
           - {DOCKER_IMAGE: "ros:noetic", AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 2}
           - {DOCKER_IMAGE: "ros:noetic", ROS_REPO: testing, AFTER_INIT: "grep -r ros-testing /etc/apt && ici_exit 1 || ici_exit 2", EXPECT_EXIT_CODE: 1}
           - {DOCKER_IMAGE: 'ros:noetic', ROS_REPO: ros, NOT_TEST_BUILD: true, DEBUG_BASH: true, VERBOSE_OUTPUT: false, DOCKER_COMMIT: img_temp, POST_PROCESS: 'eval docker image inspect $$DOCKER_COMMIT --format="$$DOCKER_COMMIT:\ \"{{.Size}}\" bytes"'}
-          - {ROS_DISTRO: noetic, PRERELEASE: true}
           - {ROS_DISTRO: noetic, AFTER_SCRIPT: 'rosenv rosrun industrial_ci run_travis', ADDITIONAL_DEBS: "ros-noetic-rosbash"}
           - {ROS_DISTRO: foxy, AFTER_SCRIPT: 'rosenv ros2 run industrial_ci run_travis', ADDITIONAL_DEBS: "ros-foxy-ros2run"}
 
@@ -122,7 +134,6 @@ jobs:
           - {ROS_DISTRO: melodic, TARGET_WORKSPACE: 'industrial_ci/mockups/test_clang_tidy', CLANG_TIDY: pedantic, CLANG_TIDY_ARGS: "-checks=-*,modernize-use-nullptr", EXPECT_EXIT_CODE: 1}
 
           - {ROS_DISTRO: noetic, PYLINT_ARGS: "--errors-only", PYLINT_EXCLUDE: "sample_talker.py", PYLINT_CHECK: "true"}
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
