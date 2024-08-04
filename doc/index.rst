@@ -39,7 +39,8 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Foxy <https://index.ros.org/doc/ros2/Releases/Release-Foxy-Fitzroy/>`__ *(EOL)*
 * `Galactic <https://docs.ros.org/en/foxy/Releases/Release-Galactic-Geochelone.html>`__ *(EOL)*
 * `Humble <https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html>`__
-* `Iron <https://docs.ros.org/en/rolling/Releases/Release-Iron-Irwini.html>`__
+* `Iron <https://docs.ros.org/en/iron/Releases/Release-Iron-Irwini.html>`__
+* `Jazzy <https://docs.ros.org/en/jazzy/Releases/Release-Jazzy-Jalisco.html>`__
 * `Rolling <https://index.ros.org/doc/ros2/Releases/Release-Rolling-Ridley/>`__
 
 Supported CIs
