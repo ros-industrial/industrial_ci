@@ -85,10 +85,6 @@ FAQ
 
   A- The ``industrial_ci`` still provides valuable checks; it ensures if your package builds without issues. Also installation rules if you define. Just as a headsup that making test cases are highly recommended as your ear may hurt.
 
-- Q- My package uses a custom Point Cloud Library (PCL) version or the `industrial_calibration <https://github.com/ros-industrial/industrial_calibration>`__ package, how do I make build work?
-
-  A- You can check `advanced_industrial_ci <https://github.com/InstitutMaupertuis/advanced_industrial_ci>`__ which provides scripts and binaries for PCL 1.8.0 and the Ceres solver. An integration example can be found `here <https://github.com/InstitutMaupertuis/ensenso_extrinsic_calibration/blob/indigo-devel/.travis.yml>`__.
-
 - Q- How does the target package get installed?
 
   A- *Travis CI* does this. It pulls in your package to a running instance of an operating system of your choice, and place your package under ``/home/travis``.
