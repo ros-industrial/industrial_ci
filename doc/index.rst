@@ -203,8 +203,8 @@ Note that some of these currently tied only to a single option, but we still lea
 * **IMMEDIATE_TEST_OUTPUT** (default: not set): If true, test output is printed immediately during the tests
 * **NOT_TEST_BUILD** (default: not set): If true, tests in ``build`` space won't be run.
 * **NOT_TEST_DOWNSTREAM** (default: not set): If true, tests in the downstream workspace won't be run.
-* **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
-* **OS_NAME** (default: derived from OS_CODE_NAME): Possible options: {``ubuntu``, ``debian``}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#optional-type-of-os-and-distribution>`__.
+* **OS_CODE_NAME** (default: derived from ROS_DISTRO): See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#type-of-os-and-distribution>`__.
+* **OS_NAME** (default: derived from OS_CODE_NAME): Possible options: {``ubuntu``, ``debian``}. See `this section for the detail <https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#type-of-os-and-distribution>`__.
 * **PARALLEL_BUILDS** (default: 0): Sets the number of parallel build jobs among all packages. ``0`` or ``true`` unsets the limit.
 * **PARALLEL_TESTS** (default: 1): Sets the number of parallel test jobs. ``0`` or ``true`` unsets the limit.
 * **PREFIX** (default: not set): Prefix string or directory for the workspaces created during the build job. The upstream, target, and downstream workspaces will be created at ``$BASEDIR/${PREFIX}<upstream_ws|target_ws|downstream_ws>``.
@@ -649,11 +649,6 @@ E.g.:
 
 * ``OS_CODE_NAME=jessie``
 * ``OS_CODE_NAME=stretch``
-
-All combinations available of OS and distros
-++++++++++++++++++++++++++++++++++++++++++++++
-
-Possible combination of ``OS_NAME`` and ``OS_CODE_NAME`` depend on available Docker images. See `ros-industrial/docker/ci <https://github.com/ros-industrial/docker/tree/master/ci>`__.
 
 Run industrial_ci on local host
 ---------------------------------------
