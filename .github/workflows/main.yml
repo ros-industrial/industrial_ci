@@ -41,6 +41,7 @@ jobs:
         - galactic
         - humble
         - iron
+        - jazzy
         include:
           - distro: rolling
             ubuntu: jammy
