@@ -16,7 +16,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: docker://koalaman/shellcheck-alpine
         with:
           args: /bin/sh -c "shellcheck -x *.sh industrial_ci/scripts/*_ci industrial_ci/src/*.sh industrial_ci/src/*/*.sh"
@@ -49,7 +49,7 @@ jobs:
             ubuntu:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ardent does not support conditions in package.xml
         run: |
           echo "BEFORE_BUILD_TARGET_WORKSPACE=sed -i /condition/d /root/target_ws/src/industrial_ci/industrial_ci/package.xml" >> "$GITHUB_ENV"
@@ -69,7 +69,7 @@ jobs:
         ROS_DISTRO: [noetic, humble, jazzy]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: ros industrial-ci
       uses: './'
       env:
@@ -136,7 +136,7 @@ jobs:
           - {ROS_DISTRO: noetic, PYLINT_ARGS: "--errors-only", PYLINT_EXCLUDE: "sample_talker.py", PYLINT_CHECK: "true"}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: './'
         with:
           config: ${{toJSON(matrix)}}
@@ -150,7 +150,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: './'
         id: ici
         with:
@@ -181,13 +181,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout external repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{matrix.repo}}
           ref: ${{matrix.ref}}
           fetch-depth: ${{matrix.depth}}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: .industrial_ci
 
@@ -208,14 +208,14 @@ jobs:
           - {ROS_DISTRO: humble, PRERELEASE: true, UBUNTU: 22.04, TARGET_WORKSPACE: ". github:ros-controls/control_msgs#galactic-devel"}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: './'
         env: ${{matrix.env}}
 
   builders:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           for BUILDER in $(ls industrial_ci/src/builders/*.sh); do
             echo "##[group]BUILDER=$BUILDER"
@@ -226,7 +226,7 @@ jobs:
   test_arm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v1
       - uses: './'
         env:
@@ -237,7 +237,7 @@ jobs:
   run_travis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           sudo apt install -y python3-yaml
           industrial_ci/scripts/run_travis
