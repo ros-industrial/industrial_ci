@@ -27,7 +27,7 @@ function setup_ros_buildfarm() {
 }
 
 function setup_ros_prerelease() {
-    ici_asroot useradd -m -d "$WORKSPACE/home" ci
+    ici_asroot useradd -u 1010 --non-unique -m -d "$WORKSPACE/home" ci
 
     if ! [ -d "$WORKSPACE/home/.ccache" ]; then
       ici_asroot mkdir -p "$WORKSPACE/home/.ccache"
