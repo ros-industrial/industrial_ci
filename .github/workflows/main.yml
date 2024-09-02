@@ -166,7 +166,7 @@ jobs:
       matrix:
         include:
           - repo: 'ros/actionlib'
-            ref: '38ce66e2ae2ec9c19cf12ab22d57a8134a9285be'
+            ref: '3558eb3c6c3e22d5dc93effa7c8adda8a4b284fa'
             depth: 0  # All history will be cloned
             env: {ROS_DISTRO: kinetic, ROS_REPO: ros, ABICHECK_URL: url, ABICHECK_MERGE: true} # actual URL will not be used in the case
 
