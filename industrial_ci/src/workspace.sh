@@ -373,7 +373,13 @@ function ici_install_dependencies {
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
 
-    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd ici_quiet ici_filter "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install "${rosdep_opts[@]}"
+    # rosdep needs to be able to install to the system packages directory for Python versions > 3.10
+    local p=$(python3 -c 'import sys; print(sys.version_info[0] > 2 and sys.version_info[1] > 10)'>&1) 
+    if [ $p == "True" ]; then
+      export PIP_BREAK_SYSTEM_PACKAGES=1
+    fi
+
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd ici_quiet ici_filter "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}"
 }
 
 function ici_build_workspace {
