@@ -372,8 +372,8 @@ function ici_install_dependencies {
     if [ -n "$skip_keys" ]; then
       rosdep_opts+=(--skip-keys "$skip_keys")
     fi
-
-    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd ici_quiet ici_filter "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install "${rosdep_opts[@]}"
+    export PIP_BREAK_SYSTEM_PACKAGES=1
+    ROS_PACKAGE_PATH="$cmake_prefix_path${ROS_PACKAGE_PATH:-}" ici_cmd ici_quiet ici_filter "(executing command)|(Setting up)" ici_exec_in_workspace "$extend" "." rosdep install "${rosdep_opts[@]}"
 }
 
 function ici_build_workspace {
