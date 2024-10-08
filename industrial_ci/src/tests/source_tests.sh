@@ -23,7 +23,11 @@
 # (As of version 0.4.4 most of them are defined in env.sh).
 
 function install_catkin_lint {
-    ici_install_pypi_pkgs_for_command catkin_lint "catkin-lint"
+    local catkin_lint_pkg="catkin-lint"
+    if [ "$ROS_PYTHON_VERSION" == "2" ]; then
+        catkin_lint_pkg="catkin-lint<1.0.0"
+    fi
+    ici_install_pypi_pkgs_for_command catkin_lint "$catkin_lint_pkg"
 }
 
 function run_clang_tidy {
