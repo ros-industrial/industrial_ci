@@ -25,7 +25,7 @@
 function install_catkin_lint {
     local catkin_lint_pkg="catkin-lint"
     if [ "$ROS_PYTHON_VERSION" == "2" ]; then
-        catkin_lint_pkg="catkin-lint<1.0.0"
+        catkin_lint_pkg="catkin-lint<1.6.23"
     fi
     ici_install_pypi_pkgs_for_command catkin_lint "$catkin_lint_pkg"
 }
