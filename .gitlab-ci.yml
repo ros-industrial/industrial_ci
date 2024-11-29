@@ -17,7 +17,7 @@ cache:
 
 # enable docker-in-docker
 services:
-  - docker:20.10.16-dind
+  - docker:20.10.24-dind
 
 before_script:
   - apk add --update bash coreutils tar grep # install industrial_ci dependencies
