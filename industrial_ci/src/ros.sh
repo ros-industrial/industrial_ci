@@ -97,6 +97,7 @@ function _set_ros_defaults {
         ;;
     "iron")
         _ros2_defaults "jammy"
+        _ros_is_eol "iron/2024-12-04"
         ;;
     "jazzy")
         _ros2_defaults "noble"
