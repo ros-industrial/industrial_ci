@@ -63,6 +63,10 @@ function _set_ros_defaults {
     "noetic")
         _ros1_defaults "focal"
         export ROS_PYTHON_VERSION=3
+        if [ "$OS_NAME" = "debian" ]; then
+            _ros_is_eol "noetic/2023-03-02"
+            export ROS_VERSION_FINAL_DEBIAN=true
+        fi
         ;;
     "ardent")
         _ros2_defaults "xenial"
@@ -123,7 +127,11 @@ function _set_ros_defaults {
 }
 
 function _use_snapshot() {
-    export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO?ROS_DISTRO needs to be set}/$1/ubuntu"
+    local osname="ubuntu"
+    if [ "$1" = "$ROS_VERSION_FINAL" ] && [ "${ROS_VERSION_FINAL_DEBIAN:-false}" = true ]; then
+        osname="debian"
+    fi
+    export ROS_REPOSITORY_PATH="http://snapshots.ros.org/${ROS_DISTRO?ROS_DISTRO needs to be set}/$1/$osname"
     export ROS_REPOSITORY_KEY="$ICI_SRC_PATH/keys/snapshots.asc"
 }
 
