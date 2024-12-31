@@ -146,7 +146,7 @@ function ici_run_cmd_in_docker() {
   fi
 
   local cid
-  cid=$(ici_cmd docker create --init "${opts[@]}" "$@")
+  cid=$(ici_cmd docker create "${opts[@]}" "$@")
 
   # detect user inside container
   local image
