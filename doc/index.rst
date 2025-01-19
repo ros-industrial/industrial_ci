@@ -413,6 +413,29 @@ References:
 - https://docs.gitlab.com/ce/ssh/README.html
 - https://docs.gitlab.com/ee/ci/ssh_keys/README.html
 
+(Github CI) Access to private repositories
+------------------------------------------
+
+Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories.
+
+#. Add the private SSH key to your target repository, under Settings-Secrets and Variables-Actions-Secrets.
+#. Add the public SSH key to the dependency repository, under Settings-Deploy Keys.
+#. Modify the industrial_ci yaml config, adding an action to clone the dependency as follows. The following example clones two dependencies:
+
+..  code-block:: yaml
+
+    - uses: actions/checkout@v4 # dependency1
+      with:
+        ssh-key: ${{ secrets.DEPENDENCY1 }}
+        repository: your_org_name/dep1_repo
+        path: dep1_repo
+    - uses: actions/checkout@v4 # dependency2
+      with:
+        ssh-key: ${{ secrets.DEPENDENCY2 }}
+        repository: your_org_name/dep2_repo
+        path: dep2_repo
+
+
 (Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
 
