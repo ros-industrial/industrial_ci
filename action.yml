@@ -5,6 +5,12 @@ inputs:
   config:
     description: 'Configuration in JSON format, e.g. from matrix'
     required: false
+  ssh-key:
+    description: 'Entire content of your private SSH key file'
+    required: false
+  ssh-known-hosts:
+    description: 'Addtional entries for the host key database'
+    required: false
 runs:
   using: 'node20'
   main: '.github/action.js'
