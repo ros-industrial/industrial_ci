@@ -419,7 +419,7 @@ References:
 Github
 ++++++
 
-Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories.
+Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories. Warning: this clones selected repositories into the current repositories (which might lead to nested packages).
 
 #. Add the private SSH key to your target repository, under Settings-Secrets and Variables-Actions-Secrets.
 #. Add the public SSH key to the dependency repository, under Settings-Deploy Keys.
