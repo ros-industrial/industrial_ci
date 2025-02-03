@@ -419,7 +419,7 @@ References:
 Github
 ++++++
 
-Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories. Warning: this clones selected repositories into the current repositories (which might lead to nested packages).
+Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories.
 
 #. Add the private SSH key to your target repository, under Settings-Secrets and Variables-Actions-Secrets.
 #. Add the public SSH key to the dependency repository, under Settings-Deploy Keys.
@@ -429,16 +429,19 @@ The following example clones two dependencies. It uses private SSH keys which ha
 
 ..  code-block:: yaml
 
+    - uses: actions/checkout@v4 # clone target repository
+      with:
+        path: target_repository_name # Put it in a unique folder
     - uses: actions/checkout@v4 # dependency1
       with:
         ssh-key: ${{ secrets.DEPENDENCY1 }}
         repository: your_org_name/dep1_repo
-        path: dep1_repo
+        path: dep1_repo # Put it in a unique folder
     - uses: actions/checkout@v4 # dependency2
       with:
         ssh-key: ${{ secrets.DEPENDENCY2 }}
         repository: your_org_name/dep2_repo
-        path: dep2_repo
+        path: dep2_repo # Put it in a unique folder
 
 
 (Recommended) Subscribe to the change in this repo (industrial_ci)
