@@ -227,7 +227,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-qemu-action@v3
       - uses: './'
         env:
           DOCKER_IMAGE: 'arm32v7/ros:melodic-ros-core'
