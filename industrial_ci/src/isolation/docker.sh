@@ -79,8 +79,15 @@ function ici_isolate() {
   fi
 
   if [ -z "${ROS_DISTRO:-}" ]; then
-      ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || ici_error "ROS_DISTRO is not set"
-  elif [ "${ROS_DISTRO}" = "false" ]; then
+      # Attempt to extract ROS_DISTRO from the docker image
+      ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*")
+      if [ -z "${ROS_DISTRO:-}" ]; then
+          ici_log "Could not extract environment variable 'ROS_DISTRO' from the docker image '${DOCKER_IMAGE}'; proceeding without 'ROS_DISTRO'"
+          unset ROS_DISTRO
+      else
+        ici_log "Extracted 'ROS_DISTRO=${ROS_DISTRO}' from docker image '${DOCKER_IMAGE}'"
+      fi
+  elif [ "${ROS_DISTRO:-}" = "false" ]; then
       unset ROS_DISTRO
   fi
 

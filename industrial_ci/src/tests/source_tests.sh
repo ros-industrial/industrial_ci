@@ -176,7 +176,7 @@ function run_source_tests {
 
     ici_step "setup_rosdep" ici_setup_rosdep
 
-    extend=${UNDERLAY:?}
+    extend=${UNDERLAY:-}
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
