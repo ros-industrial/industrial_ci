@@ -18,6 +18,7 @@
 export DOCKER_COMMIT=${DOCKER_COMMIT:-}
 export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
 export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .gitconfig .ssh .subversion}
+export DOCKER_ENTRYPOINT=${DOCKER_ENTRYPOINT:-''}
 export DOCKER_PULL=${DOCKER_PULL:-true}
 export _BUNDLE_ICI=${_BUNDLE_ICI:-false}
 
@@ -104,7 +105,7 @@ function ici_isolate() {
 
   ici_run_cmd_in_docker "${_docker_run_opts[@]}" "${run_opts[@]}" \
                         -t \
-                        --entrypoint '' \
+                        --entrypoint "$DOCKER_ENTRYPOINT" \
                         -w "$TARGET_REPO_PATH" \
                         "$DOCKER_IMAGE" \
                         /bin/bash "$ICI_SRC_PATH/run.sh" "$file" "$@"
