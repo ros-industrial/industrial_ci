@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export DOCKER_ADDITIONAL_ENVS=${DOCKER_ADDITIONAL_ENVS:-''}
 export DOCKER_COMMIT=${DOCKER_COMMIT:-}
 export DOCKER_COMMIT_MSG=${DOCKER_COMMIT_MSG:-}
 export DOCKER_CREDENTIALS=${DOCKER_CREDENTIALS-.docker .gitconfig .ssh .subversion}
@@ -118,6 +119,7 @@ function ici_isolate() {
 # * stops on interrupt signal
 #
 # Globals:
+#   DOCKER_ADDITIONAL_ENVS (read-only)
 #   ICI_SRC_PATH (read-only)
 #   SSH_AUTH_SOCK (read-only)
 # Arguments:
@@ -140,6 +142,13 @@ function ici_run_cmd_in_docker() {
   done
 
   local opts=(--env-file "${ICI_SRC_PATH}/isolation/docker.env")
+  if [ -n "$DOCKER_ADDITIONAL_ENVS" ]; then
+    ici_parse_env_array add_envs DOCKER_ADDITIONAL_ENVS
+    for env in "${add_envs[@]}"; do
+      opts+=(-e "$env")
+    done
+  fi
+
   if [ -z "$DOCKER_COMMIT" ]; then
     opts+=(--rm)
   else
