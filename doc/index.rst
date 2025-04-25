@@ -41,6 +41,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Humble <https://docs.ros.org/en/humble/Releases/Release-Humble-Hawksbill.html>`__
 * `Iron <https://docs.ros.org/en/iron/Releases/Release-Iron-Irwini.html>`__ *(EOL)*
 * `Jazzy <https://docs.ros.org/en/jazzy/Releases/Release-Jazzy-Jalisco.html>`__
+* `Kilted <https://docs.ros.org/en/kilted/Releases/Release-Kilted-Kaiju.html>`__
 * `Rolling <https://index.ros.org/doc/ros2/Releases/Release-Rolling-Ridley/>`__
 
 Supported CIs
