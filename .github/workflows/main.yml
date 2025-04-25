@@ -42,6 +42,7 @@ jobs:
         - humble
         - iron
         - jazzy
+        - kilted
         include:
           - distro: rolling
             ubuntu: jammy
@@ -66,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ROS_DISTRO: [noetic, humble, jazzy]
+        ROS_DISTRO: [noetic, humble, jazzy, kilted]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -207,6 +208,9 @@ jobs:
           - {ROS_DISTRO: jazzy, UBUNTU: 24.04}
           - {ROS_DISTRO: jazzy, UBUNTU: 24.04, TEST: debians}
           - {ROS_DISTRO: jazzy, PRERELEASE: true, UBUNTU: 24.04, TARGET_WORKSPACE: ". github:ros-controls/control_msgs#galactic-devel"}
+          - {ROS_DISTRO: kilted, UBUNTU: 24.04}
+          - {ROS_DISTRO: kilted, UBUNTU: 24.04, TEST: debians}
+          - {ROS_DISTRO: kilted, PRERELEASE: true, UBUNTU: 24.04, TARGET_WORKSPACE: ". github:ros-controls/control_msgs#master"}
     runs-on: ubuntu-${{matrix.env.UBUNTU}}
     steps:
       - uses: actions/checkout@v4
