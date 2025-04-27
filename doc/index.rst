@@ -364,8 +364,11 @@ To do so, simply set ``DOCKER_COMMIT`` the name of the image of your choice. The
   script:
       - docker push $DOCKER_COMMIT
 
-(Gitlab CI) Access to private repositories
-------------------------------------------
+Access to private repositories
+------------------------------
+
+Gitlab
+++++++
 
 If your Gitlab CI jobs require access to private repos, additional settings are needed both on:
 
@@ -413,6 +416,34 @@ References:
 
 - https://docs.gitlab.com/ce/ssh/README.html
 - https://docs.gitlab.com/ee/ci/ssh_keys/README.html
+
+Github
+++++++
+
+Follow a process very similar to the Gitlab one, described above, to add public and private SSH keys to your repositories.
+
+#. Add the private SSH key to your target repository, under Settings-Secrets and Variables-Actions-Secrets.
+#. Add the public SSH key to the dependency repository, under Settings-Deploy Keys.
+#. Modify the industrial_ci yaml config, adding an action to clone the dependency as follows.
+
+The following example clones two dependencies. It uses private SSH keys which have been saved as Github "secrets" named DEPENDENCY1 and DEPENDENCY2. The dep1_repo and dep2_repo should have corresponding "Deploy keys", which are the public ssh key.
+
+..  code-block:: yaml
+
+    - uses: actions/checkout@v4 # clone target repository
+      with:
+        path: target_repository_name # Put it in a unique folder
+    - uses: actions/checkout@v4 # dependency1
+      with:
+        ssh-key: ${{ secrets.DEPENDENCY1 }}
+        repository: your_org_name/dep1_repo
+        path: dep1_repo # Put it in a unique folder
+    - uses: actions/checkout@v4 # dependency2
+      with:
+        ssh-key: ${{ secrets.DEPENDENCY2 }}
+        repository: your_org_name/dep2_repo
+        path: dep2_repo # Put it in a unique folder
+
 
 (Recommended) Subscribe to the change in this repo (industrial_ci)
 ---------------------------------------------------------------------------------
