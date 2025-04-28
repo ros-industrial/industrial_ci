@@ -177,10 +177,12 @@ function run_source_tests {
     ici_step "setup_rosdep" ici_setup_rosdep
 
     extend=${UNDERLAY:?}
+    export ROSDEP_SOURCE_FOLDERS=("${UNDERLAY:?}")  # source folders to be ignored for rosdep install
 
     if [ -n "$UPSTREAM_WORKSPACE" ]; then
         ici_with_ws "$upstream_ws" ici_build_workspace "upstream" "$extend" "$upstream_ws"
         extend="$(ici_extend_space "$upstream_ws")"
+        ROSDEP_SOURCE_FOLDERS+=("$extend")
     fi
 
     if [ "${CLANG_TIDY:-false}" != false ]; then
@@ -210,6 +212,7 @@ function run_source_tests {
     fi
 
     extend="$(ici_extend_space "$target_ws")"
+    ROSDEP_SOURCE_FOLDERS+=("$extend")
     if [ -n "$DOWNSTREAM_WORKSPACE" ]; then
         ici_with_ws "$downstream_ws" ici_build_workspace "downstream" "$extend" "$downstream_ws"
         #extend="$(ici_extend_space "$downstream_ws")"
