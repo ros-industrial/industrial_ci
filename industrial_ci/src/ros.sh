@@ -66,6 +66,8 @@ function _set_ros_defaults {
         if [ "$OS_NAME" = "debian" ]; then
             _ros_is_eol "noetic/2023-03-02"
             export ROS_VERSION_FINAL_DEBIAN=true
+        else
+            _ros_is_eol "noetic/2025-05-29"
         fi
         ;;
     "ardent")
