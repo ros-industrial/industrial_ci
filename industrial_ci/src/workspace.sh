@@ -139,7 +139,7 @@ function ici_init_apt {
         ici_set_ros_repository_path "$current_repository_path"
     fi
 
-    if [ -n "${ROS_REPOSITORY_PATH:-}" ] && ! grep -qFs "$ROS_REPOSITORY_PATH" /etc/apt/sources.list.d/*.list; then
+    if [ -n "${ROS_REPOSITORY_PATH:-}" ] && ! grep -qFs "$ROS_REPOSITORY_PATH" /etc/apt/sources.list.d/{*.list,*.sources}; then
         if [ -n "$current_repository_path" ] && [ "$current_repository_path" != "$ROS_REPOSITORY_PATH" ]; then
             ici_warn "Setting up repository '$ROS_REPOSITORY_PATH' next to '$current_repository_path', please double check ROS_REPO='$ROS_REPO'"
         fi
