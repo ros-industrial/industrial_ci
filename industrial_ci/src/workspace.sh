@@ -83,7 +83,7 @@ function ici_gpg_import {
 }
 
 function ici_setup_gpg_key {
-    case "$ROS_REPOSITORY_KEY}" in
+    case "$ROS_REPOSITORY_KEY" in
     *://*)
         ici_process_url "${ROS_REPOSITORY_KEY}" ici_gpg_import "$_ROS_KEYRING"
         ;;
