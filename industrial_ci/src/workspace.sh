@@ -132,6 +132,13 @@ function ici_init_apt {
         fi
     fi
 
+    if [ -f /usr/share/keyrings/ros2-snapshots-archive-keyring.gpg ]; then
+        if 2>/dev/null ici_gpg /usr/share/keyrings/ros2-snapshots-archive-keyring.gpg -k | grep -q expired; then
+            ici_warn "Found legacy ROS2 snapshot keyring, replacing it"
+            ici_gpg_import /usr/share/keyrings/ros2-snapshots-archive-keyring.gpg < "$ROS_REPOSITORY_KEY"
+        fi
+    fi
+
     ici_cmd ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential gnupg2 dirmngr)
