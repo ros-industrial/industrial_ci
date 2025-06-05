@@ -171,11 +171,11 @@ jobs:
 
           - repo: 'ros-industrial/ros_canopen'
             ref: '0.7.5'
-            env: {ROS_DISTRO: kinetic, ROS_REPO: ros, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.1', ABICHECK_MERGE: false, EXPECT_EXIT_CODE: 1}
+            env: {ROS_DISTRO: kinetic, ROS_REPO: ros, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.5', ABICHECK_MERGE: false, EXPECT_EXIT_CODE: 1}
 
           - repo: 'ros-industrial/ros_canopen'
             ref: '0.7.6'
-            env: {ROS_DISTRO: kinetic, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.5', ABICHECK_MERGE: false}
+            env: {ROS_DISTRO: kinetic, ABICHECK_URL: 'github:ros-industrial/ros_canopen#0.7.6', ABICHECK_MERGE: false}
 
     runs-on: ubuntu-latest
     steps:
