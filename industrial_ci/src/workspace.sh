@@ -120,6 +120,11 @@ function ici_init_apt {
         ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
     fi
 
+    if 2>/dev/null apt-key adv -k 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA | grep -q expired; then
+        ici_warn "Expired ROS snapshots key found, installing new one"
+        ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA
+    fi
+
     ici_cmd ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential gnupg2 dirmngr)
