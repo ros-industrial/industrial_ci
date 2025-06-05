@@ -125,6 +125,13 @@ function ici_init_apt {
         ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 4B63CF8FDE49746E98FA01DDAD19BAB3CBF125EA
     fi
 
+    if [ -f /usr/share/keyrings/ros1-latest-archive-keyring.gpg ]; then
+        if 2>/dev/null ici_gpg /usr/share/keyrings/ros1-latest-archive-keyring.gpg -k | grep -q expired; then
+            ici_warn "Found legacy ROS1 keyring, replacing it"
+            ici_gpg_import /usr/share/keyrings/ros1-latest-archive-keyring.gpg < "$ROS_REPOSITORY_KEY"
+        fi
+    fi
+
     ici_cmd ici_asroot apt-get update -qq
 
     local debs_default=(apt-utils build-essential gnupg2 dirmngr)
