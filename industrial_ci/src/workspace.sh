@@ -202,6 +202,7 @@ function ici_vcs_import {
 function ici_import_repository {
     local sourcespace=$1; shift
     local url=$1; shift
+    local filter=${1-}
 
     ici_install_pkgs_for_command vcs python3-vcstool
 
@@ -221,6 +222,7 @@ function ici_import_repository {
     else
         ici_vcs_import "$sourcespace" <<< "{repositories: {'${parts[0]}': {type: '${parts[1]}', url: '${parts[2]}', version: '${parts[3]}'}}}"
     fi
+    ici_filter_directory "$sourcespace/${parts[0]}" "$filter"
 }
 
 function ici_import_file {
@@ -263,6 +265,7 @@ function ici_import_url {
 function  ici_import_directory {
     local sourcespace=$1; shift
     local dir=$1; shift
+    local filter=${1-}
     local target
     target=${sourcespace:?}/$(basename "$dir")
 
@@ -275,6 +278,58 @@ function  ici_import_directory {
         fi
     done
     ici_guard tar c "${args[@]}" -C "$dir" . | ici_guard tar x -C "$target"
+    ici_filter_directory "$target" "$filter"
+}
+
+function ici_apply_directory_filter {
+    local sourcespace=$1; shift
+    local basepath=$1; shift
+    local source=$1; shift
+    local filter=${1-}
+    local path="$basepath/$source"
+    case "$source" in
+        "")
+            ici_error "source is empty string"
+            ;;
+        -*)
+            ici_log "Removing '${source:1}'"
+            ici_guard rm -r "${sourcespace:?}/${source:1}"
+            ;;
+        /*)
+            path=$source
+            ;&
+        *)
+            if [ -d "$path" ]; then
+                ici_log "Copying '$source'"
+                ici_import_directory "$sourcespace" "$path" "$filter"
+            elif [ -f "$path" ]; then
+                ici_import_file "$sourcespace" "$path"
+            else
+                ici_error "cannot read source from '$source'"
+            fi
+            ;;
+        esac
+}
+
+function ici_filter_directory {
+    local sourcespace=$1; shift
+    local filter=$1; shift
+    if [ -z "$filter" ]; then
+        return
+    fi
+    if [[ $filter == -* ]]; then
+        for source in ${filter//,/ }; do
+            ici_apply_directory_filter "$sourcespace" "$sourcespace" "$source"
+        done
+        return
+    fi
+    local basepath="${sourcespace}_orig"
+    ici_guard mv "$sourcespace" "$basepath"
+    ici_guard mkdir "$sourcespace"
+    for source in ${filter//,/ }; do
+        ici_apply_directory_filter "$sourcespace" "$basepath" "$source"
+    done
+   ici_guard rm -rf "$basepath"
 }
 
 function ici_prepare_sourcespace {
@@ -284,52 +339,28 @@ function ici_prepare_sourcespace {
     ici_guard mkdir -p "$sourcespace"
 
     for source in "$@"; do
+        local filter=""
+        if [[ $source =~ ([^,]+),(.+) ]]; then
+            source="${BASH_REMATCH[1]}"
+            filter="${BASH_REMATCH[2]}"
+        fi
         case "$source" in
         git* | bitbucket:* | bb:* | gh:* | gl:*)
-            ici_import_repository "$sourcespace" "$source"
+            ici_import_repository "$sourcespace" "$source" "$filter"
             ;;
         http://* | https://*) # When UPSTREAM_WORKSPACE is an http url, use it directly
             ici_import_url "$sourcespace" "$source"
             ;;
-        -.)
-            local file; file=$(basename "$basepath")
-            ici_log "Removing '${sourcespace:?}/$file'"
-            ici_guard rm -r "${sourcespace:?}/$file"
-            ;;
-        -*)
-            local file="${source:1}"
-            if [ ! -e "${sourcespace:?}/$file" ]; then
-              file="$(basename "$basepath")/$file"
-            fi
-            ici_log "Removing '${sourcespace:?}/$file'"
-            ici_guard rm -r "${sourcespace:?}/$file"
-            ;;
         .)
             ici_log "Copying '$basepath'"
-            ici_import_directory "$sourcespace" "$basepath"
+            ici_import_directory "$sourcespace" "$basepath" "$filter"
             ;;
-        /*)
-            if [ -d "$source" ]; then
-                ici_log "Copying '$source'"
-                ici_import_directory  "$sourcespace" "$source"
-            elif [ -f "$source" ]; then
-                ici_import_file "$sourcespace" "$source"
-            else
-                ici_error "'$source' cannot be found"
-            fi
-            ;;
-        "")
-            ici_error "source is empty string"
+        -./*)
+            ici_log "Removing '${source:1}'"
+            ici_guard rm -r "${sourcespace:?}/$(basename "$basepath")${source:1}"
             ;;
         *)
-            if [ -d "$basepath/$source" ]; then
-                ici_log "Copying '$source'"
-                ici_import_directory "$sourcespace" "$basepath/$source"
-            elif [ -f "$basepath/$source" ]; then
-                ici_import_file "$sourcespace" "$basepath/$source"
-            else
-                ici_error "cannot read source from '$source'"
-            fi
+            ici_apply_directory_filter "$sourcespace" "$basepath" "$source" "$filter"
             ;;
         esac
     done
