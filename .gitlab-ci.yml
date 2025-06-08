@@ -72,7 +72,9 @@ docker_no_pull:
 test_arm:
   script:
     - docker run --rm --privileged multiarch/qemu-user-static --reset --credential yes --persistent yes
+    - export DOCKER_DEFAULT_PLATFORM=linux/arm/v7
     - .industrial_ci/gitlab.sh DOCKER_IMAGE='arm32v7/ros:melodic-ros-core' BEFORE_INIT='[[ $(uname -p) == armv7l ]] && exit 42' EXPECT_EXIT_CODE=42
+
 
 test_junit_docker:
   script: .industrial_ci/gitlab.sh TARGET_WORKSPACE=". gh:ros/filters.git#HEAD"
