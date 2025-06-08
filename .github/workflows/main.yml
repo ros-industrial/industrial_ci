@@ -236,6 +236,7 @@ jobs:
           DOCKER_IMAGE: 'arm32v7/ros:melodic-ros-core'
           BEFORE_INIT: '[[ $(uname -p) == armv7l ]] && exit 42'
           EXPECT_EXIT_CODE: 42
+          DOCKER_DEFAULT_PLATFORM: 'linux/arm/v7'
 
   run_travis:
     runs-on: ubuntu-latest
