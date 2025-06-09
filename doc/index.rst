@@ -771,6 +771,13 @@ Note for rerun_ci limitations
 
 If you are using this feature to have a cached way to run ci locally you probably want your dependencies to be updated just as they are when run on a remote ci service.  To achieve this you can cause the target workspace to be pulled by adding this argument: ``AFTER_SETUP_TARGET_WORKSPACE='vcs pull ~/target_ws/src/'``.
 
+Run locally with custom root certificate
+++++++++++++++++++++++++++++++++++++++++
+If a custom root ssl certificate needs to be used this can be done by passing the local certificate to the container using
+::
+
+  $ rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main DOCKER_RUN_OPTS="-v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro"
+
 For maintainers of industrial_ci repository
 ================================================
 
