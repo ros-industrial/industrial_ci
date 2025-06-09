@@ -341,7 +341,7 @@ function ici_setup_rosdep {
 
     if [ "$ROS_DISTRO" = "indigo" ] || [ "$ROS_DISTRO" = "jade" ]; then
         ici_apt_install "ros-$ROS_DISTRO-roslib"
-    else
+    elif [ -n "${ROS_DISTRO:-}" ]; then
         ici_apt_install "ros-$ROS_DISTRO-ros-environment"
     fi
 
@@ -349,7 +349,7 @@ function ici_setup_rosdep {
         ici_cmd ici_quiet ici_asroot rosdep init
     fi
     update_opts=()
-    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
+    if [ -z "${ROSDISTRO_INDEX_URL:-}" ] && [ -n "$ROS_DISTRO" ]; then
         update_opts+=(--rosdistro "$ROS_DISTRO")
     fi
 
@@ -431,7 +431,7 @@ function ici_source_setup {
     local extend=$1; shift
     if  [ ! -f "$extend/setup.bash" ]; then
         if [ "$extend" != "/opt/ros/$ROS_DISTRO" ]; then
-            ici_error "'$extend' is not a devel/install space"
+            ici_log "'$extend' is not a devel/install space; skipping source"
         fi
     else
         ici_with_unset_variables source "$extend/setup.bash"

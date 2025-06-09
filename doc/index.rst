@@ -157,6 +157,8 @@ Required environment variables:
 
 * ``ROS_DISTRO``: Version of ROS in all lower case. E.g.: ``indigo``. If it is set in the custom Docker (base) image, it might be omitted in the script call.
 
+    * Note: a ROS-independent CI build can be executed if ``ROS_DISTRO=false``. In this case ``/opt/ros/<distro>`` will not be sourced or used as the underlay during the build. This can be useful for projects that are used in the ROS ecosystem but do not have an explicit dependency on ROS.
+
 Optional environment variables
 ++++++++++++++++++++++++++++++++
 
