@@ -152,7 +152,7 @@ function ici_init_apt {
         ici_apt_install "${debs_default[@]}"
     fi
 
-    if [ -n "$ROS_DISTRO" ]; then
+    if [ -n "$ROS_DISTRO" ] && [ "$ROS_DISTRO" != false ]; then
         local current_repository_path
         current_repository_path="$(apt-cache policy "ros-$ROS_DISTRO-ros-core" 2> /dev/null | grep -Eo "[^ ]+://[^ ]+")" || true
         ici_set_ros_repository_path "$current_repository_path"
@@ -341,7 +341,7 @@ function ici_setup_rosdep {
 
     if [ "$ROS_DISTRO" = "indigo" ] || [ "$ROS_DISTRO" = "jade" ]; then
         ici_apt_install "ros-$ROS_DISTRO-roslib"
-    else
+    elif [ "$ROS_DISTRO" != false ]; then
         ici_apt_install "ros-$ROS_DISTRO-ros-environment"
     fi
 
@@ -349,7 +349,7 @@ function ici_setup_rosdep {
         ici_cmd ici_quiet ici_asroot rosdep init
     fi
     update_opts=()
-    if [ -z "${ROSDISTRO_INDEX_URL:-}" ]; then
+    if [ -z "${ROSDISTRO_INDEX_URL:-}" ] && [ "$ROS_DISTRO" != false ]; then
         update_opts+=(--rosdistro "$ROS_DISTRO")
     fi
 

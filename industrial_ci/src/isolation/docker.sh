@@ -80,8 +80,6 @@ function ici_isolate() {
 
   if [ -z "${ROS_DISTRO:-}" ]; then
       ROS_DISTRO=$(docker image inspect --format "{{.Config.Env}}" "${DOCKER_IMAGE}" | grep -o -P "(?<=ROS_DISTRO=)[a-z]*") || ici_error "ROS_DISTRO is not set"
-  elif [ "${ROS_DISTRO}" = "false" ]; then
-      unset ROS_DISTRO
   fi
 
   ici_forward_mount TARGET_REPO_PATH ro
