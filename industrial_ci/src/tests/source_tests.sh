@@ -67,32 +67,16 @@ function run_clang_tidy {
         ici_error "CLANG_TIDY_JOBS=$CLANG_TIDY_JOBS is invalid."
     fi
 
-    rm -rf "$db".{command,warn,error}
-    cat > "$db.command" << EOF
-#!/bin/bash
-num_non_file_args=\$1; shift
-args=("\${@:1:\$num_non_file_args}")
-files=("\${@:\$((num_non_file_args+1))}")
-fixes=\$(mktemp)
-rm -f /tmp/clang_tidy_output.\$\$
-for f in "\${files[@]}" ; do
-  ( cd \$(dirname \$f); clang-tidy "-export-fixes=\$fixes" "-header-filter=$regex" "-p=$build" "\${args[@]}" \$f &>> /tmp/clang_tidy_output.\$\$ 2>&1 || { touch "$db.error"; } )
-  if [ -s "\$fixes" ]; then touch "$db.warn"; fi
-done
-rm -rf "\$fixes"
-EOF
-    chmod +x "$db.command"
-
+    local err=0
     ici_log "run clang-tidy for ${#files[@]}/$num_all_files file(s) in $max_jobs process(es)."
+    set -o pipefail
+    printf "%s\0" "${files[@]}" | xargs --null run-clang-tidy "-j$max_jobs" "-header-filter=\"$regex\"" "-p=$build" "$@" 2>&1 | tee "$db.tidy.log" || err=$?
+    set +o pipefail
 
-    printf "%s\0" "${files[@]}" | xargs --null -P "$max_jobs" -n "$(( (${#files[@]} + max_jobs-1) / max_jobs))" "$db.command" "$#" "$@"
-    cat /tmp/clang_tidy_output.* | grep -vP "^([0-9]+ warnings generated|Use .* to display errors from system headers as well)\.$" || true
-    rm -rf /tmp/clang_tidy_output.*
-
-    if [ -f "$db.error" ]; then
+    if [ "$err" -ne "0" ]; then
        _run_clang_tidy_errors+=("$name")
-       ici_time_end "${ANSI_RED}"
-    elif [ -f "$db.warn" ]; then
+       ici_time_end "${ANSI_RED}" "$err"
+    elif grep -q "warning: " "$db.tidy.log"; then
         _run_clang_tidy_warnings+=("$name")
         ici_time_end "${ANSI_YELLOW}"
     else
@@ -114,10 +98,30 @@ function run_clang_tidy_check {
 
     ici_hook "before_clang_tidy_checks"
 
+    # replace -export-fixes <filename> with temporary file
+    local fixes_final=""
+    local fixes_tmp
+    local num_args=${#clang_tidy_args[@]}
+    fixes_tmp=$(mktemp)
+    for (( i=0; i<num_args; i++ )); do
+        if [ "${clang_tidy_args[i]}" == "-export-fixes" ]; then
+            fixes_final="${clang_tidy_args[i+1]}"
+            clang_tidy_args[i+1]="$fixes_tmp"
+        fi
+    done
+
+    # run clang-tidy checks on all build folders in target_ws
     while read -r db; do
         run_clang_tidy "$target_ws/src" warnings errors "$db" "${clang_tidy_args[@]}"
+        if [ -n "${fixes_final}" ]; then
+            "${ICI_SRC_PATH}/tests/merge_fixes.py" "$fixes_final" "$fixes_tmp"
+        fi
     done < <(find "$target_ws/build" -mindepth 2 -name compile_commands.json)  # -mindepth 2, because colcon puts a compile_commands.json into the build folder
 
+    if [ -n "${fixes_final}" ]; then
+        # translate file names in fixes file
+        sed -i "s#$target_ws/src/$TARGET_REPO_NAME/#$TARGET_REPO_PATH/#g" "${fixes_final}"
+    fi
     ici_hook "after_clang_tidy_checks"
 
     if [ "${#warnings[@]}" -gt "0" ]; then
