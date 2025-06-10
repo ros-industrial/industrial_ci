@@ -28,6 +28,16 @@ function run_clang_format_check() {
   local clang_format_executable="clang-format${CLANG_FORMAT_VERSION:+-$CLANG_FORMAT_VERSION}"
 
   ici_time_start install_clang_format
+
+  # Install llvm repository to install the correct clang version if not supported by default on the distro
+  if ! apt-cache search --names-only "$clang_format_executable" | grep -q "clang"; then
+    ici_install_pkgs_for_command wget wget
+    ici_apt_install lsb-release software-properties-common gnupg
+    ici_cmd wget -qO /tmp/llvm.sh https://apt.llvm.org/llvm.sh
+    ici_cmd chmod +x /tmp/llvm.sh
+    ici_cmd /tmp/llvm.sh "$CLANG_FORMAT_VERSION"
+  fi
+
   ici_apt_install git-core "$clang_format_executable"
   ici_time_end # install_clang_format
 
