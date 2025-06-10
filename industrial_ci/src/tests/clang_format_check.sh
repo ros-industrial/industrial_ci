@@ -35,7 +35,7 @@ function run_clang_format_check() {
     ici_apt_install lsb-release software-properties-common gnupg
     ici_cmd wget -qO /tmp/llvm.sh https://apt.llvm.org/llvm.sh
     ici_cmd chmod +x /tmp/llvm.sh
-    ici_cmd /tmp/llvm.sh "$CLANG_FORMAT_VERSION"
+    ici_cmd ici_asroot /tmp/llvm.sh "$CLANG_FORMAT_VERSION"
   fi
 
   ici_apt_install git-core "$clang_format_executable"
