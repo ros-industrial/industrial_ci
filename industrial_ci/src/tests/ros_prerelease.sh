@@ -110,9 +110,10 @@ function run_ros_prerelease() {
     # Environment vars.
     local downstream_depth=${PRERELEASE_DOWNSTREAM_DEPTH:-"0"}
     local reponame=${PRERELEASE_REPONAME:-$TARGET_REPO_NAME}
+    local exclude_pkg=${PRERELEASE_EXCLUDE_PKG:-""}
 
     ici_step "prepare_prerelease_workspaces" ici_cmd prepare_prerelease_workspaces "$WORKSPACE" "$reponame" "$(basename "$TARGET_REPO_PATH")"
-    ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci /tmp/ros_buildfarm/bin/python -m ros_buildfarm.scripts.prerelease.generate_prerelease_script "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::"
+    ici_step 'generate_prerelease_script' ici_cmd sudo -EH -u ci /tmp/ros_buildfarm/bin/python -m ros_buildfarm.scripts.prerelease.generate_prerelease_script "${ROSDISTRO_INDEX_URL}" "$PRERELEASE_DISTRO" default "$OS_NAME" "$OS_CODE_NAME" "${OS_ARCH:-amd64}" --build-tool "$BUILDER" --level "$downstream_depth" --output-dir "$WORKSPACE" --custom-repo "$reponame::::" --exclude-pkg "$exclude_pkg"
 
     # patch prerelease_build_underlay.sh to create test_results, if no tests were run
     # shellcheck disable=SC2016
