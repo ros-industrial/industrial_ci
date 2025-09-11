@@ -113,6 +113,10 @@ function ici_init_apt {
     fi
     echo 'debconf debconf/frontend select Noninteractive' |  ici_quiet ici_asroot debconf-set-selections
 
+    if [ "$OS_NAME" == "debian" ] && [ "$(. /etc/os-release && echo $VERSION_ID)" -le 10 ]; then
+        ici_cmd ici_asroot sed -i "s;http://deb\.debian\.org/;http://archive.debian.org/;" /etc/apt/sources.list
+    fi
+
     if 2>/dev/null apt-key adv -k C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 | grep -q expired; then
         ici_warn "Expired ROS repository key found, installing new one"
         ici_retry 3 ici_cmd apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
