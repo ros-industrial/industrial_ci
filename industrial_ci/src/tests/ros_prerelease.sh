@@ -91,9 +91,21 @@ function prepare_ros_prerelease() {
 
     if [ -n "${DOCKER_PORT:-}" ]; then
         ici_forward_variable DOCKER_HOST "$DOCKER_PORT"
+    elif [ -n "${DOCKER_HOST:-}" ]; then
+        ici_forward_variable DOCKER_HOST
+        if [[ "$DOCKER_HOST" =~ ^tcp://docker: ]]; then
+            _docker_run_opts+=(--add-host docker=host-gateway)
+        fi
+        if [ -n "${DOCKER_CERT_PATH:-}" ]; then
+            ici_forward_mount DOCKER_CERT_PATH ro
+        fi
+        if [ -n "${DOCKER_TLS_VERIFY:-}" ]; then
+            ici_forward_variable DOCKER_TLS_VERIFY
+        fi
     elif [ -e /var/run/docker.sock ]; then
         ici_forward_mount /var/run/docker.sock rw
     fi
+
     if [ -n "${CCACHE_DIR}" ]; then
       ici_forward_mount CCACHE_DIR rw "$WORKSPACE/home/.ccache"
       CCACHE_DIR= # prevent cachedir from beeing added twice

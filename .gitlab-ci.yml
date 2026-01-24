@@ -2,7 +2,7 @@
 # For local runners you might want to enable the overlay driver:
 # https://docs.gitlab.com/ce/ci/docker/using_docker_build.html#using-the-overlayfs-driver
 
-image: docker:git # docker and git clients
+image: docker:24.0.5-git # docker and git clients
 
 # The docker runner does not expose /tmp to the docker-in-docker service
 # This config ensures that the temp folder is located inside the project directory (e.g. for prerelease tests or SSH agent forwarding)
@@ -17,7 +17,7 @@ cache:
 
 # enable docker-in-docker
 services:
-  - docker:20.10.16-dind
+  - docker:24.0.5-dind
 
 before_script:
   - apk add --update bash coreutils tar grep # install industrial_ci dependencies
