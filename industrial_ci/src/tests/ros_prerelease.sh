@@ -94,7 +94,7 @@ function prepare_ros_prerelease() {
     elif [ -n "${DOCKER_HOST:-}" ]; then
         ici_forward_variable DOCKER_HOST
         if [[ "$DOCKER_HOST" =~ ^tcp://docker: ]]; then
-            _docker_run_opts+=(--add-host docker=host-gateway)
+            _docker_run_opts+=(--add-host docker:host-gateway)
         fi
         if [ -n "${DOCKER_CERT_PATH:-}" ]; then
             ici_forward_mount DOCKER_CERT_PATH ro
