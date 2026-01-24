@@ -48,6 +48,8 @@ jobs:
           - distro: rolling
             ubuntu: jammy
           - distro: rolling
+            ubuntu: resolute
+          - distro: rolling
             ubuntu:
     runs-on: ubuntu-latest
     steps:
