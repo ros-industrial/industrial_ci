@@ -117,6 +117,10 @@ function _set_ros_defaults {
         fi
         ;;
     "false")
+        export BUILDER=${BUILDER:-colcon}
+        export ROS_VERSION=0
+        export ROS_VERSION_EOL=false
+        export ROS_PYTHON_VERSION=${ROS_PYTHON_VERSION:-3}
         unset ROS_DISTRO
         ;;
     *)
@@ -129,7 +133,6 @@ function _set_ros_defaults {
     elif [ "$ROS_PYTHON_VERSION" = 3 ]; then
         export PYTHON_VERSION_NAME=python3
     fi
-
 }
 
 function _use_snapshot() {
