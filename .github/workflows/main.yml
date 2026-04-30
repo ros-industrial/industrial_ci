@@ -48,7 +48,7 @@ jobs:
           - distro: rolling
             ubuntu: jammy
           - distro: rolling
-            ubuntu: resolute
+            ubuntu: noble
           - distro: rolling
             ubuntu:
     runs-on: ubuntu-latest

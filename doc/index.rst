@@ -43,7 +43,7 @@ The following `ROS <http://wiki.ros.org/Distributions>`__ / `ROS2 <https://index
 * `Jazzy <https://docs.ros.org/en/jazzy/Releases/Release-Jazzy-Jalisco.html>`__
 * `Kilted <https://docs.ros.org/en/kilted/Releases/Release-Kilted-Kaiju.html>`__
 * `Lyrical <https://docs.ros.org/en/lyrical/Releases/Release-Lyrical-Luth.html>`__
-* `Rolling <https://index.ros.org/doc/ros2/Releases/Release-Rolling-Ridley/>`__
+* `Rolling <https://docs.ros.org/en/rolling/Releases/Release-Rolling-Ridley.html>`__
 
 Supported CIs
 +++++++++++++
