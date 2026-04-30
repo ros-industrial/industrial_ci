@@ -107,6 +107,9 @@ function _set_ros_defaults {
     "kilted")
         _ros2_defaults "noble"
         ;;
+    "lyrical")
+        _ros2_defaults "resolute"
+        ;;
     "rolling")
         _ros2_defaults "noble"
         if [ "$OS_CODE_NAME" == "jammy" ]; then

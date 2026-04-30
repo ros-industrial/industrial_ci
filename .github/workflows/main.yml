@@ -43,6 +43,7 @@ jobs:
         - iron
         - jazzy
         - kilted
+        - lyrical
         include:
           - distro: rolling
             ubuntu: jammy
@@ -67,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ROS_DISTRO: [humble, jazzy, kilted]
+        ROS_DISTRO: [humble, jazzy, kilted, lyrical]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
