@@ -111,7 +111,7 @@ function _set_ros_defaults {
         _ros2_defaults "resolute"
         ;;
     "rolling")
-        _ros2_defaults "noble"
+        _ros2_defaults "resolute"
         if [ "$OS_CODE_NAME" == "jammy" ]; then
             if [ -z "$ROSDISTRO_INDEX_VERSION" ]; then
                 ici_warn "Pinning rolling to latest supported version on jammy: 2024-02-28"
