@@ -22,7 +22,7 @@ else()
     message(FATAL_ERROR "ROS_VERSION is neither 1 nor 2")
 endif()
 
-install(PROGRAMS scripts/run_ci scripts/rerun_ci scripts/run_travis
+install(PROGRAMS scripts/run_ci scripts/rerun_ci scripts/run_travis scripts/run_gha
     DESTINATION ${${PROJECT_NAME}_BIN_DESTINATION}
 )
 
