@@ -122,6 +122,11 @@ function _set_ros_defaults {
                 ici_warn "Pinning rolling to latest supported version on noble: 2026-04-28"
                 export ROSDISTRO_INDEX_VERSION=rolling/2026-04-28
             fi
+        else
+            if [ "$ROS_REPO" == "main" ]; then
+                ici_warn "ROS_REPO='${ROS_REPO}' is not available for recent rolling releases, using ROS_REPO=testing"
+                export ROS_REPO=testing
+            fi
         fi
         ;;
     "false")
