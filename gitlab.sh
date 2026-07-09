@@ -34,9 +34,12 @@ if [ -n "$SSH_PRIVATE_KEY" ]; then
   # start SSH agent
   # shellcheck disable=SC2046
   eval $(ssh-agent -s)
+  # Adding new line at the end of ssh key to avoid https://github.com/ros-industrial/industrial_ci/issues/756
+  PRKEY_EXTENDED="${SSH_PRIVATE_KEY}\n"
+  echo -e "DEBUG: ssh key: ${SSH_PRIVATE_KEY}"
   # add key to agent
-  ssh-add <(echo "$SSH_PRIVATE_KEY") || { res=$?; echo "could not add ssh key"; exit $res; }
-
+# Temporarilly disabling to see if this lets ICI work around failure https://github.com/ros-industrial/industrial_ci/issues/756   
+#  echo -n "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add - || { res=$?; echo "could not add ssh key"; exit $res; }
   if [ -n "$SSH_SERVER_HOSTKEYS" ]; then
     mkdir -p ~/.ssh
     # setup known hosts
