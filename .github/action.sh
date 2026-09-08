@@ -32,7 +32,8 @@ source "$ICI_SRC_PATH/util.sh"
 
 if [ -n "${INPUT_CONFIG-}" ]; then
     ici_exec_for_command jq ici_error "In order to use the config parameter, please install jq"
-    vars=$(jq -r 'keys[] as $k | "export \($k)=\(.[$k]|tojson)" | gsub("\\$\\$";"\\$")' <<< "$INPUT_CONFIG"  | grep "^export [A-Z][A-Z_]*=")
+    # No supported keys is a valid no-op; keep jq errors fatal via pipefail.
+    vars=$(jq -r 'keys[] as $k | "export \($k)=\(.[$k]|tojson)" | gsub("\\$\\$";"\\$")' <<< "$INPUT_CONFIG"  | sed -n "/^export [A-Z][A-Z_]*=/p")
     echo "$vars"
     eval "$vars"
 fi
